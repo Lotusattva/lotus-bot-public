@@ -15,6 +15,12 @@ inline cluster bot(BOT_TOKEN, intents::i_all_intents); // global bot instance
 inline message_map polls; // global poll message storage
 inline message_map debug_polls; // global debug poll message storage
 
+/**
+ * Represents ownership of calculator sessions
+ * maps user-id to message-id
+ */
+inline unordered_map<snowflake, snowflake> calc_sessions; 
+
 #define NUM_ARRAY_ROLES 4
 
 enum ArrayRole {
