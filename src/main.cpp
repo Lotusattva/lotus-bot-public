@@ -24,24 +24,37 @@ int main() {
             if (subcommand.name == "poll") {
                 const auto& action{ subcommand.options[0] };
                 if (action.name == "start")
-                    co_await debug_poll_start_command(event);
+                    co_await start_debug_poll(event);
                 else if (action.name == "end")
-                    co_await debug_poll_end_command(event);
-                else
-                    co_await event.co_reply("Unknown action. Please use `start` or `end`.");
+                    co_await end_debug_poll(event);
+            } else if (subcommand.name == "calc") {
+                const auto& action{ subcommand.options[0] };
+                if (action.name == "interactive")
+                    co_await start_interactive_calculator(event);
             }
         }
+
         });
 
     bot.on_ready([](const ready_t& event) {
         if (run_once<struct register_bot_commands>()) {
-            slashcommand debug_command("debug", "debug command", bot.me.id);
-            debug_command.add_option(
+            slashcommand debug_cmd{ slashcommand("debug", "debug commands", bot.me.id)
+            .add_option(
+                // for testing polls
                 command_option(co_sub_command_group, "poll", "sect clash array sign up polls")
                 .add_option(command_option(co_sub_command, "start", "start a poll"))
                 .add_option(command_option(co_sub_command, "end", "end a poll"))
-            );
-            bot.global_bulk_command_create({ debug_command });
+            ).add_option(
+                // for testing cultivation calculator
+                command_option(co_sub_command_group, "calc", "cultivation calculator")
+                .add_option(command_option(co_sub_command, "interactive", "interactive step-by-step calculator"))
+                // .add_option(
+                //     command_option(co_sub_command, "arg", "terminal-style calculator")
+                // )
+            )
+            };
+
+            bot.global_bulk_command_create({ debug_cmd });
         }}
     );
 
@@ -71,12 +84,7 @@ int main() {
             &schedule_next_process);
     } else {
         // debugging
-
-        bot.start_timer(&create_polls, 20, &schedule_next_create);
-
-        bot.start_timer(&process_poll_results, 25, &schedule_next_process);
-
-        bot.start_timer(&mock_reminder, 10, &schedule_next_mock_reminder);
+        
     }
 
     bot.start(st_wait);
