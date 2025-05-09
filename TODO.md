@@ -1,0 +1,4 @@
+- [ ] Take advantage of caching to speed up the process
+- [x] Add scheduler for poll
+- [x] Add scheduler for reminders
+- [ ] Implement calculator
