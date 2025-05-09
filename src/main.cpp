@@ -58,7 +58,9 @@ int main() {
         }}
     );
 
-    if (!DEBUG) {
+    if (__DEBUG_MODE__) {
+        // nothing for now
+    } else {
         auto now{ chrono::system_clock::now() };
         auto now_time_t{ chrono::system_clock::to_time_t(now) };
         tm* now_tm{ std::gmtime(&now_time_t) };
@@ -82,13 +84,7 @@ int main() {
         bot.start_timer(&process_poll_results,
             seconds_to_target.count() + 24 * 60 * 60, // 24 hours later
             &schedule_next_process);
-    } else {
-        // debugging
-        
     }
 
     bot.start(st_wait);
-
-
 }
-

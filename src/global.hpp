@@ -3,7 +3,7 @@
 
 #include <dpp/dpp.h>
 
-constexpr inline bool DEBUG = true;
+#define __DEBUG_MODE__ true
 
 using namespace std;
 using namespace dpp;
@@ -19,7 +19,7 @@ inline message_map debug_polls; // global debug poll message storage
  * Represents ownership of calculator sessions
  * maps user-id to message-id
  */
-inline unordered_map<snowflake, snowflake> calc_sessions; 
+inline unordered_map<snowflake, snowflake> calc_sessions;
 
 #define NUM_ARRAY_ROLES 4
 
