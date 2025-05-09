@@ -7,7 +7,7 @@
 An interactive calculator that produces an estimate of how much longer it takes to breakthrough to the next major cultivation stage.
 
 ## Frontend
-- [-] Step-by-step chatbot style calculator
+- [ ] Step-by-step chatbot style calculator
     - Functional:
         - [x] Data collection through select menu
         - [x] Data collection for more precise numerical values via complementary slash commands
