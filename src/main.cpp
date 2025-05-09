@@ -34,28 +34,31 @@ int main() {
             }
         }
 
-        });
+        }
+    );
 
     bot.on_ready([](const ready_t& event) {
         if (run_once<struct register_bot_commands>()) {
             slashcommand debug_cmd{ slashcommand("debug", "debug commands", bot.me.id)
-            .add_option(
-                // for testing polls
-                command_option(co_sub_command_group, "poll", "sect clash array sign up polls")
-                .add_option(command_option(co_sub_command, "start", "start a poll"))
-                .add_option(command_option(co_sub_command, "end", "end a poll"))
-            ).add_option(
-                // for testing cultivation calculator
-                command_option(co_sub_command_group, "calc", "cultivation calculator")
-                .add_option(command_option(co_sub_command, "interactive", "interactive step-by-step calculator"))
-                // .add_option(
-                //     command_option(co_sub_command, "arg", "terminal-style calculator")
-                // )
-            )
+                .add_option(
+                    // for testing polls
+                    command_option(co_sub_command_group, "poll", "sect clash array sign up polls")
+                    .add_option(command_option(co_sub_command, "start", "start a poll"))
+                    .add_option(command_option(co_sub_command, "end", "end a poll"))
+                ).add_option(
+                    // for testing cultivation calculator
+                    command_option(co_sub_command_group, "calc", "cultivation calculator")
+                    .add_option(command_option(co_sub_command, "interactive", "interactive step-by-step calculator"))
+                    // .add_option(
+                    //     command_option(co_sub_command, "arg", "terminal-style calculator")
+                    // )
+                )
             };
 
             bot.global_bulk_command_create({ debug_cmd });
-        }}
+        }
+
+        }
     );
 
     if (__DEBUG_MODE__) {
