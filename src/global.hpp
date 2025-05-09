@@ -24,10 +24,10 @@ inline unordered_map<snowflake, snowflake> calc_sessions;
 #define NUM_ARRAY_ROLES 4
 
 enum ArrayRole {
-    MAGICAL_DRIVER = 0,
-    MAGICAL_PASSENGER = 1,
-    PHYSICAL_DRIVER = 2,
-    PHYSICAL_PASSENGER = 3,
+    MAGICAL_DRIVER,
+    MAGICAL_PASSENGER,
+    PHYSICAL_DRIVER,
+    PHYSICAL_PASSENGER,
 };
 
 constexpr inline const char* const ArrayRoleStr[]{
