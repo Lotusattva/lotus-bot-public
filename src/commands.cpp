@@ -100,14 +100,14 @@ task<void> start_interactive_calculator(const slashcommand_t& event) {
         .set_type(cot_button)
         .set_style(cos_primary)
         .set_label("NEXT")
-        .set_id("next")
+        .set_id("ask_stage")
     };
 
     static component cancel_button{ component()
         .set_type(cot_button)
         .set_style(cos_danger)
         .set_label("CANCEL")
-        .set_id("cancel")
+        .set_id("cancel_calc")
     };
 
     static component action_row{ component()
@@ -143,6 +143,6 @@ task<void> start_interactive_calculator(const slashcommand_t& event) {
     if (__DEBUG_MODE__)
         cerr << "Message ID: " << msg_id << endl;
 
-    calc_sessions[user_id] = msg_id;
+    calc_sessions.insert({ user_id, msg_id });
     co_return;
 }

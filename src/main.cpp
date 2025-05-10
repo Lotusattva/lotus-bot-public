@@ -5,6 +5,7 @@
 #include "commands.hpp"
 #include "global.hpp"
 #include "scheduler.hpp"
+#include "calculator.hpp"
 
 void sigint_handler(int _) {
     cout << "\nSIGINT received, shutting down..." << endl;
@@ -58,6 +59,14 @@ int main() {
             bot.global_bulk_command_create({ debug_cmd });
         }
 
+        }
+    );
+
+    bot.on_button_click([](const button_click_t& event) -> task<void> {
+        if (event.custom_id == "cancel_calc")
+            co_await cancel_calc(event);
+        else if (event.custom_id == "ask_stage")
+            co_await ask_stage(event);
         }
     );
 
