@@ -60,17 +60,6 @@ task<void> cancel_calc(const button_click_t& event) {
                 .set_type(cot_text_display)
                 .set_content("You have cancelled the session.")
             )
-            // ... and an action row
-            .add_component_v2(component()
-                .set_type(cot_action_row)
-                // ... that contains a button
-                .add_component_v2(component()
-                    .set_type(cot_button)
-                    .set_label("DELETE MESSAGE")
-                    .set_id("delete_calc_message")
-                    .set_style(cos_secondary)
-                )
-            )
         )
     };
 
