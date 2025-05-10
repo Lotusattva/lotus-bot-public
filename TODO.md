@@ -19,7 +19,7 @@ An interactive calculator that produces an estimate of how much longer it takes 
     - [ ] a `/help` subcommand that provides a detailed how-to
 
 ## Backend
-- [ ] Message ownership (for preventing other users from tempering with inputs of the command-initiating user)
+- [x] Message ownership (for preventing other users from tempering with inputs of the command-initiating user)
 - [ ] Define calculator constants
 - [ ] Implement calculator logic
 - [ ] Temperary storage of user-data
