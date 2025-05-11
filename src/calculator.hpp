@@ -33,7 +33,7 @@ enum MajorStage {
     CELESTIAL,
     ETERNAL,
 
-    __MAJOR_STAGE_COUNT__
+    NUM_MAJOR_STAGES
 };
 
 enum MinorStage {
@@ -41,7 +41,7 @@ enum MinorStage {
     MIDDLE,
     LATE,
 
-    __MINOR_STAGE_COUNT__
+    NUM_MINOR_STAGES
 };
 
 /**
@@ -51,7 +51,7 @@ enum MinorStage {
  * - second dimension: minor stage
  *
  */
-constexpr inline const unsigned GATE_COUNT[__MAJOR_STAGE_COUNT__][__MINOR_STAGE_COUNT__]{
+constexpr inline const unsigned NUM_GATES[NUM_MAJOR_STAGES][NUM_MINOR_STAGES]{
     {2u, 3u, 4u}, // FOUNDATION
     {4u, 5u, 6u}, // VIRTUOSO
     {6u, 7u, 8u}, // NASCENT
@@ -74,9 +74,9 @@ typedef unsigned long long exp_t;
  * - third dimension: gate
  *
  * Access exp required for a gate by:
- * `EXP_REQ[major_stage][minor_stage][gate]`
+ * `GATE_EXP_REQ[major_stage][minor_stage][gate]`
  */
-constexpr inline const exp_t* const EXP_REQ[__MAJOR_STAGE_COUNT__][__MINOR_STAGE_COUNT__]{
+constexpr inline const exp_t* const GATE_EXP_REQ[NUM_MAJOR_STAGES][NUM_MINOR_STAGES]{
     { // FOUNDATION
         (const exp_t[]) { // EARLY
             12376, 15624
@@ -247,7 +247,5 @@ constexpr inline const exp_t* const EXP_REQ[__MAJOR_STAGE_COUNT__][__MINOR_STAGE
         }
     }
 };
-
-
 
 #endif // CALCULATOR_HPP

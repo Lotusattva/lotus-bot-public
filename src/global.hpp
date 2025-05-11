@@ -21,13 +21,13 @@ inline message_map debug_polls; // global debug poll message storage
  */
 inline unordered_map<snowflake, snowflake> calc_sessions;
 
-#define NUM_ARRAY_ROLES 4
-
 enum ArrayRole {
     MAGICAL_DRIVER,
     MAGICAL_PASSENGER,
     PHYSICAL_DRIVER,
     PHYSICAL_PASSENGER,
+
+    NUM_ARRAY_ROLES
 };
 
 constexpr inline const char* const ArrayRoleStr[]{
@@ -44,15 +44,20 @@ constexpr inline const unsigned ArrayRoleLimit[]{
     4,
 };
 
-#define MANAGED_GUILDS 2
+enum Guild {
+    ABYSS,
+    HERMITAGE,
 
-constexpr inline const snowflake GUILD_IDS[MANAGED_GUILDS]{
+    NUM_GUILDS
+};
+
+constexpr inline const snowflake GUILD_IDS[NUM_GUILDS]{
     1331102316018929705, // Abyss
     1188528789928554596, // Hermitage
 };
 
 // TODO: change channel IDs later
-constexpr inline const snowflake CHANNEL_IDS[MANAGED_GUILDS]{
+constexpr inline const snowflake CHANNEL_IDS[NUM_GUILDS]{
     1366138167958306816, // Abyss
     1365845286181802034, // Hermitage
 };

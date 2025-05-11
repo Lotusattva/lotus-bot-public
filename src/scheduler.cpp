@@ -11,7 +11,7 @@ task<void> create_polls(timer _) {
            .add_answer(ArrayRoleStr[PHYSICAL_PASSENGER])
            .set_duration(__DEBUG_MODE__ ? 1 : 24)) };
 
-    for (auto i{ 0 }; i < MANAGED_GUILDS; ++i) {
+    for (auto i{ 0 }; i < NUM_GUILDS; ++i) {
         message my_poll{ POLL };
 
         if (__DEBUG_MODE__)
@@ -82,7 +82,7 @@ task<void> schedule_next_process(timer _) {
 }
 
 task<void> mock_reminder(timer _) {
-    for (auto i{ 0 }; i < MANAGED_GUILDS; ++i) {
+    for (auto i{ 0 }; i < NUM_GUILDS; ++i) {
         message reminder{ message()
             .set_content("This is a mock reminder to test the automated scheduler.")
             .set_channel_id(CHANNEL_IDS[i]) };
