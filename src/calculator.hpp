@@ -44,6 +44,13 @@ enum MinorStage {
     __MINOR_STAGE_COUNT__
 };
 
+/**
+ * A 2d array describing the number of gates in each stage
+ * 
+ * - first dimension: major stage
+ * - second dimension: minor stage
+ * 
+ */
 constexpr inline const unsigned short GATE_COUNT[__MAJOR_STAGE_COUNT__][__MINOR_STAGE_COUNT__]{
     {2, 3, 4}, // FOUNDATION
     {4, 5, 6}, // VIRTUOSO
@@ -57,6 +64,14 @@ constexpr inline const unsigned short GATE_COUNT[__MAJOR_STAGE_COUNT__][__MINOR_
     {20, 20, 20}, // ETERNAL
 };
 
+/**
+ * A 3d array describing the experience required to complete each gate
+ * 
+ * - first dimension: major stage
+ * - second dimension: minor stage
+ * - third dimension: gate
+ * 
+ */
 inline const vector<const unsigned long> EXP_REQ[__MAJOR_STAGE_COUNT__][__MINOR_STAGE_COUNT__]{
     { // FOUNDATION
         { // EARLY
