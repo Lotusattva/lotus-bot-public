@@ -16,7 +16,7 @@ task<void> ask_stage(const button_click_t& event);
 
 
 
-/////////////// Define calcullator constants /////////////////////
+/////////////// Define calculator constants /////////////////////
 
 enum MajorStage {
 
