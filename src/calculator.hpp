@@ -6,7 +6,7 @@
 /**
  * @brief verify whether the user causing the interaction is the owner of the session
  *
- * @returns an iterator to the session if the user is the owner, otherwise returns nullopt
+ * @returns an iterator to the session if the user is the owner, otherwise returns nulllopt
  */
 task<optional<unordered_map<snowflake, snowflake>::iterator>> verify_user(const button_click_t& event);
 
@@ -16,7 +16,7 @@ task<void> ask_stage(const button_click_t& event);
 
 
 
-/////////////// Define calculator constants /////////////////////
+/////////////// Define calcullator constants /////////////////////
 
 enum MajorStage {
 
@@ -46,10 +46,10 @@ enum MinorStage {
 
 /**
  * A 2d array describing the number of gates in each stage
- * 
+ *
  * - first dimension: major stage
  * - second dimension: minor stage
- * 
+ *
  */
 constexpr inline const unsigned short GATE_COUNT[__MAJOR_STAGE_COUNT__][__MINOR_STAGE_COUNT__]{
     {2, 3, 4}, // FOUNDATION
@@ -64,185 +64,187 @@ constexpr inline const unsigned short GATE_COUNT[__MAJOR_STAGE_COUNT__][__MINOR_
     {20, 20, 20}, // ETERNAL
 };
 
+typedef unsigned long long exp_t;
+
 /**
  * A 3d array describing the experience required to complete each gate
- * 
+ *
  * - first dimension: major stage
  * - second dimension: minor stage
  * - third dimension: gate
- * 
+ *
  */
-inline const vector<const unsigned long> EXP_REQ[__MAJOR_STAGE_COUNT__][__MINOR_STAGE_COUNT__]{
+constexpr inline const exp_t const* EXP_REQ[__MAJOR_STAGE_COUNT__][__MINOR_STAGE_COUNT__]{
     { // FOUNDATION
-        { // EARLY
-            12376ul, 15624ul
+        (const exp_t[]) { // EARLY
+            12376ull, 15624ull
         },
-        { // MIDDLE
-            15708ul, 19873ul, 23919ul
+        (const exp_t[]) { // MIDDLE
+            15708ull, 19873ull, 23919ull
         },
-        { // LATE
-            36180ul, 45426ul, 55074ul, 64320ul
+        (const exp_t[]) { // LATE
+            36180ull, 45426ull, 55074ull, 64320ull
         }
     },
     { // VIRTUOSO
-        { // EARLY
-            39438ul, 49517ul, 60033ul, 70112ul
+        (const exp_t[]) { // EARLY
+            39438ull, 49517ull, 60033ull, 70112ull
         },
-        { // MIDDLE
-            60915ul, 77190ul, 93003ul, 108810ul, 125085ul
+        (const exp_t[]) { // MIDDLE
+            60915ull, 77190ull, 93003ull, 108810ull, 125085ull
         },
-        { // LATE
-            158500ul, 199301ul, 241672ul, 280905ul, 324845ul,
-            364077ul
+        (const exp_t[]) { // LATE
+            158500ull, 199301ull, 241672ull, 280905ull, 324845ull,
+            364077ull
         }
     },
     { // NASCENT
-        { // EARLY
-            183679ul, 230962ul, 280065ul, 325529ul, 376450ul,
-            421915ul
+        (const exp_t[]) { // EARLY
+            183679ull, 230962ull, 280065ull, 325529ull, 376450ull,
+            421915ull
         },
-        { // MIDDLE
-            308712ul, 389749ul, 470786ul, 551823ul, 632859ul,
-            710038ul, 794933ul
+        (const exp_t[]) { // MIDDLE
+            308712ull, 389749ull, 470786ull, 551823ull, 632859ull,
+            710038ull, 794933ull
         },
-        { // LATE
-            719563ul, 918827ul, 1095905ul, 1295213ul, 1472337ul,
-            1671600ul, 1848723ul, 2047987ul
+        (const exp_t[]) { // LATE
+            719563ull, 918827ull, 1095905ull, 1295213ull, 1472337ull,
+            1671600ull, 1848723ull, 2047987ull
         }
     },
     { // INCARNATION
-        { // EARLY
-            801210ul, 1023083ul, 1220304ul, 1442177ul, 1639398ul,
-            1861271ul, 2058492ul, 2280365ul
+        (const exp_t[]) { // EARLY
+            801210ull, 1023083ull, 1220304ull, 1442177ull, 1639398ull,
+            1861271ull, 2058492ull, 2280365ull
         },
-        { // MIDDLE
-            1412392ul, 1804723ul, 2170898ul, 2537074ul, 2903249ul,
-            3269425ul, 3635601ul, 4027931ul, 4394107ul
+        (const exp_t[]) { // MIDDLE
+            1412392ull, 1804723ull, 2170898ull, 2537074ull, 2903249ull,
+            3269425ull, 3635601ull, 4027931ull, 4394107ull
         },
-        { // LATE
-            1483013ul, 1853766ul, 2286312ul, 2595272ul, 3027818ul,
-            3460363ul, 3769324ul, 4201870ul, 4572623ul, 4943376ul,
-            5252337ul, 5623090ul, 5932051ul, 6241012ul, 6549973ul
+        (const exp_t[]) { // LATE
+            1483013ull, 1853766ull, 2286312ull, 2595272ull, 3027818ull,
+            3460363ull, 3769324ull, 4201870ull, 4572623ull, 4943376ull,
+            5252337ull, 5623090ull, 5932051ull, 6241012ull, 6549973ull
         }
     },
     { // VOIDBREAK
-        { // EARLY
-            1020222ul, 1292280ul, 1496324ul, 1836398ul, 2040442ul,
-            2380515ul, 2584560ul, 2856619ul, 3128678ul, 3400737ul,
-            3604781ul, 3808825ul, 4080884ul, 4216914ul, 4488973ul,
-            4761031ul, 4897061ul, 5169120ul, 5373164ul, 5577208ul
+        (const exp_t[]) { // EARLY
+            1020222ull, 1292280ull, 1496324ull, 1836398ull, 2040442ull,
+            2380515ull, 2584560ull, 2856619ull, 3128678ull, 3400737ull,
+            3604781ull, 3808825ull, 4080884ull, 4216914ull, 4488973ull,
+            4761031ull, 4897061ull, 5169120ull, 5373164ull, 5577208ull
         },
-        { // MIDDLE
-            2131409ul, 2699785ul, 3126066ul, 3836536ul, 4262817ul,
-            4973288ul, 5399569ul, 5967944ul, 6536321ul, 7104696ul,
-            7530977ul, 7957260ul, 8525635ul, 8809823ul, 9378199ul,
-            9946574ul, 10230762ul, 10799138ul, 11225420ul, 11651701ul
+        (const exp_t[]) { // MIDDLE
+            2131409ull, 2699785ull, 3126066ull, 3836536ull, 4262817ull,
+            4973288ull, 5399569ull, 5967944ull, 6536321ull, 7104696ull,
+            7530977ull, 7957260ull, 8525635ull, 8809823ull, 9378199ull,
+            9946574ull, 10230762ull, 10799138ull, 11225420ull, 11651701ull
         },
-        { // LATE
-            4615726ul, 5846585ul, 6769731ul, 8308306ul, 9231451ul,
-            10770025ul, 11693172ul, 12924031ul, 14154891ul, 15385751ul,
-            16308897ul, 17232041ul, 18462902ul, 19078331ul, 20309192ul,
-            21540052ul, 22155482ul, 23386342ul, 24309487ul, 25232632ul
+        (const exp_t[]) { // LATE
+            4615726ull, 5846585ull, 6769731ull, 8308306ull, 9231451ull,
+            10770025ull, 11693172ull, 12924031ull, 14154891ull, 15385751ull,
+            16308897ull, 17232041ull, 18462902ull, 19078331ull, 20309192ull,
+            21540052ull, 22155482ull, 23386342ull, 24309487ull, 25232632ull
         }
     },
     { // WHOLENESS
-        { // EARLY
-            2802204ul, 3549458ul, 4109898ul, 5043967ul, 5604407ul,
-            6538475ul, 7098915ul, 7846170ul, 8593424ul, 9340679ul,
-            9901119ul, 10461560ul, 11208814ul, 11582441ul, 12329696ul,
-            13076950ul, 13450577ul, 14197831ul, 14758272ul, 15318712ul
+        (const exp_t[]) { // EARLY
+            2802204ull, 3549458ull, 4109898ull, 5043967ull, 5604407ull,
+            6538475ull, 7098915ull, 7846170ull, 8593424ull, 9340679ull,
+            9901119ull, 10461560ull, 11208814ull, 11582441ull, 12329696ull,
+            13076950ull, 13450577ull, 14197831ull, 14758272ull, 15318712ull
         },
-        { // MIDDLE
-            3959269ul, 5015074ul, 5806927ul, 7126683ul, 7918537ul,
-            9238293ul, 10030147ul, 11085952ul, 12141757ul, 13197562ul,
-            13989415ul, 14781270ul, 15837074ul, 16364976ul, 17420782ul,
-            18476587ul, 19004489ul, 20060294ul, 20852147ul, 21644001ul
+        (const exp_t[]) { // MIDDLE
+            3959269ull, 5015074ull, 5806927ull, 7126683ull, 7918537ull,
+            9238293ull, 10030147ull, 11085952ull, 12141757ull, 13197562ull,
+            13989415ull, 14781270ull, 15837074ull, 16364976ull, 17420782ull,
+            18476587ull, 19004489ull, 20060294ull, 20852147ull, 21644001ull
         },
-        { // LATE
-            4566759ul, 5784560ul, 6697912ul, 8220165ul, 9133517ul,
-            10655769ul, 11569121ul, 12786923ul, 14004725ul, 15222528ul,
-            16135879ul, 17049231ul, 18267033ul, 18875934ul, 20093737ul,
-            21311538ul, 21920440ul, 23138242ul, 24051593ul, 24964954ul
+        (const exp_t[]) { // LATE
+            4566759ull, 5784560ull, 6697912ull, 8220165ull, 9133517ull,
+            10655769ull, 11569121ull, 12786923ull, 14004725ull, 15222528ull,
+            16135879ull, 17049231ull, 18267033ull, 18875934ull, 20093737ull,
+            21311538ull, 21920440ull, 23138242ull, 24051593ull, 24964954ull
         }
     },
     { // PERFECTION
-        { // EARLY
-            7047835ul, 8927256ul, 10336824ul, 12686101ul, 14095669ul,
-            16444946ul, 17854513ul, 19733936ul, 21613358ul, 23492780ul,
-            24902348ul, 26311914ul, 28191337ul, 29131048ul, 31010470ul,
-            32889893ul, 33829604ul, 35709026ul, 37118593ul, 38528160ul
+        (const exp_t[]) { // EARLY
+            7047835ull, 8927256ull, 10336824ull, 12686101ull, 14095669ull,
+            16444946ull, 17854513ull, 19733936ull, 21613358ull, 23492780ull,
+            24902348ull, 26311914ull, 28191337ull, 29131048ull, 31010470ull,
+            32889893ull, 33829604ull, 35709026ull, 37118593ull, 38528160ull
         },
-        { // MIDDLE
-            10361621ul, 13124720ul, 15197044ul, 18650918ul, 20723242ul,
-            24177115ul, 26249440ul, 29012538ul, 31775638ul, 34538736ul,
-            36611061ul, 38683384ul, 41446484ul, 42828033ul, 45591132ul,
-            48354231ul, 49735780ul, 52498879ul, 54571204ul, 56643527ul
+        (const exp_t[]) { // MIDDLE
+            10361621ull, 13124720ull, 15197044ull, 18650918ull, 20723242ull,
+            24177115ull, 26249440ull, 29012538ull, 31775638ull, 34538736ull,
+            36611061ull, 38683384ull, 41446484ull, 42828033ull, 45591132ull,
+            48354231ull, 49735780ull, 52498879ull, 54571204ull, 56643527ull
         },
-        { // LATE
-            13731909ul, 17393750ul, 20140132ul, 24717435ul, 27463816ul,
-            32041119ul, 34787501ul, 38449343ul, 42111185ul, 45773027ul,
-            48519409ul, 51265790ul, 54927633ul, 56758553ul, 60420396ul,
-            64082238ul, 65913160ul, 69575001ul, 72321383ul, 75067764ul
+        (const exp_t[]) { // LATE
+            13731909ull, 17393750ull, 20140132ull, 24717435ull, 27463816ull,
+            32041119ull, 34787501ull, 38449343ull, 42111185ull, 45773027ull,
+            48519409ull, 51265790ull, 54927633ull, 56758553ull, 60420396ull,
+            64082238ull, 65913160ull, 69575001ull, 72321383ull, 75067764ull
         }
     },
     { // NIRVANA
-        { // EARLY
-            16786018ul, 21262289ul, 24619493ul, 30214832ul, 33572035ul,
-            39167375ul, 42524578ul, 47000849ul, 51477121ul, 55953392ul,
-            59310596ul, 62667799ul, 67144071ul, 69382206ul, 73858478ul,
-            78334749ul, 80572885ul, 85049156ul, 88406360ul, 91763563ul
+        (const exp_t[]) { // EARLY
+            16786018ull, 21262289ull, 24619493ull, 30214832ull, 33572035ull,
+            39167375ull, 42524578ull, 47000849ull, 51477121ull, 55953392ull,
+            59310596ull, 62667799ull, 67144071ull, 69382206ull, 73858478ull,
+            78334749ull, 80572885ull, 85049156ull, 88406360ull, 91763563ull
         },
-        { // MIDDLE
-            21455765ul, 27177300ul, 31468452ul, 38620374ul, 42911526ul,
-            50063448ul, 54354600ul, 60076137ul, 65797673ul, 71519211ul,
-            75810363ul, 80101516ul, 85823053ul, 88683821ul, 94405358ul,
-            100126894ul, 102987663ul, 108709201ul, 113000352ul, 117291505ul
+        (const exp_t[]) { // MIDDLE
+            21455765ull, 27177300ull, 31468452ull, 38620374ull, 42911526ull,
+            50063448ull, 54354600ull, 60076137ull, 65797673ull, 71519211ull,
+            75810363ull, 80101516ull, 85823053ull, 88683821ull, 94405358ull,
+            100126894ull, 102987663ull, 108709201ull, 113000352ull, 117291505ull
         },
-        { // LATE
-            26926091ul, 34106381ul, 39491600ul, 48466963ul, 53852181ul,
-            62827545ul, 68212762ul, 75393054ul, 82573344ul, 89753635ul,
-            95138854ul, 100524071ul, 107704362ul, 111294508ul, 118474798ul,
-            125655089ul, 129245235ul, 136425525ul, 141810744ul, 147195961ul
+        (const exp_t[]) { // LATE
+            26926091ull, 34106381ull, 39491600ull, 48466963ull, 53852181ull,
+            62827545ull, 68212762ull, 75393054ull, 82573344ull, 89753635ull,
+            95138854ull, 100524071ull, 107704362ull, 111294508ull, 118474798ull,
+            125655089ull, 129245235ull, 136425525ull, 141810744ull, 147195961ull
         }
     },
     { // CELESTIAL
-        { // EARLY
-            43853989ul, 55548385ul, 64319182ul, 78937179ul, 87707976ul,
-            102325973ul, 111096770ul, 122791166ul, 134485564ul, 146179961ul,
-            154950758ul, 163721555ul, 175415953ul, 181263151ul, 192957548ul,
-            204651945ul, 210499143ul, 222193540ul, 230964337ul, 239735135ul
+        (const exp_t[]) { // EARLY
+            43853989ull, 55548385ull, 64319182ull, 78937179ull, 87707976ull,
+            102325973ull, 111096770ull, 122791166ull, 134485564ull, 146179961ull,
+            154950758ull, 163721555ull, 175415953ull, 181263151ull, 192957548ull,
+            204651945ull, 210499143ull, 222193540ull, 230964337ull, 239735135ull
         },
-        { // MIDDLE
-            57847086ul, 73272975ul, 84842392ul, 104124754ul, 115694171ul,
-            134976533ul, 146545951ul, 161971839ul, 177397729ul, 192823619ul,
-            204393035ul, 215962453ul, 231388342ul, 239101287ul, 254527177ul,
-            269953066ul, 277666011ul, 293091900ul, 304661317ul, 316230734ul
+        (const exp_t[]) { // MIDDLE
+            57847086ull, 73272975ull, 84842392ull, 104124754ull, 115694171ull,
+            134976533ull, 146545951ull, 161971839ull, 177397729ull, 192823619ull,
+            204393035ull, 215962453ull, 231388342ull, 239101287ull, 254527177ull,
+            269953066ull, 277666011ull, 293091900ull, 304661317ull, 316230734ull
         },
-        { // LATE
-            78231251ul, 99092916ul, 114739167ul, 140816251ul, 156462500ul,
-            182539583ul, 198185834ul, 219047500ul, 239909167ul, 260770834ul,
-            276417084ul, 292063334ul, 312925000ul, 323355834ul, 344217501ul,
-            365079167ul, 375510001ul, 396371667ul, 412017917ul, 427664167ul
+        (const exp_t[]) { // LATE
+            78231251ull, 99092916ull, 114739167ull, 140816251ull, 156462500ull,
+            182539583ull, 198185834ull, 219047500ull, 239909167ull, 260770834ull,
+            276417084ull, 292063334ull, 312925000ull, 323355834ull, 344217501ull,
+            365079167ull, 375510001ull, 396371667ull, 412017917ull, 427664167ull
         }
     },
     { // ETERNAL
-        { // EARLY
-            126409270ul, 160118408ul, 185400262ul, 227536685ul, 252818538ul,
-            294954962ul, 320236816ul, 353945954ul, 387655093ul, 421364232ul,
-            446646085ul, 471927939ul, 505637078ul, 522491646ul, 556200786ul,
-            589909924ul, 606764493ul, 640473632ul, 665755485ul, 691037339ul
+        (const exp_t[]) { // EARLY
+            126409270ull, 160118408ull, 185400262ull, 227536685ull, 252818538ull,
+            294954962ull, 320236816ull, 353945954ull, 387655093ull, 421364232ull,
+            446646085ull, 471927939ull, 505637078ull, 522491646ull, 556200786ull,
+            589909924ull, 606764493ull, 640473632ull, 665755485ull, 691037339ull
         },
-        { // MIDDLE
-            147741734ul, 187139530ul, 216687876ul, 265935121ul, 295483467ul,
-            344730713ul, 374279058ul, 413676855ul, 453074650ul, 492472446ul,
-            522020793ul, 551569139ul, 590966936ul, 610665833ul, 650063628ul,
-            689461425ul, 709160322ul, 748558118ul, 778106464ul, 807654811ul
+        (const exp_t[]) { // MIDDLE
+            147741734ull, 187139530ull, 216687876ull, 265935121ull, 295483467ull,
+            344730713ull, 374279058ull, 413676855ull, 453074650ull, 492472446ull,
+            522020793ull, 551569139ull, 590966936ull, 610665833ull, 650063628ull,
+            689461425ull, 709160322ull, 748558118ull, 778106464ull, 807654811ull
         },
-        { // LATE
-            192195528ul, 243447668ul, 281886773ul, 345951950ul, 384391054ul,
-            448456231ul, 486895336ul, 538147477ul, 589399617ul, 640651758ul,
-            679090863ul, 717529969ul, 768782109ul, 794408180ul, 845660321ul,
-            896912461ul, 922538531ul, 973790672ul, 1012229778ul, 1050668882ul
+        (const exp_t[]) { // LATE
+            192195528ull, 243447668ull, 281886773ull, 345951950ull, 384391054ull,
+            448456231ull, 486895336ull, 538147477ull, 589399617ull, 640651758ull,
+            679090863ull, 717529969ull, 768782109ull, 794408180ull, 845660321ull,
+            896912461ull, 922538531ull, 973790672ull, 1012229778ull, 1050668882ull
         }
     }
 };
