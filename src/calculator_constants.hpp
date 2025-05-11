@@ -57,6 +57,20 @@ constexpr inline const unsigned NUM_GATES[NUM_MAJOR_STAGES][NUM_MINOR_STAGES]{
 
 typedef unsigned long long exp_t;
 
+/*
+
+// UNUSED: exp req for Novice and Connection
+
+constexpr inline const exp_t NOVICE_EXP_REQ{ 2 };
+
+#define NUM_CONNECTION_STAGES 10
+
+constexpr inline const exp_t CONNECTION_EXP_REQ[NUM_CONNECTION_STAGES]{
+    13, 73, 176, 500, 1000, 1600, 2500, 3000, 3500, 4500
+};
+
+*/
+
 /**
  * A 3d array describing the experience required to complete each gate
  *
@@ -305,9 +319,10 @@ static_assert(std::accumulate(RESPIRA_MULT_CHANCE, RESPIRA_MULT_CHANCE + 4, 0.0)
 //////////////////// Pills /////////////////////
 
 enum PillRarity {
-    /* Excluding command and uncommon */
+    /* Excluding common and uncommon */
     // COMMON,
     // UNCOMMON,
+
     RARE,
     EPIC,
     LEGENDARY,
@@ -318,10 +333,29 @@ enum PillRarity {
 
 /**
  * Pill base exp per rarity
- * 
+ *
  * TODO: these values need to be verified
  */
 constexpr inline const exp_t PILL_BASE_EXP[NUM_MAJOR_STAGES][NUM_PILL_RARITIES]{
+    /*
+    
+    // UNUSED: pill base exp for Novice and Connection
+
+    { // NOVICE
+        400, // RARE
+        750, // EPIC
+        1500, // LEGENDARY
+        3000 // MYTHIC
+    },
+    { // CONNECTION
+        2000, // RARE
+        3750, // EPIC
+        7500, // LEGENDARY
+        15000 // MYTHIC
+    },
+
+    */
+
     { // FOUNDATION
         6080, // RARE
         11400, // EPIC
