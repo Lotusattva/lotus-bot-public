@@ -1,6 +1,9 @@
 #ifndef CALCULATOR_CONSTANTS_HPP
 #define CALCULATOR_CONSTANTS_HPP
 
+#include <cassert>
+#include <numeric>
+
 ///////////////// Cultivation stages and exp requirements /////////////////
 
 enum MajorStage {
@@ -277,6 +280,103 @@ constexpr inline const double ARTIFACT_ENERGY_RECOVERY_RATE[MAX_ARTIFACT_STAR + 
     3.
 };
 
+///////////////////// Respira ///////////////////////
+
+constexpr inline const int RESPIRA_MULT[]{
+    1,
+    2,
+    5,
+    10
+};
+
+constexpr inline const double RESPIRA_MULT_CHANCE[]{
+    0.55,
+    0.3,
+    0.1475,
+    0.0025
+};
+
+// these two arrays need to be equal length
+static_assert(sizeof(RESPIRA_MULT) / sizeof(RESPIRA_MULT[0]) == sizeof(RESPIRA_MULT_CHANCE) / sizeof(RESPIRA_MULT_CHANCE[0]), "RESPIRA_MULT and RESPIRA_MULT_CHANCE must have the same size");
+
+// RESPIRA_MULT_CHANCE need to add up to 1
+static_assert(std::accumulate(RESPIRA_MULT_CHANCE, RESPIRA_MULT_CHANCE + 4, 0.0) == 1.0);
+
+//////////////////// Pills /////////////////////
+
+enum PillRarity {
+    /* Excluding command and uncommon */
+    // COMMON,
+    // UNCOMMON,
+    RARE,
+    EPIC,
+    LEGENDARY,
+    MYTHIC,
+
+    NUM_PILL_RARITIES
+};
+
+/**
+ * Pill base exp per rarity
+ * 
+ * TODO: these values need to be verified
+ */
+constexpr inline const exp_t PILL_BASE_EXP[NUM_MAJOR_STAGES][NUM_PILL_RARITIES]{
+    { // FOUNDATION
+        6080, // RARE
+        11400, // EPIC
+        22800, // LEGENDARY
+        45600 // MYTHIC
+    },
+    { // VIRTUOSO
+        16000, // RARE
+        30000, // EPIC
+        60000, // LEGENDARY
+        120000 // MYTHIC
+    },
+    { // NASCENT
+        25600, // RARE
+        48000, // EPIC
+        96000, // LEGENDARY
+        192000 // MYTHIC
+    },
+    { // INCARNATION
+        38400, // RARE
+        72000, // EPIC
+        144000, // LEGENDARY
+        288000 // MYTHIC
+    },
+    { // VOIDBREAK
+        65600, // RARE
+        123000, // EPIC
+        246000, // LEGENDARY
+        492000 // MYTHIC
+    },
+    { // WHOLENESS
+        99200, // RARE
+        186000, // EPIC
+        372000, // LEGENDARY
+        744000 // MYTHIC
+    },
+    { // PERFECTION
+        182400, // RARE
+        342000, // EPIC
+        684000, // LEGENDARY
+        1368000 // MYTHIC
+    },
+    { // NIRVANA
+        410800, // RARE
+        770250, // EPIC
+        1540500, // LEGENDARY
+        3081000 // MYTHIC
+    },
+    { // CELESTIAL
+        -1, -1, -1, -1 // no data available at this time
+    },
+    { // ETERNAL
+        -1, -1, -1, -1 // no data available at this time
+    }
+};
 
 
 #endif // CALCULATOR_CONSTANTS_HPP
