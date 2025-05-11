@@ -255,12 +255,12 @@ constexpr inline const exp_t* const GATE_EXP_REQ[NUM_MAJOR_STAGES][NUM_MINOR_STA
 ///////////////////////// Aura gem ////////////////////////////
 
 enum AuraGemRarity {
-    COMMON,
-    UNCOMMON,
-    RARE,
-    EPIC,
-    LEGENDARY,
-    MYTHIC,
+    COMMON_AG,
+    UNCOMMON_AG,
+    RARE_AG,
+    EPIC_AG,
+    LEGENDARY_AG,
+    MYTHIC_AG,
 
     NUM_AURA_GEM_RARITIES
 };
@@ -323,10 +323,10 @@ enum PillRarity {
     // COMMON,
     // UNCOMMON,
 
-    RARE,
-    EPIC,
-    LEGENDARY,
-    MYTHIC,
+    RARE_P,
+    EPIC_P,
+    LEGENDARY_P,
+    MYTHIC_P,
 
     NUM_PILL_RARITIES
 };
@@ -405,10 +405,10 @@ constexpr inline const exp_t PILL_BASE_EXP[NUM_MAJOR_STAGES][NUM_PILL_RARITIES]{
         3081000 // MYTHIC
     },
     { // CELESTIAL
-        -1, -1, -1, -1 // no data available at this time
+        0, 0, 0, 0 // no data available at this time
     },
     { // ETERNAL
-        -1, -1, -1, -1 // no data available at this time
+        0, 0, 0, 0 // no data available at this time
     }
 };
 
