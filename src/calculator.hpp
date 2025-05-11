@@ -15,12 +15,19 @@ task<void> cancel_calc(const button_click_t& event);
 task<void> ask_stage(const button_click_t& event);
 
 
+////////////////////////////////////////////////////////////////////
+////////////////// Define calculator constants /////////////////////
+////////////////////////////////////////////////////////////////////
 
-/////////////// Define calculator constants /////////////////////
+
+///////////////// Cultivation stages and exp requirements /////////////////
 
 enum MajorStage {
 
-    // excluding novice and connection
+    /* Exclude the following two outlier stages */
+    // NOVICE,
+    // CONNECTION,
+    /* Most people get through these stages within a couple hours anyway */
 
     FOUNDATION,
     VIRTUOSO,
@@ -104,8 +111,7 @@ constexpr inline const exp_t* const GATE_EXP_REQ[NUM_MAJOR_STAGES][NUM_MINOR_STA
             183679, 230962, 280065, 325529, 376450, 421915
         },
         (const exp_t[]) { // MIDDLE
-            308712, 389749, 470786, 551823, 632859, 710038,
-            794933
+            308712, 389749, 470786, 551823, 632859, 710038, 794933
         },
         (const exp_t[]) { // LATE
             719563, 918827, 1095905, 1295213, 1472337, 1671600, 1848723, 2047987
@@ -247,5 +253,49 @@ constexpr inline const exp_t* const GATE_EXP_REQ[NUM_MAJOR_STAGES][NUM_MINOR_STA
         }
     }
 };
+
+///////////////////////// Aura gem ////////////////////////////
+
+enum AuraGemRarity {
+    COMMON,
+    UNCOMMON,
+    RARE,
+    EPIC,
+    LEGENDARY,
+    MYTHIC,
+
+    NUM_AURA_GEM_RARITIES
+};
+
+/**
+ * Aura gem absoprtion rate multipliers per rarity
+ */
+constexpr inline const double AURA_GEM_MULT[NUM_AURA_GEM_RARITIES]{
+    0.1,
+    0.13,
+    0.16,
+    0.2,
+    0.24,
+    0.28
+};
+
+////////////////////////// Artifacts ///////////////////////////
+
+#define MAX_ARTIFACT_STAR 5
+
+/**
+ * Artifact energy recovery rate per star
+ * Unit: points per 15 mins
+ */
+constexpr inline const double ARTIFACT_ENERGY_RECOVERY_RATE[MAX_ARTIFACT_STAR + 1]{
+    1.,
+    1.3,
+    1.6,
+    2.,
+    2.4,
+    3.
+};
+
+
 
 #endif // CALCULATOR_HPP
