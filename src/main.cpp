@@ -70,7 +70,7 @@ int main() {
         }
     );
 
-    if (__DEBUG_MODE__) {
+    if (DEBUG) {
         // nothing for now
     } else {
         auto now{ chrono::system_clock::now() };

@@ -3,7 +3,7 @@
 
 #include <dpp/dpp.h>
 
-#define __DEBUG_MODE__ true
+#define DEBUG true
 
 using namespace std;
 using namespace dpp;

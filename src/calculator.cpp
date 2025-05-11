@@ -1,18 +1,18 @@
 #include "calculator.hpp"
 
 task<optional<unordered_map<snowflake, snowflake>::iterator>> verify_user(const button_click_t& event) {
-    if (__DEBUG_MODE__)
+    if (DEBUG)
         cerr << "Verifying user..." << endl;
 
     snowflake user_id{ event.command.usr.id };
     auto it{ calc_sessions.find(user_id) };
     if (it == calc_sessions.end()) {
-        if (__DEBUG_MODE__)
+        if (DEBUG)
             cerr << "User ID: " << user_id << " is not the owner of this session." << endl;
         co_return nullopt;
     }
 
-    if (__DEBUG_MODE__)
+    if (DEBUG)
         cerr << "querying message ID..." << endl;
 
     confirmation_callback_t callback{ co_await event.co_get_original_response() };
@@ -22,24 +22,24 @@ task<optional<unordered_map<snowflake, snowflake>::iterator>> verify_user(const 
     }
     snowflake msg_id{ callback.get<message>().id };
 
-    if (__DEBUG_MODE__)
+    if (DEBUG)
         cerr << "Message ID: " << msg_id << endl;
 
     if (it->second != msg_id) {
-        if (__DEBUG_MODE__)
+        if (DEBUG)
             cerr << "User ID: " << user_id << " is not the owner of this session." << endl;
         co_return nullopt;
     }
 
-    if (__DEBUG_MODE__)
+    if (DEBUG)
         cerr << "User ID: " << user_id << " is the owner of this session." << endl;
     co_return it;
 }
 
 task<void> cancel_calc(const button_click_t& event) {
     co_await event.co_reply(ir_deferred_update_message, "");
-    
-    if (__DEBUG_MODE__)
+
+    if (DEBUG)
         cerr << "Canceling calculator session..." << endl;
 
     optional<unordered_map<snowflake, snowflake>::iterator> it{ co_await verify_user(event) };
@@ -47,7 +47,7 @@ task<void> cancel_calc(const button_click_t& event) {
     if (!it.has_value())
         co_return;
 
-    if (__DEBUG_MODE__)
+    if (DEBUG)
         cerr << "Owner verified, removing session..." << endl;
 
     static message session_cancel_message{ message()

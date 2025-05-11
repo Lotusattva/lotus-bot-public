@@ -9,12 +9,12 @@ task<void> create_polls(timer _) {
            .add_answer(ArrayRoleStr[MAGICAL_PASSENGER])
            .add_answer(ArrayRoleStr[PHYSICAL_DRIVER])
            .add_answer(ArrayRoleStr[PHYSICAL_PASSENGER])
-           .set_duration(__DEBUG_MODE__ ? 1 : 24)) };
+           .set_duration(DEBUG ? 1 : 24)) };
 
     for (auto i{ 0 }; i < NUM_GUILDS; ++i) {
         message my_poll{ POLL };
 
-        if (__DEBUG_MODE__)
+        if (DEBUG)
             cerr << "Creating poll for channel: " << CHANNEL_IDS[i] << endl;
 
         my_poll.set_channel_id(CHANNEL_IDS[i]);
@@ -64,7 +64,7 @@ task<void> process_poll_results(timer _) {
 }
 
 task<void> schedule_next_create(timer _) {
-    if (__DEBUG_MODE__)
+    if (DEBUG)
         bot.start_timer(&create_polls, 60, &schedule_next_create);
     else
         bot.start_timer(&create_polls, SECONDS_IN_WEEK, &schedule_next_create);
@@ -73,7 +73,7 @@ task<void> schedule_next_create(timer _) {
 }
 
 task<void> schedule_next_process(timer _) {
-    if (__DEBUG_MODE__)
+    if (DEBUG)
         bot.start_timer(&process_poll_results, 60, &schedule_next_process);
     else
         bot.start_timer(&process_poll_results, SECONDS_IN_WEEK, &schedule_next_process);

@@ -130,7 +130,7 @@ task<void> start_interactive_calculator(const slashcommand_t& event) {
     // logs session
     snowflake user_id{ event.command.usr.id };
 
-    if (__DEBUG_MODE__)
+    if (DEBUG)
         cerr << "User ID: " << user_id << endl;
 
     confirmation_callback_t callback{ co_await event.co_get_original_response() };
@@ -140,7 +140,7 @@ task<void> start_interactive_calculator(const slashcommand_t& event) {
     }
     snowflake msg_id{ callback.get<message>().id };
 
-    if (__DEBUG_MODE__)
+    if (DEBUG)
         cerr << "Message ID: " << msg_id << endl;
 
     calc_sessions.insert({ user_id, msg_id });
