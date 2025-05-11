@@ -269,12 +269,12 @@ enum AuraGemRarity {
  * Aura gem absoprtion rate multipliers per rarity
  */
 constexpr inline const double AURA_GEM_MULT[NUM_AURA_GEM_RARITIES]{
-    0.1,
-    0.13,
-    0.16,
-    0.2,
-    0.24,
-    0.28
+    0.1, // COMMON
+    0.13, // UNCOMMON
+    0.16, // RARE
+    0.2, // EPIC
+    0.24, // LEGENDARY
+    0.28 // MYTHIC
 };
 
 ////////////////////////// Artifacts ///////////////////////////
@@ -286,12 +286,12 @@ constexpr inline const double AURA_GEM_MULT[NUM_AURA_GEM_RARITIES]{
  * Unit: points per 15 mins
  */
 constexpr inline const double ARTIFACT_ENERGY_RECOVERY_RATE[MAX_ARTIFACT_STAR + 1]{
-    1.,
-    1.3,
-    1.6,
-    2.,
-    2.4,
-    3.
+    1., // 0 star
+    1.3, // 1 star
+    1.6, // 2 star
+    2., // 3 star
+    2.4, // 4 star
+    3. // 5 star
 };
 
 ///////////////////// Respira ///////////////////////
@@ -338,7 +338,7 @@ enum PillRarity {
  */
 constexpr inline const exp_t PILL_BASE_EXP[NUM_MAJOR_STAGES][NUM_PILL_RARITIES]{
     /*
-    
+
     // UNUSED: pill base exp for Novice and Connection
 
     { // NOVICE
