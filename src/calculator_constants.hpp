@@ -4,6 +4,21 @@
 #include <cassert>
 #include <numeric>
 
+/////////////////// Item rarities ////////////////
+
+enum Rarity {
+    COMMON,
+    UNCOMMON,
+    RARE,
+    EPIC,
+    LEGENDARY,
+    MYTHIC,
+
+    NUM_RARITIES
+};
+
+
+
 ///////////////// Cultivation stages and exp requirements /////////////////
 
 enum MajorStage {
@@ -252,23 +267,14 @@ constexpr inline const exp_t* const GATE_EXP_REQ[NUM_MAJOR_STAGES][NUM_MINOR_STA
     }
 };
 
+
+
 ///////////////////////// Aura gem ////////////////////////////
-
-enum AuraGemRarity {
-    COMMON_AG,
-    UNCOMMON_AG,
-    RARE_AG,
-    EPIC_AG,
-    LEGENDARY_AG,
-    MYTHIC_AG,
-
-    NUM_AURA_GEM_RARITIES
-};
 
 /**
  * Aura gem absoprtion rate multipliers per rarity
  */
-constexpr inline const double AURA_GEM_MULT[NUM_AURA_GEM_RARITIES]{
+constexpr inline const double AURA_GEM_MULT[NUM_RARITIES]{
     0.1, // COMMON
     0.13, // UNCOMMON
     0.16, // RARE
@@ -276,6 +282,8 @@ constexpr inline const double AURA_GEM_MULT[NUM_AURA_GEM_RARITIES]{
     0.24, // LEGENDARY
     0.28 // MYTHIC
 };
+
+
 
 ////////////////////////// Artifacts ///////////////////////////
 
@@ -293,6 +301,8 @@ constexpr inline const double ARTIFACT_ENERGY_RECOVERY_RATE[MAX_ARTIFACT_STAR + 
     2.4, // 4 star
     3. // 5 star
 };
+
+
 
 ///////////////////// Respira ///////////////////////
 
@@ -342,38 +352,33 @@ static_assert(sizeof(RESPIRA_MULT) / sizeof(RESPIRA_MULT[0]) == sizeof(RESPIRA_M
 // RESPIRA_MULT_CHANCE need to add up to 1
 static_assert(std::accumulate(RESPIRA_MULT_CHANCE, RESPIRA_MULT_CHANCE + 4, 0.0) == 1.0);
 
+
+
 //////////////////// Pills /////////////////////
-
-enum PillRarity {
-    /* Excluding common and uncommon */
-    // COMMON,
-    // UNCOMMON,
-
-    RARE_P,
-    EPIC_P,
-    LEGENDARY_P,
-    MYTHIC_P,
-
-    NUM_PILL_RARITIES
-};
 
 /**
  * Pill base exp per rarity
+ * 
+ * NOTE: base exp for common and uncommon pills are not used and are set to 0
  *
  * TODO: these values need to be verified
  */
-constexpr inline const exp_t PILL_BASE_EXP[NUM_MAJOR_STAGES][NUM_PILL_RARITIES]{
+constexpr inline const exp_t PILL_BASE_EXP[NUM_MAJOR_STAGES][NUM_RARITIES]{
     /*
 
     // UNUSED: pill base exp for Novice and Connection
 
     { // NOVICE
+        0, // COMMON
+        0, // UNCOMMON
         400, // RARE
         750, // EPIC
         1500, // LEGENDARY
         3000 // MYTHIC
     },
     { // CONNECTION
+        0, // COMMON
+        0, // UNCOMMON
         2000, // RARE
         3750, // EPIC
         7500, // LEGENDARY
@@ -383,60 +388,110 @@ constexpr inline const exp_t PILL_BASE_EXP[NUM_MAJOR_STAGES][NUM_PILL_RARITIES]{
     */
 
     { // FOUNDATION
+        0, // COMMON
+        0, // UNCOMMON
         6080, // RARE
         11400, // EPIC
         22800, // LEGENDARY
         45600 // MYTHIC
     },
     { // VIRTUOSO
+        0, // COMMON
+        0, // UNCOMMON
         16000, // RARE
         30000, // EPIC
         60000, // LEGENDARY
         120000 // MYTHIC
     },
     { // NASCENT
+        0, // COMMON
+        0, // UNCOMMON
         25600, // RARE
         48000, // EPIC
         96000, // LEGENDARY
         192000 // MYTHIC
     },
     { // INCARNATION
+        0, // COMMON
+        0, // UNCOMMON
         38400, // RARE
         72000, // EPIC
         144000, // LEGENDARY
         288000 // MYTHIC
     },
     { // VOIDBREAK
+        0, // COMMON
+        0, // UNCOMMON
         65600, // RARE
         123000, // EPIC
         246000, // LEGENDARY
         492000 // MYTHIC
     },
     { // WHOLENESS
+        0, // COMMON
+        0, // UNCOMMON
         99200, // RARE
         186000, // EPIC
         372000, // LEGENDARY
         744000 // MYTHIC
     },
     { // PERFECTION
+        0, // COMMON
+        0, // UNCOMMON
         182400, // RARE
         342000, // EPIC
         684000, // LEGENDARY
         1368000 // MYTHIC
     },
     { // NIRVANA
+        0, // COMMON
+        0, // UNCOMMON
         410800, // RARE
         770250, // EPIC
         1540500, // LEGENDARY
         3081000 // MYTHIC
     },
     { // CELESTIAL
-        0, 0, 0, 0 // no data available at this time
+        0, 0, 0, 0, 0, 0 // no data available at this time
     },
     { // ETERNAL
-        0, 0, 0, 0 // no data available at this time
+        0, 0, 0, 0, 0, 0 // no data available at this time
     }
 };
+
+
+//////////////////// Myrimon fruits and extractor /////////////////////////
+
+/**
+ * TODO: these values need to be verified
+ */
+enum FruitRank {
+    R3, // Incarnation (?)
+    R6, // Voidbreak
+    R7, // Wholeness
+    R8, // Perfection
+    R9, // Nirvana
+    R10, // Celestial
+    R11, // Eternal
+
+    NUM_FRUIT_RANKS
+};
+
+constexpr inline const exp_t FRUIT_BASE_EXP[NUM_FRUIT_RANKS] {
+    65000, // R3
+    96000, // R6
+    130000, // R7
+    240000, // R8
+    420000, // R9
+    800000, // R10
+    1810000 // R11
+};
+
+#define MAX_EXTRACTOR_NODE_LVL 30
+#define EXP_BONUS_PER_NODE_LVL 0.02
+#define EXP_GUSH_BONUS_PER_NODE_LVL 0.04
+#define GUSH_BASE_CHANCE 0.1
+#define GUSH_CHANCE_PER_RARITY 0.05
 
 
 #endif // CALCULATOR_CONSTANTS_HPP
