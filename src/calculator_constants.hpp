@@ -310,6 +310,28 @@ constexpr inline const double RESPIRA_MULT_CHANCE[]{
     0.0025
 };
 
+/**
+ * Respira base exp per major stage
+ * 
+ * Players' respira exp is usually a lot higher than the base exp because of various bonuses
+ * 
+ * TODO: these values need to be verified
+ */
+constexpr inline const exp_t RESPIRA_BASE_EXP[NUM_MAJOR_STAGES] {
+    // 6, // NOVICE
+    // 20, // CONNECTION
+
+    110, // FOUNDATION
+    650, // VIRTUOSO
+    3200, // NASCENT
+    5300, // INCARNATION
+    7800, // VOIDBREAK
+    10500, // WHOLENESS
+    13500, // PERFECTION
+    25000, // NIRVANA
+    37500, // CELESTIAL
+};
+
 // these two arrays need to be equal length
 static_assert(sizeof(RESPIRA_MULT) / sizeof(RESPIRA_MULT[0]) == sizeof(RESPIRA_MULT_CHANCE) / sizeof(RESPIRA_MULT_CHANCE[0]), "RESPIRA_MULT and RESPIRA_MULT_CHANCE must have the same size");
 
