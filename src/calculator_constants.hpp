@@ -310,6 +310,10 @@ constexpr inline const double RESPIRA_MULT_CHANCE[]{
     0.0025
 };
 
+constexpr inline const double RESPIRA_MULT_EXPECTANCY {
+    std::inner_product(RESPIRA_MULT, RESPIRA_MULT + 4, RESPIRA_MULT_CHANCE, 0.0)
+};
+
 /**
  * Respira base exp per major stage
  * 
