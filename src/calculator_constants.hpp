@@ -521,9 +521,9 @@ constexpr inline const double NODE_QUALITY_CHANCE[NUM_QUALITIES][MAX_EXTRACTOR_N
         0.15, // lvl 7
         0.1, // lvl 8
         0.05, // lvl 9
+
         // for lvl 10 and above, the chance is 0.0
-        0.0, // lvl 10
-        0.0, 0.0, 0.0, 0.0, 0.0, // lvl 11-15
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, // lvl 10-15
         0.0, 0.0, 0.0, 0.0, 0.0, // lvl 16-20
         0.0, 0.0, 0.0, 0.0, 0.0, // lvl 21-25
         0.0, 0.0, 0.0, 0.0, 0.0, // lvl 26-30
@@ -549,7 +549,6 @@ constexpr inline const double NODE_QUALITY_CHANCE[NUM_QUALITIES][MAX_EXTRACTOR_N
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, // lvl 15-20
         0.0, 0.0, 0.0, 0.0, 0.0, // lvl 21-25
         0.0, 0.0, 0.0, 0.0, 0.0, // lvl 26-30
-
     },
     { // RARE
         // for lvl 0-10, the chance is 0.0
