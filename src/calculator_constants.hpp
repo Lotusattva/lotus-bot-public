@@ -503,6 +503,140 @@ constexpr inline const double QUALITY_MULT[NUM_QUALITIES]{
 #define GUSH_BASE_CHANCE 0.1
 #define GUSH_CHANCE_PER_QUALITY 0.05
 
+/**
+ * Chance of generating an orb of a certain quality based on the extractor "Quality" node level
+ * 
+ * ex. get chance of getting a EPIC orb if "Quality" node is at level 10: 
+ * NODE_QUALITY_CHANCE[EPIC][10]
+ */
+constexpr inline const double NODE_QUALITY_CHANCE[NUM_QUALITIES][MAX_EXTRACTOR_NODE_LVL + 1] {
+    { // COMMON
+        0.7, // lvl 0
+        0.65, // lvl 1
+        0.6, // lvl 2
+        0.55, // lvl 3
+        0.5, // lvl 4
+        0.45, // lvl 5
+        0.2, // lvl 6
+        0.15, // lvl 7
+        0.1, // lvl 8
+        0.05, // lvl 9
+        // for lvl 10 and above, the chance is 0.0
+        0.0, // lvl 10
+        0.0, 0.0, 0.0, 0.0, 0.0, // lvl 11-15
+        0.0, 0.0, 0.0, 0.0, 0.0, // lvl 16-20
+        0.0, 0.0, 0.0, 0.0, 0.0, // lvl 21-25
+        0.0, 0.0, 0.0, 0.0, 0.0, // lvl 26-30
+    },
+    { // UNCOMMON 
+        0.0, // lvl 0
+        0.05, // lvl 1
+        0.1, // lvl 2
+        0.15, // lvl 3
+        0.2, // lvl 4
+        0.25, // lvl 5
+        0.5, // lvl 6
+        0.55, // lvl 7
+        0.6, // lvl 8
+        0.65, // lvl 9
+        0.7, // lvl 10
+        0.4, // lvl 11
+        0.3, // lvl 12
+        0.2, // lvl 13
+        0.1, // lvl 14
+
+        // for lvl 15 and above, the chance is 0.0
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, // lvl 15-20
+        0.0, 0.0, 0.0, 0.0, 0.0, // lvl 21-25
+        0.0, 0.0, 0.0, 0.0, 0.0, // lvl 26-30
+
+    },
+    { // RARE
+        // for lvl 0-10, the chance is 0.0
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, // lvl 0-5
+        0.0, 0.0, 0.0, 0.0, 0.0, // lvl 6-10
+
+        0.3, // lvl 11
+        0.4, // lvl 12
+        0.5, // lvl 13
+        0.6, // lvl 14
+        0.7, // lvl 15
+        0.4, // lvl 16
+        0.3, // lvl 17
+        0.2, // lvl 18
+        0.1, // lvl 19
+
+        // for lvl 20 and above, the chance is 0.0
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, // lvl 20-25
+        0.0, 0.0, 0.0, 0.0, 0.0, // lvl 26-30
+    },
+    { // EPIC
+        // for lvl 0-15, the chance is 0.0
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, // lvl 0-5
+        0.0, 0.0, 0.0, 0.0, 0.0, // lvl 6-10
+        0.0, 0.0, 0.0, 0.0, 0.0, // lvl 11-15
+
+        0.3, // lvl 16
+        0.4, // lvl 17
+        0.5, // lvl 18
+        0.6, // lvl 19
+        0.7, // lvl 20
+        0.4, // lvl 21
+        0.3, // lvl 22
+        0.2, // lvl 23
+        0.1, // lvl 24
+
+        // for lvl 25 and above, the chance is 0.0
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, // lvl 25-30
+    },
+    { // LEGENDARY
+        // for lvl 0-20, the chance is 0.0
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, // lvl 0-5
+        0.0, 0.0, 0.0, 0.0, 0.0, // lvl 6-10
+        0.0, 0.0, 0.0, 0.0, 0.0, // lvl 11-15
+        0.0, 0.0, 0.0, 0.0, 0.0, // lvl 16-20
+
+        0.3, // lvl 21
+        0.4, // lvl 22
+        0.5, // lvl 23
+        0.6, // lvl 24
+        0.7, // lvl 25
+        0.4, // lvl 26
+        0.3, // lvl 27
+        0.2, // lvl 28
+        0.1, // lvl 29
+        0.0, // lvl 30
+    },
+    { // MYTHIC
+        // for lvl 0-25, the chance is 0.0
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, // lvl 0-5
+        0.0, 0.0, 0.0, 0.0, 0.0, // lvl 6-10
+        0.0, 0.0, 0.0, 0.0, 0.0, // lvl 11-15
+        0.0, 0.0, 0.0, 0.0, 0.0, // lvl 16-20
+        0.0, 0.0, 0.0, 0.0, 0.0, // lvl 21-25
+
+        0.3, // lvl 26
+        0.4, // lvl 27
+        0.5, // lvl 28
+        0.6, // lvl 29
+        0.7, // lvl 30
+    }
+};
+
+/*
+### Quality chance calculation: 
+
+For the chance of getting orb of a certain quality `Q`, 
+when the "Quality" extractor node is at level `N`,
+and the extractor is at quality `R`: 
+
+chance = NODE_QUALITY_CHANCE[Q][N] + (R == Q ? 0.3 : 0.0)
+
+assert(SUM(chance of all Q) == 1.0) at a given N and R. 
+- TODO: implement testing for this assertion
+
+*/
+
 /*
 
 ### EXP calculation:
@@ -543,6 +677,8 @@ QUESTION:
         exp_with_gush = base_exp * base_mult * gush_mult
 
 */
+
+
 
 
 #endif // CALCULATOR_CONSTANTS_HPP
