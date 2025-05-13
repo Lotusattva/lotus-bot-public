@@ -6,7 +6,7 @@
 
 /////////////////// Item rarities ////////////////
 
-enum Rarity {
+enum Quality {
     COMMON,
     UNCOMMON,
     RARE,
@@ -14,7 +14,7 @@ enum Rarity {
     LEGENDARY,
     MYTHIC,
 
-    NUM_RARITIES
+    NUM_QUALITIES
 };
 
 
@@ -272,9 +272,9 @@ constexpr inline const exp_t* const GATE_EXP_REQ[NUM_MAJOR_STAGES][NUM_MINOR_STA
 ///////////////////////// Aura gem ////////////////////////////
 
 /**
- * Aura gem absoprtion rate multipliers per rarity
+ * Aura gem absoprtion rate multipliers per quality
  */
-constexpr inline const double AURA_GEM_MULT[NUM_RARITIES]{
+constexpr inline const double AURA_GEM_MULT[NUM_QUALITIES]{
     0.1, // COMMON
     0.13, // UNCOMMON
     0.16, // RARE
@@ -320,18 +320,18 @@ constexpr inline const double RESPIRA_MULT_CHANCE[]{
     0.0025
 };
 
-constexpr inline const double RESPIRA_MULT_EXPECTANCY {
+constexpr inline const double RESPIRA_MULT_EXPECTANCY{
     std::inner_product(RESPIRA_MULT, RESPIRA_MULT + 4, RESPIRA_MULT_CHANCE, 0.0)
 };
 
 /**
  * Respira base exp per major stage
- * 
+ *
  * Players' respira exp is usually a lot higher than the base exp because of various bonuses
- * 
+ *
  * TODO: these values need to be verified
  */
-constexpr inline const exp_t RESPIRA_BASE_EXP[NUM_MAJOR_STAGES] {
+constexpr inline const exp_t RESPIRA_BASE_EXP[NUM_MAJOR_STAGES]{
     // 6, // NOVICE
     // 20, // CONNECTION
 
@@ -357,13 +357,13 @@ static_assert(std::accumulate(RESPIRA_MULT_CHANCE, RESPIRA_MULT_CHANCE + 4, 0.0)
 //////////////////// Pills /////////////////////
 
 /**
- * Pill base exp per rarity
- * 
+ * Pill base exp per quality
+ *
  * NOTE: base exp for common and uncommon pills are not used and are set to 0
  *
  * TODO: these values need to be verified
  */
-constexpr inline const exp_t PILL_BASE_EXP[NUM_MAJOR_STAGES][NUM_RARITIES]{
+constexpr inline const exp_t PILL_BASE_EXP[NUM_MAJOR_STAGES][NUM_QUALITIES]{
     /*
 
     // UNUSED: pill base exp for Novice and Connection
@@ -477,7 +477,7 @@ enum FruitRank {
     NUM_FRUIT_RANKS
 };
 
-constexpr inline const exp_t FRUIT_BASE_EXP[NUM_FRUIT_RANKS] {
+constexpr inline const exp_t FRUIT_BASE_EXP[NUM_FRUIT_RANKS]{
     65000, // R3
     96000, // R6
     130000, // R7
@@ -487,11 +487,62 @@ constexpr inline const exp_t FRUIT_BASE_EXP[NUM_FRUIT_RANKS] {
     1810000 // R11
 };
 
+constexpr inline const double QUALITY_MULT[NUM_QUALITIES]{
+    1.0, // COMMON
+    1.3, // UNCOMMON
+    1.6, // RARE
+    2.0, // EPIC
+    2.4, // LEGENDARY
+    3.0, // MYTHIC
+};
+
 #define MAX_EXTRACTOR_NODE_LVL 30
 #define EXP_BONUS_PER_NODE_LVL 0.02
-#define EXP_GUSH_BONUS_PER_NODE_LVL 0.04
+#define EXP_GUSH_BASE_MULT 1.5
+#define EXP_GUSH_MULT_PER_NODE_LVL 0.04
 #define GUSH_BASE_CHANCE 0.1
-#define GUSH_CHANCE_PER_RARITY 0.05
+#define GUSH_CHANCE_PER_QUALITY 0.05
+
+/*
+
+### EXP calculation:
+
+base_mult = [(1 + exp_node_bonus) + conditional_20%] * quality_multiplier
+
+exp_no_gush = base_mult * base_exp
+
+where: 
+- base_mult = the multiplier applied to the base exp of the fruit without gush
+
+- exp_no_gush = exp of the orb produced when consuming a myrimon fruit without triggering gush
+
+- base_exp = base exp of the fruit based on its rank (R6, R7, etc)
+
+- exp_node_bonus = 0.02 * <level of the "CultiXP" extractor node>
+
+- conditional_20% = A conditional 20% exp bonus is applied to exp orb of a certain quality
+    if the "CultiXP" extractor node is at or above this quality (ex. if the orb is RARE, and
+    the "CultiXP" extractor node is at RARE or higher, then the 20% bonus applies)
+
+- quality_multiplier = the multiplier applied to the base exp of the fruit based on its quality
+    (ex. 1.0 for COMMON, 1.3 for UNCOMMON, etc)
+
+### Gush calculation: 
+
+gush_mult = EXP_GUSH_BASE_MULT 
+    + (EXP_GUSH_MULT_PER_NODE_LVL * <level of the "Gush" extractor node>)
+
+QUESTION: 
+    Which is the correct calculation for exp with gush?
+
+    - option 1: 
+        exp_with_gush = base_exp * gush_mult
+    - option 2:
+        exp_with_gush = base_exp * (base_mult + gush_mult)
+    - option 3:
+        exp_with_gush = base_exp * base_mult * gush_mult
+
+*/
 
 
 #endif // CALCULATOR_CONSTANTS_HPP
