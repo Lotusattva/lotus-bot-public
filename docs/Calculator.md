@@ -18,7 +18,7 @@ $$\text{Exp} = \text{AbodeAura} \times (\text{AbsorptionRate}_{\text{Player}} + 
 
 Where:
 - $\text{Exp}$ is the cultivation exp income per unit time
-- $ \text{AbsorptionRate}_{\text{Aura Gem}} $ is dependent on $ \text{AbsorptionRate}_{\text{player}} $ and the quality of the aura gem
+- \( \text{AbsorptionRate}_{\text{Aura Gem}} \)  is dependent on $ \text{AbsorptionRate}_{\text{player}} $ and the quality of the aura gem
 
 ## Cultivation Pills
 
