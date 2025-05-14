@@ -68,30 +68,30 @@ Where:
 
 ### Gush chance
 
-Consuming a myrimon fruit has a chance to gush, and there is also a pity system such that gush is guaranteed to trigger on 6th fruit if consuming the first 5 fruits did not gush. Collecting information about player's current position in the pity cycle and doing calculations from there is cumbersome on both the bot and the player. Therefore, to simplify this process, we will use a consolidated per-use gush chance.
+Consuming a myrimon fruit has a chance to gush, and there is also a pity system such that a gush is guaranteed to trigger on the 6th fruit if consuming the first 5 fruits did not gush. Collecting information about the player's current position in the pity cycle and doing calculations from there is cumbersome for both the bot and the player. Therefore, to simplify this process, we will use a consolidated per-use gush chance.
 
 To derive the consolidated per-use gush chance, we first consider the probability of getting a gush before the 6th fruit. Let $k$ be the number of fruits consumed, and $k \in [1, 5], k \in \mathbb{Z}$. Let $P$ be the chance to gush. The probability of getting a gush before the 6th fruit is given by:
 
 $$\Pr(\text{trigger on } k) = (1 - P)^{k-1} \cdot P$$
 
 Where:
-- (1 - P)^{k-1} is the probability of not getting a gush in the first $k-1$ fruits
-- $P$ is the probability of getting a gush on the *k*th fruit
+- $(1 - P)^{k-1}$ is the probability of not getting a gush in the first $k-1$ fruits
+- $P$ is the probability of getting a gush on the $k\text{th}$ fruit
 
 The probability of a pity trigger is given by:
 
 $$\Pr(\text{pity}) = \Pr(\text{trigger on }6) = (1 - P)^5 \cdot 100\% = (1 - P)^5$$
 
 Where:
-- (1 - P)^5 is the probability of not getting a gush in the first 5 fruits
-- 100% is the probability of getting a gush on the 6th fruit i.e. the pity
+- $(1 - P)^5$ is the probability of not getting a gush in the first 5 fruits
+- $100\%$ is the probability of getting a gush on the 6th fruit, i.e., the pity
 
 Then, we can compute the expected number of fruits consumed per gush as follows:
 
 $$E[\text{fruits per pity cycle}] = \sum_{k=1}^{5} k \cdot \Pr(\text{trigger on } k) + 6 \cdot \Pr(\text{pity})$$
 
 Finally, let:
-- $\text{Numerator} = 1$ be the number of gush per pity cycle
+- $\text{Numerator} = 1$ be the number of gushes per pity cycle
 - $\text{Denominator} = E[\text{fruits per pity cycle}]$ be the expected number of fruits consumed in each pity cycle
 
 We can compute the consolidated per-use gush chance as follows:
@@ -104,7 +104,7 @@ $$
 \end{align*}
 $$
 
-as a fucntion of $P$.
+as a function of $P$.
 
 The chance to gush $P$ is dependent on the quality of the "Quality" aura extractor node, which is defined in the following table:
 
