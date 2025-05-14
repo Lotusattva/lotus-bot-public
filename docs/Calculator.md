@@ -80,11 +80,11 @@ Where:
 
 The probability of a pity trigger is given by:
 
-$$\Pr(\text{pity}) = \Pr(\text{trigger on }6) = (1 - P)^5 \cdot 100\% = (1 - P)^5$$
+$$\Pr(\text{pity}) = \Pr(\text{trigger on }6) = (1 - P)^5 \cdot 100 \\% = (1 - P)^5$$
 
 Where:
 - $(1 - P)^5$ is the probability of not getting a gush in the first 5 fruits
-- $100\%$ is the probability of getting a gush on the 6th fruit, i.e., the pity
+- $100\\%$ is the probability of getting a gush on the 6th fruit, i.e., the pity
 
 Then, we can compute the expected number of fruits consumed per gush as follows:
 
