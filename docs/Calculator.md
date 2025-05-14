@@ -44,20 +44,20 @@ Where:
 
 - $PillBaseExp$ is the base cultivation exp of the pill, which is dependent on the rank and quality of the pill. The base cultivation exp for each rank and quality is (partially) defined in the following table:
 
-| Pill Rank | Common | Uncommon | Rare | Epic | Legendary | Mythic |
-|-----------|--------|----------|------|------|-----------|--------|
-| 1         | *TODO* | *TODO*   | 400  | 750  | 1500      | 3000   |
-| 2         | *TODO* | *TODO*   | 2000 | 3750 | 7500      | 15000  |
-| 3         | *TODO* | *TODO*   |*TODO*|*TODO*| *TODO*    | *TODO* |
-| 4         | *TODO* | *TODO*   |*TODO*|*TODO*| *TODO*    | *TODO* |
-| 5         | *TODO* | *TODO*   |*TODO*|*TODO*| *TODO*    | *TODO* |
-| 6         | *TODO* | *TODO*   |*TODO*|*TODO*| *TODO*    | *TODO* |
-| 7         | *TODO* | *TODO*   |*TODO*|*TODO*| *TODO*    | *TODO* |
-| 8         | *TODO* | *TODO*   |*TODO*|*TODO*| *TODO*    | *TODO* |
-| 9         | *TODO* | *TODO*   |*TODO*|*TODO*| *TODO*    | *TODO* |
-| 10        | *TODO* | *TODO*   |*TODO*|*TODO*| *TODO*    | *TODO* |
-| 11        | *TODO* | *TODO*   |*TODO*|*TODO*| *TODO*    | *TODO* |
-| 12        | *TODO* | *TODO*   |*TODO*|*TODO*| *TODO*    | *TODO* |
+| Pill Rank | Common | Uncommon |  Rare  |  Epic  | Legendary | Mythic  |
+|-----------|--------|----------|--------|--------|-----------|---------|
+| 1         | 125    | 250      | 400    | 750    | 1500      | 3000    |
+| 2         | 625    | 1250     | 2000   | 3750   | 7500      | 15000   |
+| 3         | 1900   | 3800     | 6080   | 11400  | 22800     | 45600   |
+| 4         | 5000   | 10000    | 16000  | 30000  | 60000     | 120000  |
+| 5         | 8000   | 16000    | 25600  | 48000  | 96000     | 192000  |
+| 6         | *TODO* | *TODO*   | 38400  | 72000  | 144000    | 288000  |
+| 7         | *TODO* | *TODO*   | 65600  | 123000 | 246000    | 492000  |
+| 8         | *TODO* | *TODO*   | 99200  | 186000 | 372000    | 744000  |
+| 9         | *TODO* | *TODO*   | 182400 | 342000 | 684000    | 1368000 |
+| 10        | *TODO* | *TODO*   | 410800 | 770250 | 1540500   | 3081000 |
+| 11        | *TODO* | *TODO*   | *TODO* | *TODO* | *TODO*    | *TODO*  |
+| 12        | *TODO* | *TODO*   | *TODO* | *TODO* | *TODO*    | *TODO*  |
 
 - $PlayerPillBonus$ is the player's sum of all cultivation pill bonuses they gain from various sources such as techniques, curios, and immortal friends. Unfortunately, the game does not display the player's total cultivation pill bonus, so the value has to be calculated. Doubly unfortunate, the game rounds numbers to 2 decimal places, so even if we attempt to calculate the player's total cultivation pill bonus, we may not be able to get the exact number.
 
