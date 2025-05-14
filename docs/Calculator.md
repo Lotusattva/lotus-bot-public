@@ -70,4 +70,38 @@ Todo!
 
 ## Creation Artifacts: the Vase and the Mirror
 
+Vase
+| Vase Rank | Gain/Taoist year| Cap | Energy per Pill, Epic, Legendary | Pills a day / Pills a day with Epic, Legendary/ Pills a day with charge/ Pills a day with charge, Epic, Legendary
+| 1         | +1              | 300 | 100 / 90                         | 0.96 / 1.06 / 1.96 / 2.06
+| 2         | +1.5            | 400 | 100 / 90                         | 1.44 / 1.56 / 2.44 / 2.56
+| 3         | +2              | 500 | 100 / 90                         | 1.92 / 2.02 / 2.92 / 3.02
+| 4         | +2.5            | 600 | 100 / 90                         | 2.40 / 2.50 / 3.40 / 3.50
+| 5         | +3              | 700 | 100 / 90                         | 2.88 / 2.98 / 3.88 / 3.98
+
+Get 100 Energy a day with charge
+  
+- Rank 1 10% increase to exp for crafted pills
+- Rank 3 exp for crafted pills increased to 20% instead of 10%
+- Rank 5 15% chance to double craft
+- Jade Purity Vase Transmog +8% increased exp for crafted pills
+
+
+Mirror
+*Based on ingame data will update tomorrow to real figures*
+| Mirror Rank | Gain/Taoist year| Cap | Mythic duplication Gain a day, Gain with charge
+| 1           | +1              | 300 | 0.48  / 0.98
+| 2           | +1.6            | 400 | 0.768 / 1.268
+| 3           | +2              | 500 | 0.96  / 1.46
+| 4           | +2.5            | 600 | 1.20  / 1.70
+| 5           | +3              | 700 | 1.44  / 1.94
+
+
+Get 100 Energy a day with charge
+Mythic Duplication Cost 190 for R7
+
+- Rank 1 -5% Energy cost for Duplication
+- Rank 3 Energy Reduction cost increased to 10%
+- Rank 5 15% chance to obtain a Duplicate
+
+
 Todo!
