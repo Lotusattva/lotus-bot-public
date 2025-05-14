@@ -66,15 +66,13 @@ Where:
 
 ## Myrimon Fruits and the Aura Extractor
 
-Todo!
-
 ### Gush chance
 
 Consuming a myrimon fruit has a chance to gush, and there is also a pity system such that gush is guaranteed to trigger on 6th fruit if consuming the first 5 fruits did not gush. Collecting information about player's current position in the pity cycle and doing calculations from there is cumbersome on both the bot and the player. Therefore, to simplify this process, we will use a consolidated per-use gush chance.
 
 The consolidated per-use gush chance can be calculated as a function of $P$, the chance to gush, as follows:
 
-$$P_{consolidated} = \frac{1}{E[\text{items per cycle}]}$$
+$$P_{\text{consolidated}} = \frac{1}{E[\text{items per cycle}]}$$
 
 where,
 
