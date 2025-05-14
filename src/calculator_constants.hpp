@@ -302,6 +302,14 @@ constexpr inline const double ARTIFACT_ENERGY_RECOVERY_RATE[MAX_ARTIFACT_STAR + 
     3. // 5 star
 };
 
+#define VASE_TRANSMOG_PILL_BONUS 0.08 // additive
+#define VASE_1_STAR_PILL_BONUS 0.1
+#define VASE_3_STAR_PILL_BONUS 0.2 // not additive! overrides VASE_1_STAR_PILL_BONUS
+#define VASE_5_STAR_COSTLESS_CHANCE 0.15 // chance to not cost energy when purifying a pill
+
+#define MIRROR_1_STAR_COST_DEDUCTION 0.05 
+#define MIRROR_3_STAR_COST_DEDUCTION 0.1 // not additive! overrides MIRROR_1_STAR_COST_DEDUCTION
+#define MIRROR_5_STAR_CHANCE_EXTRA_DUPLICATE 0.15 // chance to make an extra copy when duplicating an item
 
 
 ///////////////////// Respira ///////////////////////
