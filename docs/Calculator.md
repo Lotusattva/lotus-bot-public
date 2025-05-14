@@ -14,10 +14,10 @@ Cultivation™ and aura gem are players' passive cultivation exp income sources,
 
 The calculation is straight forward:
 
-$$ Exp = AbodeAura \times (PlayerAbsorptionRate + AuraGemAbsorptionRate) $$
+$$ ExpRate = AbodeAura \times (PlayerAbsorptionRate + AuraGemAbsorptionRate) $$
 
 where:
-- $Exp$ is the cultivation exp income per unit time
+- $ExpRate$ is the cultivation exp income per unit time
 - $AuraGemAbsorptionRate$ is calculated as: $AuraGemAbsorptionRate = PlayerAbsorptionRate * AuraGemMultiplier$
 
 Where $AuraGemMultiplier$ depends on the quality of the aura gem, and is defined in the following table:
