@@ -17,10 +17,10 @@ task<void> start_debug_poll(const slashcommand_t& event) {
     static const message POLL{
         message().set_poll(poll()
             .set_question("Sign up here for arrays")
-            .add_answer(ArrayRoleStr[MAGICAL_DRIVER])
-            .add_answer(ArrayRoleStr[MAGICAL_PASSENGER])
-            .add_answer(ArrayRoleStr[PHYSICAL_DRIVER])
-            .add_answer(ArrayRoleStr[PHYSICAL_PASSENGER])
+            .add_answer(ARRAY_ROLE_STR[MAGICAL_DRIVER])
+            .add_answer(ARRAY_ROLE_STR[MAGICAL_PASSENGER])
+            .add_answer(ARRAY_ROLE_STR[PHYSICAL_DRIVER])
+            .add_answer(ARRAY_ROLE_STR[PHYSICAL_PASSENGER])
             .set_duration(24)) };
 
     co_await event.co_reply(POLL);

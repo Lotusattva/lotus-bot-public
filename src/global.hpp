@@ -30,14 +30,14 @@ enum ArrayRole {
     NUM_ARRAY_ROLES
 };
 
-constexpr inline const char* const ArrayRoleStr[]{
+constexpr inline const char* const ARRAY_ROLE_STR[]{
     "Magical driver",
     "Magical passenger",
     "Physical driver",
     "Physical passenger",
 };
 
-constexpr inline const unsigned ArrayRoleLimit[]{
+constexpr inline const unsigned ARRAY_ROLE_LIMIT[]{
     2,
     8,
     1,

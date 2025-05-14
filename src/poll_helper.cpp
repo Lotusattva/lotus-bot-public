@@ -13,10 +13,10 @@ void select(vector<string>& vec, unsigned limit) {
 
 task<optional<map<string, vector<string>>>> get_voters(const message& msg, const members_container& members) {
     map<string, vector<string>> role_selections{
-        { ArrayRoleStr[MAGICAL_DRIVER], {} },
-        { ArrayRoleStr[MAGICAL_PASSENGER], {} },
-        { ArrayRoleStr[PHYSICAL_DRIVER], {} },
-        { ArrayRoleStr[PHYSICAL_PASSENGER], {} },
+        { ARRAY_ROLE_STR[MAGICAL_DRIVER], {} },
+        { ARRAY_ROLE_STR[MAGICAL_PASSENGER], {} },
+        { ARRAY_ROLE_STR[PHYSICAL_DRIVER], {} },
+        { ARRAY_ROLE_STR[PHYSICAL_PASSENGER], {} },
     };
 
     const poll& poll{ msg.get_poll() };
@@ -44,7 +44,7 @@ task<optional<map<string, vector<string>>>> get_voters(const message& msg, const
 
 void make_selections(map<string, vector<string>>& role_selections) {
     for (auto i{ 0 }; i < NUM_ARRAY_ROLES; ++i)
-        select(role_selections[ArrayRoleStr[i]], ArrayRoleLimit[i]);
+        select(role_selections[ARRAY_ROLE_STR[i]], ARRAY_ROLE_LIMIT[i]);
 }
 
 string print_role_selections(const map<string, vector<string>>& role_selections) {

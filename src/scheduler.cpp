@@ -5,10 +5,10 @@ task<void> create_polls(timer _) {
     static message POLL{
        message().set_poll(poll()
            .set_question("Sign up here for arrays")
-           .add_answer(ArrayRoleStr[MAGICAL_DRIVER])
-           .add_answer(ArrayRoleStr[MAGICAL_PASSENGER])
-           .add_answer(ArrayRoleStr[PHYSICAL_DRIVER])
-           .add_answer(ArrayRoleStr[PHYSICAL_PASSENGER])
+           .add_answer(ARRAY_ROLE_STR[MAGICAL_DRIVER])
+           .add_answer(ARRAY_ROLE_STR[MAGICAL_PASSENGER])
+           .add_answer(ARRAY_ROLE_STR[PHYSICAL_DRIVER])
+           .add_answer(ARRAY_ROLE_STR[PHYSICAL_PASSENGER])
            .set_duration(DEBUG ? 1 : 24)) };
 
     for (auto i{ 0 }; i < NUM_GUILDS; ++i) {
