@@ -6,7 +6,7 @@
 
 /////////////////// Item rarities ////////////////
 
-enum Quality {
+enum quality_t {
     COMMON,
     UNCOMMON,
     RARE,
@@ -21,7 +21,7 @@ enum Quality {
 
 ///////////////// Cultivation stages and exp requirements /////////////////
 
-enum MajorStage {
+enum major_stage_t {
 
     /* Exclude the following two outlier stages */
     // NOVICE,
@@ -42,7 +42,7 @@ enum MajorStage {
     NUM_MAJOR_STAGES
 };
 
-enum MinorStage {
+enum minor_stage_t {
     EARLY,
     MIDDLE,
     LATE,
@@ -465,7 +465,7 @@ constexpr inline const exp_t PILL_BASE_EXP[NUM_MAJOR_STAGES][NUM_QUALITIES]{
 /**
  * TODO: these values need to be verified
  */
-enum FruitRank {
+enum fruit_rank_t {
     R3, // Incarnation (?)
     R6, // Voidbreak
     R7, // Wholeness
@@ -505,11 +505,11 @@ constexpr inline const double QUALITY_MULT[NUM_QUALITIES]{
 
 /**
  * Chance of generating an orb of a certain quality based on the extractor "Quality" node level
- * 
- * ex. get chance of getting a EPIC orb if "Quality" node is at level 10: 
+ *
+ * ex. get chance of getting a EPIC orb if "Quality" node is at level 10:
  * NODE_QUALITY_CHANCE[EPIC][10]
  */
-constexpr inline const double NODE_QUALITY_CHANCE[NUM_QUALITIES][MAX_EXTRACTOR_NODE_LVL + 1] {
+constexpr inline const double NODE_QUALITY_CHANCE[NUM_QUALITIES][MAX_EXTRACTOR_NODE_LVL + 1]{
     { // COMMON
         0.7, // lvl 0
         0.65, // lvl 1
@@ -623,15 +623,15 @@ constexpr inline const double NODE_QUALITY_CHANCE[NUM_QUALITIES][MAX_EXTRACTOR_N
 };
 
 /*
-### Quality chance calculation: 
+### Quality chance calculation:
 
-For the chance of getting orb of a certain quality `Q`, 
+For the chance of getting orb of a certain quality `Q`,
 when the "Quality" extractor node is at level `N`,
-and the extractor is at quality `R`: 
+and the extractor is at quality `R`:
 
 chance = NODE_QUALITY_CHANCE[Q][N] + (R == Q ? 0.3 : 0.0)
 
-assert(SUM(chance of all Q) == 1.0) at a given N and R. 
+assert(SUM(chance of all Q) == 1.0) at a given N and R.
 - TODO: implement testing for this assertion
 
 */
@@ -644,7 +644,7 @@ base_mult = [(1 + exp_node_bonus) + conditional_20%] * quality_multiplier
 
 exp_no_gush = base_mult * base_exp
 
-where: 
+where:
 - base_mult = the multiplier applied to the base exp of the fruit without gush
 
 - exp_no_gush = exp of the orb produced when consuming a myrimon fruit without triggering gush
@@ -660,15 +660,15 @@ where:
 - quality_multiplier = the multiplier applied to the base exp of the fruit based on its quality
     (ex. 1.0 for COMMON, 1.3 for UNCOMMON, etc)
 
-### Gush calculation: 
+### Gush calculation:
 
-gush_mult = EXP_GUSH_BASE_MULT 
+gush_mult = EXP_GUSH_BASE_MULT
     + (EXP_GUSH_MULT_PER_NODE_LVL * <level of the "Gush" extractor node>)
 
-QUESTION: 
+QUESTION:
     Which is the correct calculation for exp with gush?
 
-    - option 1: 
+    - option 1:
         exp_with_gush = base_exp * gush_mult
     - option 2:
         exp_with_gush = base_exp * (base_mult + gush_mult)
