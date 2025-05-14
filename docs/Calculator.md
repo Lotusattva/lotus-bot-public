@@ -14,11 +14,10 @@ Cultivation™ and aura gem are players' passive cultivation exp income sources,
 
 The calculation is straight forward:
 
-$$\text{Exp} = \text{AbodeAura} \times (\text{AbsorptionRate}_{\text{Player}} + \text{AbsorptionRate}_{\text{Aura Gem}})$$
+$$ A \times B = C $$
 
-Where:
-- $\text{Exp}$ is the cultivation exp income per unit time
-- \[ \text{AbsorptionRate}_{\text{Aura Gem}} \]  is dependent on $ \text{AbsorptionRate}_{\text{player}} $ and the quality of the aura gem
+- $var1$ is something
+- $var2$ is something else
 
 ## Cultivation Pills
 
