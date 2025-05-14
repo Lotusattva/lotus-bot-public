@@ -76,7 +76,7 @@ $$P_{\text{consolidated}} = \frac{1}{E[\text{items per cycle}]}$$
 
 where,
 
-$$E[\text{items per cycle}] = \sum_{k=1}^{5} k \cdot (1-P)^{k-1} \cdot P + 6 \cdot (1-P)^{5}$$
+$$E[\text{items per cycle}] = \sum_{k=1}^{5} [k \cdot (1-P)^{k-1} \cdot P] + 6 \cdot (1-P)^{5}$$
 
 Where:
 - $E[\text{items per cycle}]$ is the expected number of items consumed in a pity cycle, or in other words, the expected number of items consumed to get a gush.
