@@ -101,7 +101,7 @@ $$
     P_{\text{consolidated}} & = \frac{\text{Numerator}}{\text{Denominator}} \\
                             & = \frac{1}{\sum_{k=1}^{5} k \cdot \Pr(\text{trigger on } k) + 6 \cdot \Pr(\text{pity})} \\
                             & = \frac{1}{\sum_{k=1}^{5} k \cdot (1 - P)^{k-1} \cdot P + 6 \cdot (1 - P)^5} \\
-                            & = \frac{1}{(2-P)(3+(P-3)P)(1+(P-1)P)} \\
+                            & = \frac{1}{(2-P)\cdot(3+(P-3) \cdot P)\cdot(1+(P-1) \cdot P)} \\
 \end{align*}
 $$
 
