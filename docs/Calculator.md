@@ -70,7 +70,7 @@ Where:
 
 Consuming a myrimon fruit has a chance to gush, and there is also a pity system such that gush is guaranteed to trigger on 6th fruit if consuming the first 5 fruits did not gush. Collecting information about player's current position in the pity cycle and doing calculations from there is cumbersome on both the bot and the player. Therefore, to simplify this process, we will use a consolidated per-use gush chance.
 
-To derive the consolidated per-use gush chance, we first consider the probability of getting a gush before the 6th fruit. Let $k$ be the number of fruits consumed, and $k \in [1, 5]$. Let $P$ be the chance to gush. The probability of getting a gush before the 6th fruit is given by:
+To derive the consolidated per-use gush chance, we first consider the probability of getting a gush before the 6th fruit. Let $k$ be the number of fruits consumed, and $k \in [1, 5], k \in \mathbb{Z}$. Let $P$ be the chance to gush. The probability of getting a gush before the 6th fruit is given by:
 
 $$\Pr(\text{trigger on } k) = (1 - P)^{k-1} \cdot P$$
 
