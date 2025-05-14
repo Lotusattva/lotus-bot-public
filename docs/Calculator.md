@@ -18,7 +18,7 @@ $$ Exp = AbodeAura \times (PlayerAbsorptionRate + AuraGemAbsorptionRate) $$
 
 where:
 - $Exp$ is the cultivation exp income per unit time
-- $ AuraGemAbsorptionRate = PlayerAbsorptionRate * AuraGemMultiplier $
+- $AuraGemAbsorptionRate$ is calculated as: $AuraGemAbsorptionRate = PlayerAbsorptionRate * AuraGemMultiplier$
 
 Where $AuraGemMultiplier$ depends on the quality of the aura gem and is in the range of $[0.1, 0.28]$.
 
