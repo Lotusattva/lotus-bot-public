@@ -44,20 +44,20 @@ Where:
 
 - $PillBaseExp$ is the base cultivation exp of the pill, which is dependent on the rank and quality of the pill. The base cultivation exp for each rank and quality is (partially) defined in the following table:
 
-| Pill Rank | Common | Uncommon |  Rare  |  Epic  | Legendary | Mythic  |
-|-----------|--------|----------|--------|--------|-----------|---------|
-| 1         | 125    | 250      | 400    | 750    | 1500      | 3000    |
-| 2         | 625    | 1250     | 2000   | 3750   | 7500      | 15000   |
-| 3         | 1900   | 3800     | 6080   | 11400  | 22800     | 45600   |
-| 4         | 5000   | 10000    | 16000  | 30000  | 60000     | 120000  |
-| 5         | 8000   | 16000    | 25600  | 48000  | 96000     | 192000  |
-| 6         | *TODO* | *TODO*   | 38400  | 72000  | 144000    | 288000  |
-| 7         | *TODO* | *TODO*   | 65600  | 123000 | 246000    | 492000  |
-| 8         | *TODO* | *TODO*   | 99200  | 186000 | 372000    | 744000  |
-| 9         | *TODO* | *TODO*   | 182400 | 342000 | 684000    | 1368000 |
-| 10        | *TODO* | *TODO*   | 410800 | 770250 | 1540500   | 3081000 |
-| 11        | *TODO* | *TODO*   | *TODO* | *TODO* | *TODO*    | *TODO*  |
-| 12        | *TODO* | *TODO*   | *TODO* | *TODO* | *TODO*    | *TODO*  |
+    | Pill Rank | Common | Uncommon |  Rare  |  Epic  | Legendary | Mythic  |
+    |-----------|--------|----------|--------|--------|-----------|---------|
+    | 1         | 125    | 250      | 400    | 750    | 1500      | 3000    |
+    | 2         | 625    | 1250     | 2000   | 3750   | 7500      | 15000   |
+    | 3         | 1900   | 3800     | 6080   | 11400  | 22800     | 45600   |
+    | 4         | 5000   | 10000    | 16000  | 30000  | 60000     | 120000  |
+    | 5         | 8000   | 16000    | 25600  | 48000  | 96000     | 192000  |
+    | 6         | *TODO* | *TODO*   | 38400  | 72000  | 144000    | 288000  |
+    | 7         | *TODO* | *TODO*   | 65600  | 123000 | 246000    | 492000  |
+    | 8         | *TODO* | *TODO*   | 99200  | 186000 | 372000    | 744000  |
+    | 9         | *TODO* | *TODO*   | 182400 | 342000 | 684000    | 1368000 |
+    | 10        | *TODO* | *TODO*   | 410800 | 770250 | 1540500   | 3081000 |
+    | 11        | *TODO* | *TODO*   | *TODO* | *TODO* | *TODO*    | *TODO*  |
+    | 12        | *TODO* | *TODO*   | *TODO* | *TODO* | *TODO*    | *TODO*  |
 
 - $PlayerPillBonus$ is the player's sum of all cultivation pill bonuses they gain from various sources such as techniques, curios, and immortal friends. Unfortunately, the game does not display the player's total cultivation pill bonus, so the value has to be calculated. Doubly unfortunate, the game rounds numbers to 2 decimal places, so even if we attempt to calculate the player's total cultivation pill bonus, we may not be able to get the exact number.
 
@@ -67,6 +67,32 @@ Where:
 ## Myrimon Fruits and the Aura Extractor
 
 Todo!
+
+### Gush chance
+
+Consuming a myrimon fruit has a chance to gush, and there is also a pity system such that gush is guaranteed to trigger on 6th fruit if consuming the first 5 fruits did not gush. Collecting information about player's current position in the pity cycle and doing calculations from there is cumbersome on both the bot and the player. Therefore, to simplify this process, we will use a consolidated per-use gush chance.
+
+The consolidated per-use gush chance can be calculated as a function of $P$, the chance to gush, as follows:
+
+$$P_{consolidated} = \frac{1}{E[\text{items per cycle}]}$$
+
+where,
+
+$$E[\text{items per cycle}] = \sum_{k=1}^{5} k \cdot (1-P)^{k-1} \cdot P + 6 \cdot (1-P)^{5}$$
+
+Where:
+- $E[\text{items per cycle}]$ is the expected number of items consumed in a pity cycle, or in other words, the expected number of items consumed to get a gush.
+- $P$ is the chance to gush, which is dependent on the quality of the "Quality" aura extractor node, as defined in the following table:
+
+    | Node Quality | $P$: Chance to Gush |
+    |--------------|---------------------|
+    | Common       | 0.1                 |
+    | Uncommon     | 0.15                |
+    | Rare         | 0.2                 |
+    | Epic         | 0.25                |
+    | Legendary    | 0.3                 |
+    | Mythic       | 0.35                |
+
 
 ## Creation Artifacts: the Vase and the Mirror
 
