@@ -20,11 +20,49 @@ where:
 - $Exp$ is the cultivation exp income per unit time
 - $AuraGemAbsorptionRate$ is calculated as: $AuraGemAbsorptionRate = PlayerAbsorptionRate * AuraGemMultiplier$
 
-Where $AuraGemMultiplier$ depends on the quality of the aura gem and is in the range of $[0.1, 0.28]$.
+Where $AuraGemMultiplier$ depends on the quality of the aura gem, and is defined in the following table:
+
+| Aura Gem Quality | Aura Gem Multiplier |
+|------------------|---------------------|
+| Common           | 0.1                 |
+| Uncommon         | 0.13                |
+| Rare             | 0.16                |
+| Epic             | 0.2                 |
+| Legendary        | 0.24                |
+| Mythic           | 0.28                |
 
 ## Cultivation Pills
 
-Todo!
+A player has a limited number of cultivation pill attempts per day. Each pill offers an amount of exp depending on its rank and quality and the player's cultivation pill bonuses. The calculation is as follows:
+- For common to legendary pills:
+$$ Exp = PillBaseExp \times (1 + PlayerPillBonus) $$
+- For mythic pills:
+$$ Exp = PillBaseExp \times (1 + PlayerPillBonus + VaseBonus) $$
+
+Where:
+- $Exp$ is the cultivation exp gained from consuming the pill
+
+- $PillBaseExp$ is the base cultivation exp of the pill, which is dependent on the rank and quality of the pill. The base cultivation exp for each rank and quality is (partially) defined in the following table:
+
+| Pill Rank | Common | Uncommon | Rare | Epic | Legendary | Mythic |
+|-----------|--------|----------|------|------|-----------|--------|
+| 1         | *TODO* | *TODO*   | 400  | 750  | 1500      | 3000   |
+| 2         | *TODO* | *TODO*   | 2000 | 3750 | 7500      | 15000  |
+| 3         | *TODO* | *TODO*   |*TODO*|*TODO*| *TODO*    | *TODO* |
+| 4         | *TODO* | *TODO*   |*TODO*|*TODO*| *TODO*    | *TODO* |
+| 5         | *TODO* | *TODO*   |*TODO*|*TODO*| *TODO*    | *TODO* |
+| 6         | *TODO* | *TODO*   |*TODO*|*TODO*| *TODO*    | *TODO* |
+| 7         | *TODO* | *TODO*   |*TODO*|*TODO*| *TODO*    | *TODO* |
+| 8         | *TODO* | *TODO*   |*TODO*|*TODO*| *TODO*    | *TODO* |
+| 9         | *TODO* | *TODO*   |*TODO*|*TODO*| *TODO*    | *TODO* |
+| 10        | *TODO* | *TODO*   |*TODO*|*TODO*| *TODO*    | *TODO* |
+| 11        | *TODO* | *TODO*   |*TODO*|*TODO*| *TODO*    | *TODO* |
+| 12        | *TODO* | *TODO*   |*TODO*|*TODO*| *TODO*    | *TODO* |
+
+- $PlayerPillBonus$ is the player's sum of all cultivation pill bonuses they gain from various sources such as techniques, curios, and immortal friends. Unfortunately, the game does not display the player's total cultivation pill bonus, so the value has to be calculated. Doubly unfortunate, the game rounds numbers to 2 decimal places, so even if we attempt to calculate the player's total cultivation pill bonus, we may not be able to get the exact number.
+
+- $VaseBonus$ is the bonus from the creation artifact vase, and it's only applied to mythic pills. This bonus is 10% if the vase is 1-2 stars, 20% if it is 3 stars and above. An additional 8% is added to the bonus if the player has the vase's transmog.
+
 
 ## Myrimon Fruits and the Aura Extractor
 
