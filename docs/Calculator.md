@@ -34,10 +34,10 @@ Where $AuraGemMultiplier$ depends on the quality of the aura gem, and is defined
 ## Cultivation Pills
 
 A player has a limited number of cultivation pill attempts per day. Each pill offers an amount of exp depending on its rank and quality and the player's cultivation pill bonuses. The calculation is as follows:
-- For common to legendary pills:
-$$ Exp = PillBaseExp \times (1 + PlayerPillBonus) $$
-- For mythic pills:
-$$ Exp = PillBaseExp \times (1 + PlayerPillBonus + VaseBonus) $$
+- For common to legendary pills:\
+$$Exp = PillBaseExp \times (1 + PlayerPillBonus)$$
+- For mythic pills:\
+$$Exp = PillBaseExp \times (1 + PlayerPillBonus + VaseBonus)$$
 
 Where:
 - $Exp$ is the cultivation exp gained from consuming the pill
