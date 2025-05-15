@@ -43,7 +43,7 @@ Where:
 - $Exp$ is the cultivation exp gained from consuming the pill
 
 - $PillBaseExp$ is the base cultivation exp of the pill, which is dependent on the rank and quality of the pill. The base cultivation exp for each rank and quality is (partially) defined in the following table:
-    <details><summary>Click to show table</summary>
+    <details><summary><ins>Click to show table</ins></summary>
 
     | Pill Rank | Common | Uncommon |  Rare  |  Epic  | Legendary | Mythic  |
     |-----------|--------|----------|--------|--------|-----------|---------|
@@ -129,7 +129,7 @@ The quality of the exp orb produced by the aura extractor upon consuming a myrim
 
 2. The level of the "Quality" node distributes the remaining 70% chance among qualities as defined in the following table:
     
-    <details><summary>Click to show table</summary>
+    <details><summary><ins>Click to show table</ins></summary>
 
     | Node Level | Common | Uncommon | Rare  | Epic  | Legendary | Mythic |
     |------------|--------|----------|-------|-------|-----------|--------|
