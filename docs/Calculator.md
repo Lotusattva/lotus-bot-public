@@ -118,6 +118,53 @@ The chance to gush $P$ is dependent on the quality of the "Quality" aura extract
 | Legendary    | 0.3  |
 | Mythic       | 0.35 |
 
+### Exp orb quality
+
+The quality of the exp orb produced by the aura extractor upon consuming a myrimon fruit is dependent on 1) the quality of the aura extractor itself, and 2) the level of the "Quality" node:
+    
+1. The aura extractor adds a 30% chance to produce an orb of the same quality as itself, e.g., if the extractor is of *Epic* quality, then an orb of *Epic* quality would have a 30% higher chance to be produced.
+
+2. The level of the "Quality" node distributes the remaining 70% chance among qualities as defined in the following table:
+    
+    | Node Level | Common | Uncommon | Rare  | Epic  | Legendary | Mythic |
+    |------------|--------|----------|-------|-------|-----------|--------|
+    | 0          | 70%    | 0%       | 0%    | 0%    | 0%        | 0%     |
+    | 1          | 65%    | 5%       | 0%    | 0%    | 0%        | 0%     |
+    | 2          | 60%    | 10%      | 0%    | 0%    | 0%        | 0%     |
+    | 3          | 55%    | 15%      | 0%    | 0%    | 0%        | 0%     |
+    | 4          | 50%    | 25%      | 0%    | 0%    | 0%        | 0%     |
+    | 5          | 45%    | 25%      | 0%    | 0%    | 0%        | 0%     |
+    | 6          | 20%    | 50%      | 0%    | 0%    | 0%        | 0%     |
+    | 7          | 15%    | 55%      | 0%    | 0%    | 0%        | 0%     |
+    | 8          | 10%    | 60%      | 0%    | 0%    | 0%        | 0%     |
+    | 9          | 5%     | 65%      | 0%    | 0%    | 0%        | 0%     |
+    | 10         | 0%     | 70%      | 0%    | 0%    | 0%        | 0%     |
+    | 11         | 0%     | 40%      | 30%   | 0%    | 0%        | 0%     |
+    | 12         | 0%     | 30%      | 40%   | 0%    | 0%        | 0%     |
+    | 13         | 0%     | 20%      | 50%   | 0%    | 0%        | 0%     |
+    | 14         | 0%     | 10%      | 60%   | 0%    | 0%        | 0%     |
+    | 15         | 0%     | 0%       | 70%   | 0%    | 0%        | 0%     |
+    | 16         | 0%     | 0%       | 40%   | 30%   | 0%        | 0%     |
+    | 17         | 0%     | 0%       | 30%   | 40%   | 0%        | 0%     |
+    | 18         | 0%     | 0%       | 20%   | 50%   | 0%        | 0%     |
+    | 19         | 0%     | 0%       | 10%   | 60%   | 0%        | 0%     |
+    | 20         | 0%     | 0%       | 0%    | 70%   | 0%        | 0%     |
+    | 21         | 0%     | 0%       | 0%    | 40%   | 30%       | 0%     |
+    | 22         | 0%     | 0%       | 0%    | 30%   | 40%       | 0%     |
+    | 23         | 0%     | 0%       | 0%    | 20%   | 50%       | 0%     |
+    | 24         | 0%     | 0%       | 0%    | 10%   | 60%       | 0%     |
+    | 25         | 0%     | 0%       | 0%    | 0%    | 70%       | 0%     |
+    | 26         | 0%     | 0%       | 0%    | 0%    | 40%       | 30%    |
+    | 27         | 0%     | 0%       | 0%    | 0%    | 30%       | 40%    |
+    | 28         | 0%     | 0%       | 0%    | 0%    | 20%       | 50%    |
+    | 29         | 0%     | 0%       | 0%    | 0%    | 10%       | 60%    |
+    | 30         | 0%     | 0%       | 0%    | 0%    | 0%        | 70%    |
+
+> For example, if the aura extractor is of *Epic* quality and the "Quality" node is at level 16, then the player has a 40% chance of getting a *Rare* orb and a 60% chance of getting an *Epic* orb. 
+> - 40% chance of getting a *Rare* orb comes from "Quality" node at level 16
+> - 60% chance of getting an *Epic* orb comes from two sources:
+>   - 30% chance of getting an *Epic* orb from the aura extractor itself being of *Epic* quality
+>   - 30% chance of getting an *Epic* orb from the "Quality" node at level 16
 
 ## Creation Artifacts: the Vase and the Mirror
 
