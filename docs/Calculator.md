@@ -43,6 +43,7 @@ Where:
 - $Exp$ is the cultivation exp gained from consuming the pill
 
 - $PillBaseExp$ is the base cultivation exp of the pill, which is dependent on the rank and quality of the pill. The base cultivation exp for each rank and quality is (partially) defined in the following table:
+    <details><summary>Click to show table</summary>
 
     | Pill Rank | Common | Uncommon |  Rare  |  Epic  | Legendary | Mythic  |
     |-----------|--------|----------|--------|--------|-----------|---------|
@@ -58,6 +59,8 @@ Where:
     | 10        | 128375 | 256750   | 410800 | 770250 | 1540500   | 3081000 |
     | 11        | *TODO* | *TODO*   | *TODO* | *TODO* | *TODO*    | *TODO*  |
     | 12        | *TODO* | *TODO*   | *TODO* | *TODO* | *TODO*    | *TODO*  |
+
+    </details>
 
 - $PlayerPillBonus$ is the player's sum of all cultivation pill bonuses they gain from various sources such as techniques, curios, and immortal friends. Unfortunately, the game does not display the player's total cultivation pill bonus, so the value has to be calculated. Doubly unfortunate, the game rounds numbers to 2 decimal places, so even if we attempt to calculate the player's total cultivation pill bonus, we may not be able to get the exact number.
 
@@ -126,6 +129,8 @@ The quality of the exp orb produced by the aura extractor upon consuming a myrim
 
 2. The level of the "Quality" node distributes the remaining 70% chance among qualities as defined in the following table:
     
+    <details><summary>Click to show table</summary>
+
     | Node Level | Common | Uncommon | Rare  | Epic  | Legendary | Mythic |
     |------------|--------|----------|-------|-------|-----------|--------|
     | 0          | 70%    | 0%       | 0%    | 0%    | 0%        | 0%     |
@@ -159,6 +164,8 @@ The quality of the exp orb produced by the aura extractor upon consuming a myrim
     | 28         | 0%     | 0%       | 0%    | 0%    | 20%       | 50%    |
     | 29         | 0%     | 0%       | 0%    | 0%    | 10%       | 60%    |
     | 30         | 0%     | 0%       | 0%    | 0%    | 0%        | 70%    |
+
+    </details>
 
 > For example, if the aura extractor is of *Epic* quality and the "Quality" node is at level 16, then the player has a 40% chance of getting a *Rare* orb and a 60% chance of getting an *Epic* orb. 
 > - 40% chance of getting a *Rare* orb comes from "Quality" node at level 16
