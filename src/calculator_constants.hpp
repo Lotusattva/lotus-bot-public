@@ -134,7 +134,7 @@ constexpr inline const exp_t* const GATE_EXP_REQ[NUM_MAJOR_STAGES][NUM_MINOR_STA
             39438, 49517, 60033, 70112
         },
         (const exp_t[]) { // MIDDLE
-            60915, 77190, 93003, 108810, 125085
+            60915, 77190, 93000, 108810, 125085
         },
         (const exp_t[]) { // LATE
             158500, 199301, 241672, 280905, 324845, 364077
@@ -148,7 +148,7 @@ constexpr inline const exp_t* const GATE_EXP_REQ[NUM_MAJOR_STAGES][NUM_MINOR_STA
             308712, 389749, 470786, 551823, 632859, 710038, 794933
         },
         (const exp_t[]) { // LATE
-            719563, 918827, 1095905, 1295213, 1472337, 1671600, 1848723, 2047987
+            719563, 918827, 1095950, 1295213, 1472337, 1671600, 1848723, 2047987
         }
     },
     { // INCARNATION
@@ -392,7 +392,7 @@ static_assert(std::accumulate(RESPIRA_MULT_CHANCE, RESPIRA_MULT_CHANCE + 4, 0.0)
  *
  * TODO: these values need to be verified
  */
-constexpr inline const exp_t PILL_BASE_EXP[NUM_MAJOR_STAGES][NUM_QUALITIES]{
+constexpr inline const exp_t PILL_BASE_EXP[NUM_MAJOR_STAGES][NUM_RARITIES]{
     /*
 
     // UNUSED: pill base exp for Novice and Connection
@@ -400,47 +400,58 @@ constexpr inline const exp_t PILL_BASE_EXP[NUM_MAJOR_STAGES][NUM_QUALITIES]{
     { // NOVICE
         0, // COMMON
         0, // UNCOMMON
+        0, // RARE
+        0, // EPIC
+        0, // LEGENDARY
+        0  // MYTHIC
+
+    },
+    { // CONNECTION R1
+        125, // COMMON
+        250, // UNCOMMON
         400, // RARE
         750, // EPIC
         1500, // LEGENDARY
         3000 // MYTHIC
-    },
-    { // CONNECTION
-        0, // COMMON
-        0, // UNCOMMON
-        2000, // RARE
-        3750, // EPIC
-        7500, // LEGENDARY
-        15000 // MYTHIC
+
     },
 
     */
 
-    { // FOUNDATION
-        0, // COMMON
-        0, // UNCOMMON
+    { // FOUNDATION R2
+        625, // COMMON
+        1250, // UNCOMMON
+        2000, // RARE
+        3750, // EPIC
+        7500, // LEGENDARY
+        15000 // MYTHIC
+
+    },
+    { // VIRTUOSO R3
+        1900, // COMMON
+        3800, // UNCOMMON
         6080, // RARE
         11400, // EPIC
         22800, // LEGENDARY
         45600 // MYTHIC
     },
-    { // VIRTUOSO
-        0, // COMMON
-        0, // UNCOMMON
+    { // NASCENT R4
+        5000, // COMMON
+        10000, // UNCOMMON
         16000, // RARE
         30000, // EPIC
         60000, // LEGENDARY
         120000 // MYTHIC
     },
-    { // NASCENT
-        0, // COMMON
-        0, // UNCOMMON
+    { // INCARNATION R5
+        8000, // COMMON
+        16000, // UNCOMMON
         25600, // RARE
         48000, // EPIC
         96000, // LEGENDARY
         192000 // MYTHIC
     },
-    { // INCARNATION
+    { // VOIDBREAK
         0, // COMMON
         0, // UNCOMMON
         38400, // RARE
@@ -448,7 +459,7 @@ constexpr inline const exp_t PILL_BASE_EXP[NUM_MAJOR_STAGES][NUM_QUALITIES]{
         144000, // LEGENDARY
         288000 // MYTHIC
     },
-    { // VOIDBREAK
+    { // WHOLENESS
         0, // COMMON
         0, // UNCOMMON
         65600, // RARE
@@ -456,7 +467,7 @@ constexpr inline const exp_t PILL_BASE_EXP[NUM_MAJOR_STAGES][NUM_QUALITIES]{
         246000, // LEGENDARY
         492000 // MYTHIC
     },
-    { // WHOLENESS
+    { // PERFECTION
         0, // COMMON
         0, // UNCOMMON
         99200, // RARE
@@ -464,7 +475,7 @@ constexpr inline const exp_t PILL_BASE_EXP[NUM_MAJOR_STAGES][NUM_QUALITIES]{
         372000, // LEGENDARY
         744000 // MYTHIC
     },
-    { // PERFECTION
+    { // NIRVANA
         0, // COMMON
         0, // UNCOMMON
         182400, // RARE
@@ -472,16 +483,12 @@ constexpr inline const exp_t PILL_BASE_EXP[NUM_MAJOR_STAGES][NUM_QUALITIES]{
         684000, // LEGENDARY
         1368000 // MYTHIC
     },
-    { // NIRVANA
-        0, // COMMON
-        0, // UNCOMMON
+    { // CELESTIAL
+        0, 0, 0, 0, 0, 0 // no data available at this time
         410800, // RARE
         770250, // EPIC
         1540500, // LEGENDARY
         3081000 // MYTHIC
-    },
-    { // CELESTIAL
-        0, 0, 0, 0, 0, 0 // no data available at this time
     },
     { // ETERNAL
         0, 0, 0, 0, 0, 0 // no data available at this time
@@ -673,6 +680,7 @@ base_mult = [(1 + exp_node_bonus) + conditional_20%] * quality_multiplier
 
 exp_no_gush = base_mult * base_exp
 
+note: exp_node_bonus will be different depending on whether you are in mortal world or spirit world
 where:
 - base_mult = the multiplier applied to the base exp of the fruit without gush
 
@@ -680,7 +688,9 @@ where:
 
 - base_exp = base exp of the fruit based on its rank (R6, R7, etc)
 
-- exp_node_bonus = 0.02 * <level of the "CultiXP" extractor node>
+- exp_node_bonus_sw = 0.02 * <level of the "CultiXP" extractor node> (Spirit World)
+
+- exp_node_bonus_mw = 0.04 * <level of the "CultiXP" extractor node> (Mortal World)
 
 - conditional_20% = A conditional 20% exp bonus is applied to exp orb of a certain quality
     if the "CultiXP" extractor node is at or above this quality (ex. if the orb is RARE, and
@@ -694,15 +704,9 @@ where:
 gush_mult = EXP_GUSH_BASE_MULT
     + (EXP_GUSH_MULT_PER_NODE_LVL * <level of the "Gush" extractor node>)
 
-QUESTION:
-    Which is the correct calculation for exp with gush?
+Gush calculation equation :
 
-    - option 1:
-        exp_with_gush = base_exp * gush_mult
-    - option 2:
-        exp_with_gush = base_exp * (base_mult + gush_mult)
-    - option 3:
-        exp_with_gush = base_exp * base_mult * gush_mult
+exp_with_gush = base_exp * base_mult * gush_mult
 
 */
 
