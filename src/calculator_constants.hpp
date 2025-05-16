@@ -392,7 +392,7 @@ static_assert(std::accumulate(RESPIRA_MULT_CHANCE, RESPIRA_MULT_CHANCE + 4, 0.0)
  *
  * TODO: these values need to be verified
  */
-constexpr inline const exp_t PILL_BASE_EXP[NUM_MAJOR_STAGES][NUM_RARITIES]{
+constexpr inline const exp_t PILL_BASE_EXP[NUM_MAJOR_STAGES][NUM_QUALITIES]{
     /*
 
     // UNUSED: pill base exp for Novice and Connection
@@ -451,46 +451,47 @@ constexpr inline const exp_t PILL_BASE_EXP[NUM_MAJOR_STAGES][NUM_RARITIES]{
         96000, // LEGENDARY
         192000 // MYTHIC
     },
-    { // VOIDBREAK
-        0, // COMMON
-        0, // UNCOMMON
+    { // VOIDBREAK R6
+        12000, // COMMON
+        24000, // UNCOMMON
         38400, // RARE
         72000, // EPIC
         144000, // LEGENDARY
         288000 // MYTHIC
     },
-    { // WHOLENESS
-        0, // COMMON
-        0, // UNCOMMON
+    { // WHOLENESS R7
+        20500, // COMMON
+        41000, // UNCOMMON
         65600, // RARE
         123000, // EPIC
         246000, // LEGENDARY
         492000 // MYTHIC
     },
-    { // PERFECTION
-        0, // COMMON
-        0, // UNCOMMON
+    { // PERFECTION R8
+        31000, // COMMON
+        62000, // UNCOMMON
         99200, // RARE
         186000, // EPIC
         372000, // LEGENDARY
         744000 // MYTHIC
     },
-    { // NIRVANA
-        0, // COMMON
-        0, // UNCOMMON
+    { // NIRVANA R9
+        57000, // COMMON
+        114000, // UNCOMMON
         182400, // RARE
         342000, // EPIC
         684000, // LEGENDARY
         1368000 // MYTHIC
     },
-    { // CELESTIAL
-        0, 0, 0, 0, 0, 0 // no data available at this time
+    { // CELESTIAL R10
+        128375, // COMMON
+        256750, // UNCOMMON
         410800, // RARE
         770250, // EPIC
         1540500, // LEGENDARY
         3081000 // MYTHIC
     },
-    { // ETERNAL
+    { // ETERNAL R11
         0, 0, 0, 0, 0, 0 // no data available at this time
     }
 };
