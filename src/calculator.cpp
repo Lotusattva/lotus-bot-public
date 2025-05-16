@@ -38,6 +38,8 @@ task<void> calculator_select_click_handler(const select_click_t& event) {
     } else if (event.custom_id == "select_minor_stage") {
         if (DEBUG)
             cerr << "Minor stage selected: " << event.values[0] << endl;
+
+        client.minor_stage = get_minor_stage(event.values[0]);
     } else {
         cerr << "Unhandled select event: " << event.custom_id << endl;
     }
