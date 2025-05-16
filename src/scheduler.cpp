@@ -45,7 +45,7 @@ task<void> process_poll_results(timer _) {
         else
             members = confirmation.get<guild_member_map>();
 
-        optional<map<string, vector<string>>> voters{ co_await get_voters(msg, members) };
+        optional<map<string_view, vector<string>>> voters{ co_await get_voters(msg, members) };
         if (!voters.has_value()) {
             cerr << "Error: " << confirmation.get_error().message << endl;
             message error_msg{ message().set_content("Failed to fetch poll results.").set_channel_id(msg.channel_id) };
@@ -53,7 +53,7 @@ task<void> process_poll_results(timer _) {
             continue;
         }
 
-        map<string, vector<string>> role_selections{ voters.value() };
+        map<string_view, vector<string>> role_selections{ voters.value() };
         make_selections(role_selections);
         string post{ "# Selections: \n" + print_role_selections(role_selections) };
         message result_msg{ message().set_content(post).set_channel_id(msg.channel_id) };

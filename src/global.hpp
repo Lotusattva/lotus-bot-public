@@ -8,7 +8,7 @@
 using namespace std;
 using namespace dpp;
 
-inline const char* BOT_TOKEN{ getenv("BOT_TOKEN") };
+inline string BOT_TOKEN{ getenv("BOT_TOKEN") };
 
 inline cluster bot(BOT_TOKEN, intents::i_all_intents); // global bot instance
 
@@ -24,7 +24,7 @@ enum ArrayRole {
     NUM_ARRAY_ROLES
 };
 
-constexpr inline const char* const ARRAY_ROLE_STR[]{
+constexpr inline string_view const ARRAY_ROLE_STR[]{
     "Magical driver",
     "Magical passenger",
     "Physical driver",

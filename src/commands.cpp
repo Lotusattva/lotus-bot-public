@@ -69,14 +69,14 @@ task<void> end_debug_poll(const slashcommand_t& event) {
     debug_polls.erase(it);
 
     msg = callback.get<message>();
-    optional<map<string, vector<string>>> voters{ co_await get_voters(msg, members) };
+    optional<map<string_view, vector<string>>> voters{ co_await get_voters(msg, members) };
     if (!voters.has_value()) {
         co_await thinking;
         event.edit_original_response(message {"Could not fetch poll results."});
         co_return;
     }
 
-    map<string, vector<string>> role_selections{ voters.value() };
+    map<string_view, vector<string>> role_selections{ voters.value() };
     make_selections(role_selections);
     string post{ "# Selections: \n" + print_role_selections(role_selections) };
     co_await thinking;

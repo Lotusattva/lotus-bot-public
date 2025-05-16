@@ -27,6 +27,20 @@ task<void> calculator_select_click_handler(const select_click_t& event) {
 
     if (!it.has_value())
         co_return;
+
+    calculator_client_t& client{ it.value()->second.second };
+
+    if (event.custom_id == "select_major_stage") {
+        if (DEBUG)
+            cerr << "Major stage selected: " << event.values[0] << endl;
+
+        client.major_stage = get_major_stage(event.values[0]);
+    } else if (event.custom_id == "select_minor_stage") {
+        if (DEBUG)
+            cerr << "Minor stage selected: " << event.values[0] << endl;
+    } else {
+        cerr << "Unhandled select event: " << event.custom_id << endl;
+    }
 }
 
 template<std::derived_from<interaction_create_t> T>
@@ -100,7 +114,7 @@ task<void> calc_cancel(const button_click_t& event) {
 component major_stage_selectmenu_factory() {
     component major_stage_selectmenu{ component()
         .set_type(cot_selectmenu)
-        .set_id("major_stage")
+        .set_id("select_major_stage")
         .set_placeholder("Select your major stage")
         .set_required(true)
     };
@@ -114,7 +128,7 @@ component major_stage_selectmenu_factory() {
 component minor_stage_selectmenu_factory() {
     component minor_stage_selectmenu{ component()
         .set_type(cot_selectmenu)
-        .set_id("minor_stage")
+        .set_id("select_minor_stage")
         .set_placeholder("Select your minor stage")
         .set_required(true)
     };

@@ -11,8 +11,8 @@ void select(vector<string>& vec, unsigned limit) {
     }
 }
 
-task<optional<map<string, vector<string>>>> get_voters(const message& msg, const members_container& members) {
-    map<string, vector<string>> role_selections{
+task<optional<map<string_view, vector<string>>>> get_voters(const message& msg, const members_container& members) {
+    map<string_view, vector<string>> role_selections{
         { ARRAY_ROLE_STR[MAGICAL_DRIVER], {} },
         { ARRAY_ROLE_STR[MAGICAL_PASSENGER], {} },
         { ARRAY_ROLE_STR[PHYSICAL_DRIVER], {} },
@@ -42,20 +42,20 @@ task<optional<map<string, vector<string>>>> get_voters(const message& msg, const
     co_return role_selections;
 }
 
-void make_selections(map<string, vector<string>>& role_selections) {
+void make_selections(map<string_view, vector<string>>& role_selections) {
     for (auto i{ 0 }; i < NUM_ARRAY_ROLES; ++i)
         select(role_selections[ARRAY_ROLE_STR[i]], ARRAY_ROLE_LIMIT[i]);
 }
 
-string print_role_selections(const map<string, vector<string>>& role_selections) {
+string print_role_selections(const map<string_view, vector<string>>& role_selections) {
     string result;
     for (const auto& [role, names] : role_selections)
         result += print_single_role_selection(role, names);
     return result;
 }
 
-string print_single_role_selection(const string& role, const vector<string>& vec) {
-    string result{ "## " + role + "\n" };
+string print_single_role_selection(const string_view& role, const vector<string>& vec) {
+    string result{ "## " + string(role) + "\n" };
     if (vec.empty())
         result += "*No one signed up for this role.*\n";
     else for (const auto& name : vec)

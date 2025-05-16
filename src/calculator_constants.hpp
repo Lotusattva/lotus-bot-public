@@ -5,6 +5,18 @@
 #include <numeric>
 #include <map>
 #include <string>
+#include <string_view>
+
+////////////// Utility functions //////////////
+
+// Compile-time string hash
+constexpr uint64_t hash_string(std::string_view str) {
+    uint64_t hash = 5381;
+    for (char c : str) {
+        hash = ((hash << 5) + hash) + static_cast<unsigned char>(c);
+    }
+    return hash;
+}
 
 /////////////////// Item rarities ////////////////
 
@@ -57,6 +69,24 @@ constexpr inline const char* MAJOR_STAGE_STR[NUM_MAJOR_STAGES]{
     "Eternal"
 };
 
+constexpr major_stage_t get_major_stage(std::string_view name) {
+    const uint64_t hash = hash_string(name);
+
+    switch (hash) {
+        case hash_string("Foundation"): return FOUNDATION;
+        case hash_string("Virtuoso"): return VIRTUOSO;
+        case hash_string("Nascence"): return NASCENT;
+        case hash_string("Incarnation"): return INCARNATION;
+        case hash_string("Voidbreak"): return VOIDBREAK;
+        case hash_string("Wholeness"): return WHOLENESS;
+        case hash_string("Perfection"): return PERFECTION;
+        case hash_string("Nirvana"): return NIRVANA;
+        case hash_string("Celestial"): return CELESTIAL;
+        case hash_string("Eternal"): return ETERNAL;
+        default: return NUM_MAJOR_STAGES; // An invalid stage, indicates an error
+    }
+}
+
 enum minor_stage_t {
     EARLY,
     MIDDLE,
@@ -70,6 +100,17 @@ constexpr inline const char* MINOR_STAGE_STR[NUM_MINOR_STAGES]{
     "Middle",
     "Late"
 };
+
+constexpr minor_stage_t get_minor_stage(std::string_view name) {
+    const uint64_t hash = hash_string(name);
+
+    switch (hash) {
+        case hash_string("Early"): return EARLY;
+        case hash_string("Middle"): return MIDDLE;
+        case hash_string("Late"): return LATE;
+        default: return NUM_MINOR_STAGES; // An invalid stage, indicates an error
+    }
+}
 
 /**
  * A 2d array describing the number of gates in each stage

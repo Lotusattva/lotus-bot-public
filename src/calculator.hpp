@@ -21,7 +21,7 @@ enum calc_event_t {
     NUM_CALC_EVENTS
 };
 
-constexpr inline const char* const CALC_EVENT_IDS[NUM_CALC_EVENTS]{
+constexpr inline string_view const CALC_EVENT_IDS[NUM_CALC_EVENTS]{
     "calc_cancel",
     "calc_ask_stage",
     "calc_ask_percent_progress"
