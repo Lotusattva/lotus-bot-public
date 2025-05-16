@@ -3,6 +3,8 @@
 
 #include <cassert>
 #include <numeric>
+#include <map>
+#include <string>
 
 /////////////////// Item rarities ////////////////
 
@@ -42,12 +44,31 @@ enum major_stage_t {
     NUM_MAJOR_STAGES
 };
 
+constexpr inline const char* MAJOR_STAGE_STR[NUM_MAJOR_STAGES]{
+    "Foundation",
+    "Virtuoso",
+    "Nascence",
+    "Incarnation",
+    "Voidbreak",
+    "Wholeness",
+    "Perfection",
+    "Nirvana",
+    "Celestial",
+    "Eternal"
+};
+
 enum minor_stage_t {
     EARLY,
     MIDDLE,
     LATE,
 
     NUM_MINOR_STAGES
+};
+
+constexpr inline const char* MINOR_STAGE_STR[NUM_MINOR_STAGES]{
+    "Early",
+    "Middle",
+    "Late"
 };
 
 /**

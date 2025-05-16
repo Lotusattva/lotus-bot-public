@@ -1,5 +1,6 @@
 #include "commands.hpp"
 #include "poll_helper.hpp"
+#include "calculator.hpp"
 
 task<void> start_debug_poll(const slashcommand_t& event) {
     // remove finalized polls
@@ -101,13 +102,6 @@ task<void> start_interactive_calculator(const slashcommand_t& event) {
         .set_style(cos_primary)
         .set_label("NEXT")
         .set_id("ask_stage")
-    };
-
-    static component cancel_button{ component()
-        .set_type(cot_button)
-        .set_style(cos_danger)
-        .set_label("CANCEL")
-        .set_id("cancel_calc")
     };
 
     static component action_row{ component()

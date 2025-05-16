@@ -14,4 +14,13 @@ task<void> cancel_calc(const button_click_t& event);
 
 task<void> ask_stage(const button_click_t& event);
 
+inline const component cancel_button{ component()
+    .set_type(cot_button)
+    .set_style(cos_danger)
+    .set_label("CANCEL")
+    .set_id("cancel_calc")
+};
+
+task<void> ask_percent_progress(const button_click_t& event);
+
 #endif // CALCULATOR_HPP

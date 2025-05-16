@@ -67,6 +67,14 @@ int main() {
             co_await cancel_calc(event);
         else if (event.custom_id == "ask_stage")
             co_await ask_stage(event);
+        else if (event.custom_id == "ask_percent_progress")
+            co_await ask_percent_progress(event);
+        }
+    );
+
+    bot.on_select_click([](const select_click_t& event) -> task<void> {
+        // do nothing
+        co_await event.co_reply(ir_deferred_update_message, "");
         }
     );
 
