@@ -35,8 +35,7 @@ int main() {
             }
         }
 
-        }
-    );
+        });
 
     bot.on_ready([](const ready_t& event) {
         if (run_once<struct register_bot_commands>()) {
@@ -59,8 +58,7 @@ int main() {
             bot.global_bulk_command_create({ debug_cmd });
         }
 
-        }
-    );
+        });
 
     bot.on_button_click([](const button_click_t& event) -> task<void> {
         // if event.custom_id starts with "calc_", redirect to calculator handler
@@ -72,14 +70,12 @@ int main() {
                 cerr << "Unhandled button click event: " << event.custom_id << endl;
         }
 
-        }
-    );
+        });
 
     bot.on_select_click([](const select_click_t& event) -> task<void> {
         // do nothing
         co_await event.co_reply(ir_deferred_update_message, "");
-        }
-    );
+        });
 
     if (DEBUG) {
         // nothing for now
