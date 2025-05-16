@@ -1,5 +1,69 @@
 #include "calculator.hpp"
-#include "calculator_constants.hpp"
+
+static const component cancel_button{ component()
+    .set_type(cot_button)
+    .set_style(cos_danger)
+    .set_label("CANCEL")
+    .set_id("calc_cancel")
+};
+
+task<void> start_interactive_calculator(const slashcommand_t& event) {
+    static component calc_overview_text{ component()
+        .set_type(cot_text_display)
+        .set_content(
+            "This is a cultivation calculator that produces an estimate of "
+            "the time it takes to breakthrough to the next major stage.\n\n"
+            "I will walk you through a step-by-step process to collect the "
+            "necessary in-game data to perform the calculation. Please grab "
+            "your mobile device and launch the game. \n\n"
+            "Click **NEXT** if you are ready proceed! "
+            "Otherwise, click **CANCEL** to end this session."
+        )
+    };
+
+    static component next_button{ component()
+        .set_type(cot_button)
+        .set_style(cos_primary)
+        .set_label("NEXT")
+        .set_id("calc_ask_stage")
+    };
+
+    static component action_row{ component()
+        .set_type(cot_action_row)
+        .add_component_v2(next_button)
+        .add_component_v2(cancel_button)
+    };
+
+    static message msg{ message()
+        .set_flags(m_using_components_v2)
+        .add_component_v2(component()
+            .set_type(cot_container)
+            .add_component_v2(calc_overview_text)
+            .add_component_v2(action_row)
+        )
+    };
+
+    co_await event.co_reply(msg);
+
+    // logs session
+    snowflake user_id{ event.command.usr.id };
+
+    if (DEBUG)
+        cerr << "User ID: " << user_id << endl;
+
+    confirmation_callback_t callback{ co_await event.co_get_original_response() };
+    if (callback.is_error()) {
+        cerr << "Error: " << callback.get_error().message << endl;
+        co_return;
+    }
+    snowflake msg_id{ callback.get<message>().id };
+
+    if (DEBUG)
+        cerr << "Message ID: " << msg_id << endl;
+
+    calc_sessions.insert({ user_id, make_pair(msg_id, calculator_client_t{}) });
+    co_return;
+}
 
 task<void> calculator_button_click_handler(const button_click_t& event) {
     if (!co_await verify_user(event))
