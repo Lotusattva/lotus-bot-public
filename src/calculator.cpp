@@ -24,7 +24,7 @@ task<void> calculator_button_click_handler(const button_click_t& event) {
 
 task<void> calculator_select_click_handler(const select_click_t& event) {
     auto it{ co_await verify_user(event) };
-    if (!it.has_value())
+    if (!it)
         co_return;
 
     calculator_client_t& client{ it.value()->second.second };
@@ -145,7 +145,7 @@ task<void> calc_ask_stage(const button_click_t& event) {
     static component major_stage_selectmenu{ component()
         .set_type(cot_action_row)
         .add_component_v2(major_stage_selectmenu_factory()) };
-        
+
     static component minor_stage_selectmenu{ component()
         .set_type(cot_action_row)
         .add_component_v2(minor_stage_selectmenu_factory()) };
