@@ -10,7 +10,7 @@
 ////////////// Utility functions //////////////
 
 // Compile-time string hash
-constexpr uint64_t hash_string(std::string_view str) {
+constexpr uint64_t hash_string(string_view str) {
     uint64_t hash = 5381;
     for (char c : str) {
         hash = ((hash << 5) + hash) + static_cast<unsigned char>(c);
@@ -30,7 +30,6 @@ enum quality_t {
 
     NUM_QUALITIES
 };
-
 
 
 ///////////////// Cultivation stages and exp requirements /////////////////
@@ -56,33 +55,33 @@ enum major_stage_t {
     NUM_MAJOR_STAGES
 };
 
-constexpr inline const char* MAJOR_STAGE_STR[NUM_MAJOR_STAGES]{
-    "Foundation",
-    "Virtuoso",
-    "Nascence",
-    "Incarnation",
-    "Voidbreak",
-    "Wholeness",
-    "Perfection",
-    "Nirvana",
-    "Celestial",
-    "Eternal"
+constexpr inline string_view MAJOR_STAGE_STR[NUM_MAJOR_STAGES]{
+    "Foundation"sv,
+    "Virtuoso"sv,
+    "Nascence"sv,
+    "Incarnation"sv,
+    "Voidbreak"sv,
+    "Wholeness"sv,
+    "Perfection"sv,
+    "Nirvana"sv,
+    "Celestial"sv,
+    "Eternal"sv
 };
 
 constexpr major_stage_t get_major_stage(std::string_view name) {
     const uint64_t hash = hash_string(name);
 
     switch (hash) {
-        case hash_string("Foundation"): return FOUNDATION;
-        case hash_string("Virtuoso"): return VIRTUOSO;
-        case hash_string("Nascence"): return NASCENT;
-        case hash_string("Incarnation"): return INCARNATION;
-        case hash_string("Voidbreak"): return VOIDBREAK;
-        case hash_string("Wholeness"): return WHOLENESS;
-        case hash_string("Perfection"): return PERFECTION;
-        case hash_string("Nirvana"): return NIRVANA;
-        case hash_string("Celestial"): return CELESTIAL;
-        case hash_string("Eternal"): return ETERNAL;
+        case hash_string(MAJOR_STAGE_STR[FOUNDATION]): return FOUNDATION;
+        case hash_string(MAJOR_STAGE_STR[VIRTUOSO]): return VIRTUOSO;
+        case hash_string(MAJOR_STAGE_STR[NASCENT]): return NASCENT;
+        case hash_string(MAJOR_STAGE_STR[INCARNATION]): return INCARNATION;
+        case hash_string(MAJOR_STAGE_STR[VOIDBREAK]): return VOIDBREAK;
+        case hash_string(MAJOR_STAGE_STR[WHOLENESS]): return WHOLENESS;
+        case hash_string(MAJOR_STAGE_STR[PERFECTION]): return PERFECTION;
+        case hash_string(MAJOR_STAGE_STR[NIRVANA]): return NIRVANA;
+        case hash_string(MAJOR_STAGE_STR[CELESTIAL]): return CELESTIAL;
+        case hash_string(MAJOR_STAGE_STR[ETERNAL]): return ETERNAL;
         default: return NUM_MAJOR_STAGES; // An invalid stage, indicates an error
     }
 }
@@ -95,19 +94,19 @@ enum minor_stage_t {
     NUM_MINOR_STAGES
 };
 
-constexpr inline const char* MINOR_STAGE_STR[NUM_MINOR_STAGES]{
-    "Early",
-    "Middle",
-    "Late"
+constexpr inline string_view MINOR_STAGE_STR[NUM_MINOR_STAGES]{
+    "Early"sv,
+    "Middle"sv,
+    "Late"sv
 };
 
 constexpr minor_stage_t get_minor_stage(std::string_view name) {
     const uint64_t hash = hash_string(name);
 
     switch (hash) {
-        case hash_string("Early"): return EARLY;
-        case hash_string("Middle"): return MIDDLE;
-        case hash_string("Late"): return LATE;
+        case hash_string(MINOR_STAGE_STR[EARLY]): return EARLY;
+        case hash_string(MINOR_STAGE_STR[MIDDLE]): return MIDDLE;
+        case hash_string(MINOR_STAGE_STR[LATE]): return LATE;
         default: return NUM_MINOR_STAGES; // An invalid stage, indicates an error
     }
 }
