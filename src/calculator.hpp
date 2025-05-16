@@ -29,7 +29,7 @@ constexpr inline const char* const CALC_EVENT_IDS[NUM_CALC_EVENTS]{
 /**
  * @brief verify whether the user causing the interaction is the owner of the session
  *
- * @returns an iterator to the session if the user is the owner, otherwise returns nulllopt
+ * @returns an iterator to the session if the user is the owner, otherwise returns nullopt
  */
 task<optional<unordered_map<snowflake, pair<snowflake, calculator_client_t>>::iterator>> verify_user(const button_click_t& event);
 
