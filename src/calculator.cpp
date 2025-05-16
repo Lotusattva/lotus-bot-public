@@ -1,6 +1,24 @@
 #include "calculator.hpp"
 #include "calculator_constants.hpp"
 
+task<void> calculator_handler(const button_click_t& event) {
+    const string& id{ event.custom_id };
+
+    if (DEBUG)
+        cerr << "Handling calculator event: " << id << endl;
+
+    if (id == CALC_EVENT_IDS[CALC_CANCEL])
+        co_await calc_cancel(event);
+    else if (id == CALC_EVENT_IDS[CALC_ASK_STAGE])
+        co_await calc_ask_stage(event);
+    else if (id == CALC_EVENT_IDS[CALC_ASK_PERCENT_PROGRESS])
+        co_await calc_ask_percent_progress(event);
+    else
+        cerr << "Unhandled calculator event: " << id << endl;
+
+    co_return;
+}
+
 task<optional<unordered_map<snowflake, pair<snowflake, calculator_client_t>>::iterator>> verify_user(const button_click_t& event) {
     if (DEBUG)
         cerr << "Verifying user..." << endl;
