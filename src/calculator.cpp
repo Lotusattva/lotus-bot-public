@@ -201,6 +201,8 @@ task<void> calc_ask_stage(const button_click_t& event) {
     if (DEBUG)
         cerr << "Asking for cultivation stage..." << endl;
 
+    //////////// Customize UI elements here! ////////////////
+
     static component text_display{ component()
         .set_type(cot_text_display)
         .set_content("Please select your major and minor stage")
@@ -254,6 +256,13 @@ task<void> calc_ask_stage(const button_click_t& event) {
 task<void> calc_ask_percent_progress(const button_click_t& event) {
     if (DEBUG)
         cerr << "Asking for percent progress..." << endl;
+
+    //////////// Customize UI elements here! ////////////////
+
+    static component text_display{ component()
+        .set_type(cot_text_display)
+        .set_content("WRITE SOME TEXT HERE")
+    };
 
     // TODO
 
