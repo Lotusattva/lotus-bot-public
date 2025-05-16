@@ -27,6 +27,17 @@ constexpr inline string_view const CALC_EVENT_IDS[NUM_CALC_EVENTS]{
     "calc_ask_percent_progress"
 };
 
+enum calc_select_t {
+    CALC_SELECT_MAJOR_STAGE,
+    CALC_SELECT_MINOR_STAGE,
+
+    NUM_CALC_SELECTS
+};
+
+constexpr inline string_view const CALC_SELECT_IDS[NUM_CALC_SELECTS]{
+    "calc_select_major_stage",
+    "calc_select_minor_stage"
+};
 
 /**
  * @brief verify whether the user causing the interaction is the owner of the session

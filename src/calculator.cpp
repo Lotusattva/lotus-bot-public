@@ -2,6 +2,9 @@
 #include "calculator_constants.hpp"
 
 task<void> calculator_button_click_handler(const button_click_t& event) {
+    if (!(co_await verify_user(event)).has_value())
+        co_return;
+
     const string& id{ event.custom_id };
 
     if (DEBUG)
@@ -20,22 +23,18 @@ task<void> calculator_button_click_handler(const button_click_t& event) {
 }
 
 task<void> calculator_select_click_handler(const select_click_t& event) {
-    if (DEBUG)
-        cerr << "Canceling calculator session..." << endl;
-
     auto it{ co_await verify_user(event) };
-
     if (!it.has_value())
         co_return;
 
     calculator_client_t& client{ it.value()->second.second };
 
-    if (event.custom_id == "select_major_stage") {
+    if (event.custom_id == CALC_SELECT_IDS[CALC_SELECT_MAJOR_STAGE]) {
         if (DEBUG)
             cerr << "Major stage selected: " << event.values[0] << endl;
 
         client.major_stage = get_major_stage(event.values[0]);
-    } else if (event.custom_id == "select_minor_stage") {
+    } else if (event.custom_id == CALC_SELECT_IDS[CALC_SELECT_MINOR_STAGE]) {
         if (DEBUG)
             cerr << "Minor stage selected: " << event.values[0] << endl;
 
@@ -86,14 +85,6 @@ task<void> calc_cancel(const button_click_t& event) {
     if (DEBUG)
         cerr << "Canceling calculator session..." << endl;
 
-    auto it{ co_await verify_user(event) };
-
-    if (!it.has_value())
-        co_return;
-
-    if (DEBUG)
-        cerr << "Owner verified, removing session..." << endl;
-
     static message session_cancel_message{ message()
         .set_flags(m_using_components_v2)
         .add_component_v2(component()
@@ -109,14 +100,14 @@ task<void> calc_cancel(const button_click_t& event) {
 
     co_await event.co_edit_response(session_cancel_message);
 
-    calc_sessions.erase(it.value());
+    calc_sessions.erase(event.command.usr.id);
     co_return;
 }
 
 component major_stage_selectmenu_factory() {
     component major_stage_selectmenu{ component()
         .set_type(cot_selectmenu)
-        .set_id("select_major_stage")
+        .set_id(CALC_SELECT_IDS[CALC_SELECT_MAJOR_STAGE])
         .set_placeholder("Select your major stage")
         .set_required(true)
     };
@@ -130,7 +121,7 @@ component major_stage_selectmenu_factory() {
 component minor_stage_selectmenu_factory() {
     component minor_stage_selectmenu{ component()
         .set_type(cot_selectmenu)
-        .set_id("select_minor_stage")
+        .set_id(CALC_SELECT_IDS[CALC_SELECT_MINOR_STAGE])
         .set_placeholder("Select your minor stage")
         .set_required(true)
     };
@@ -144,14 +135,6 @@ component minor_stage_selectmenu_factory() {
 task<void> calc_ask_stage(const button_click_t& event) {
     if (DEBUG)
         cerr << "Asking for cultivation stage..." << endl;
-
-    auto it{ co_await verify_user(event) };
-
-    if (!it.has_value())
-        co_return;
-
-    if (DEBUG)
-        cerr << "Owner verified, asking for cultivation stage..." << endl;
 
     static component text_display{ component()
         .set_type(cot_text_display)
@@ -207,14 +190,6 @@ task<void> calc_ask_stage(const button_click_t& event) {
 task<void> calc_ask_percent_progress(const button_click_t& event) {
     if (DEBUG)
         cerr << "Asking for percent progress..." << endl;
-
-    auto it{ co_await verify_user(event) };
-
-    if (!it.has_value())
-        co_return;
-
-    if (DEBUG)
-        cerr << "Owner verified, asking for percent progress..." << endl;
 
     // TODO
 
