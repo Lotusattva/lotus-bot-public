@@ -37,7 +37,7 @@ task<optional<unordered_map<snowflake, pair<snowflake, calculator_client_t>>::it
     co_return it;
 }
 
-task<void> cancel_calc(const button_click_t& event) {
+task<void> calc_cancel(const button_click_t& event) {
     co_await event.co_reply(ir_deferred_update_message, "");
 
     if (DEBUG)
@@ -98,7 +98,7 @@ component minor_stage_selectmenu_factory() {
     return minor_stage_selectmenu;
 }
 
-task<void> ask_stage(const button_click_t& event) {
+task<void> calc_ask_stage(const button_click_t& event) {
     co_await event.co_reply(ir_deferred_update_message, "");
 
     if (DEBUG)
@@ -124,10 +124,10 @@ task<void> ask_stage(const button_click_t& event) {
         .set_type(cot_button)
         .set_style(cos_primary)
         .set_label("NEXT")
-        .set_id("ask_percent_progress")
+        .set_id("calc_ask_percent_progress")
     };
 
-    static message ask_stage_message{ message()
+    static message calc_ask_stage_message{ message()
         .set_flags(m_using_components_v2)
         .add_component_v2(component()
             // a container
@@ -153,7 +153,7 @@ task<void> ask_stage(const button_click_t& event) {
     if (DEBUG)
         cerr << "Sending cultivation stage selection message..." << endl;
 
-    confirmation_callback_t confirmation{ co_await event.co_edit_response(ask_stage_message) };
+    confirmation_callback_t confirmation{ co_await event.co_edit_response(calc_ask_stage_message) };
 
     if (confirmation.is_error()) {
         cerr << "Error: " << confirmation.get_error().message << endl;
@@ -163,7 +163,7 @@ task<void> ask_stage(const button_click_t& event) {
     co_return;
 }
 
-task<void> ask_percent_progress(const button_click_t& event) {
+task<void> calc_ask_percent_progress(const button_click_t& event) {
     co_await event.co_reply(ir_deferred_update_message, "");
 
     if (DEBUG)

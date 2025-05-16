@@ -101,7 +101,7 @@ task<void> start_interactive_calculator(const slashcommand_t& event) {
         .set_type(cot_button)
         .set_style(cos_primary)
         .set_label("NEXT")
-        .set_id("ask_stage")
+        .set_id("calc_ask_stage")
     };
 
     static component action_row{ component()

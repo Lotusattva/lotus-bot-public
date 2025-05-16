@@ -63,12 +63,15 @@ int main() {
     );
 
     bot.on_button_click([](const button_click_t& event) -> task<void> {
-        if (event.custom_id == "cancel_calc")
-            co_await cancel_calc(event);
-        else if (event.custom_id == "ask_stage")
-            co_await ask_stage(event);
-        else if (event.custom_id == "ask_percent_progress")
-            co_await ask_percent_progress(event);
+        // if event.custom_id starts with "calc_", redirect to calculator handler
+        if (event.custom_id.starts_with("calc_"))
+            co_await calculator_handler(event);
+        else {
+            co_await event.co_reply(ir_deferred_update_message, ""); // do nothing on client side
+            if (DEBUG)
+                cerr << "Unhandled button click event: " << event.custom_id << endl;
+        }
+
         }
     );
 
