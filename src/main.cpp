@@ -61,11 +61,12 @@ int main() {
         });
 
     bot.on_button_click([](const button_click_t& event) -> task<void> {
+        co_await event.co_reply(ir_deferred_update_message, ""); 
         // if event.custom_id starts with "calc_", redirect to calculator handler
         if (event.custom_id.starts_with("calc_"))
-            co_await calculator_handler(event);
+            co_await calculator_button_click_handler(event);
         else {
-            co_await event.co_reply(ir_deferred_update_message, ""); // do nothing on client side
+            // do nothing on client side
             if (DEBUG)
                 cerr << "Unhandled button click event: " << event.custom_id << endl;
         }
@@ -73,8 +74,15 @@ int main() {
         });
 
     bot.on_select_click([](const select_click_t& event) -> task<void> {
-        // do nothing
         co_await event.co_reply(ir_deferred_update_message, "");
+        // if event.custom_id starts with "calc_", redirect to calculator handler
+        if (event.custom_id.starts_with("calc_"))
+            co_await calculator_select_click_handler(event);
+        else {
+            // do nothing on client side
+            if (DEBUG)
+                cerr << "Unhandled select click event: " << event.custom_id << endl;
+        }
         });
 
     if (DEBUG) {
