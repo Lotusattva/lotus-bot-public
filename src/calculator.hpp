@@ -4,7 +4,8 @@
 #include "global.hpp"
 #include "calculator_client.hpp"
 
-task<void> calculator_handler(const button_click_t& event);
+task<void> calculator_button_click_handler(const button_click_t& event);
+task<void> calculator_select_click_handler(const select_click_t& event);
 
 /**
  * Represents ownership of calculator sessions
@@ -26,12 +27,14 @@ constexpr inline const char* const CALC_EVENT_IDS[NUM_CALC_EVENTS]{
     "calc_ask_percent_progress"
 };
 
+
 /**
  * @brief verify whether the user causing the interaction is the owner of the session
  *
  * @returns an iterator to the session if the user is the owner, otherwise returns nullopt
  */
-task<optional<unordered_map<snowflake, pair<snowflake, calculator_client_t>>::iterator>> verify_user(const button_click_t& event);
+template<std::derived_from<interaction_create_t> T>
+task<optional<unordered_map<snowflake, pair<snowflake, calculator_client_t>>::iterator>> verify_user(const T& event);
 
 task<void> calc_cancel(const button_click_t& event);
 

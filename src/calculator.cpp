@@ -1,7 +1,7 @@
 #include "calculator.hpp"
 #include "calculator_constants.hpp"
 
-task<void> calculator_handler(const button_click_t& event) {
+task<void> calculator_button_click_handler(const button_click_t& event) {
     const string& id{ event.custom_id };
 
     if (DEBUG)
@@ -19,7 +19,18 @@ task<void> calculator_handler(const button_click_t& event) {
     co_return;
 }
 
-task<optional<unordered_map<snowflake, pair<snowflake, calculator_client_t>>::iterator>> verify_user(const button_click_t& event) {
+task<void> calculator_select_click_handler(const select_click_t& event) {
+    if (DEBUG)
+        cerr << "Canceling calculator session..." << endl;
+
+    auto it{ co_await verify_user(event) };
+
+    if (!it.has_value())
+        co_return;
+}
+
+template<std::derived_from<interaction_create_t> T>
+task<optional<unordered_map<snowflake, pair<snowflake, calculator_client_t>>::iterator>> verify_user(const T& event) {
     if (DEBUG)
         cerr << "Verifying user..." << endl;
 
@@ -56,8 +67,6 @@ task<optional<unordered_map<snowflake, pair<snowflake, calculator_client_t>>::it
 }
 
 task<void> calc_cancel(const button_click_t& event) {
-    co_await event.co_reply(ir_deferred_update_message, "");
-
     if (DEBUG)
         cerr << "Canceling calculator session..." << endl;
 
@@ -117,8 +126,6 @@ component minor_stage_selectmenu_factory() {
 }
 
 task<void> calc_ask_stage(const button_click_t& event) {
-    co_await event.co_reply(ir_deferred_update_message, "");
-
     if (DEBUG)
         cerr << "Asking for cultivation stage..." << endl;
 
@@ -182,8 +189,6 @@ task<void> calc_ask_stage(const button_click_t& event) {
 }
 
 task<void> calc_ask_percent_progress(const button_click_t& event) {
-    co_await event.co_reply(ir_deferred_update_message, "");
-
     if (DEBUG)
         cerr << "Asking for percent progress..." << endl;
 
@@ -194,13 +199,6 @@ task<void> calc_ask_percent_progress(const button_click_t& event) {
 
     if (DEBUG)
         cerr << "Owner verified, asking for percent progress..." << endl;
-
-    // retrive components on original message
-    confirmation_callback_t callback{ co_await event.co_get_original_response() };
-    if (callback.is_error()) {
-        cerr << "Error: " << callback.get_error().message << endl;
-        co_return;
-    }
 
     // TODO
 
