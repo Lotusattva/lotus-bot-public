@@ -2,7 +2,7 @@
 #include "calculator_constants.hpp"
 
 task<void> calculator_button_click_handler(const button_click_t& event) {
-    if (!(co_await verify_user(event)).has_value())
+    if (!co_await verify_user(event))
         co_return;
 
     const string& id{ event.custom_id };
@@ -39,12 +39,13 @@ task<void> calculator_select_click_handler(const select_click_t& event) {
             cerr << "Minor stage selected: " << event.values[0] << endl;
 
         client.minor_stage = get_minor_stage(event.values[0]);
-    } else {
+    } else
         cerr << "Unhandled select event: " << event.custom_id << endl;
-    }
+
+    co_return;
 }
 
-template<std::derived_from<interaction_create_t> T>
+template<derived_from<interaction_create_t> T>
 task<optional<unordered_map<snowflake, pair<snowflake, calculator_client_t>>::iterator>> verify_user(const T& event) {
     if (DEBUG)
         cerr << "Verifying user..." << endl;
@@ -141,8 +142,13 @@ task<void> calc_ask_stage(const button_click_t& event) {
         .set_content("Please select your major and minor stage")
     };
 
-    static component major_stage_selectmenu{ major_stage_selectmenu_factory() };
-    static component minor_stage_selectmenu{ minor_stage_selectmenu_factory() };
+    static component major_stage_selectmenu{ component()
+        .set_type(cot_action_row)
+        .add_component_v2(major_stage_selectmenu_factory()) };
+        
+    static component minor_stage_selectmenu{ component()
+        .set_type(cot_action_row)
+        .add_component_v2(minor_stage_selectmenu_factory()) };
 
     static component next_button{ component()
         .set_type(cot_button)
@@ -158,14 +164,8 @@ task<void> calc_ask_stage(const button_click_t& event) {
             .set_type(cot_container)
             // ...with a text display
             .add_component_v2(text_display)
-            .add_component_v2(component()
-                .set_type(cot_action_row)
-                .add_component_v2(major_stage_selectmenu)
-            )
-            .add_component_v2(component()
-                .set_type(cot_action_row)
-                .add_component_v2(minor_stage_selectmenu)
-            )
+            .add_component_v2(major_stage_selectmenu)
+            .add_component_v2(minor_stage_selectmenu)
             .add_component_v2(component()
                 .set_type(cot_action_row)
                 .add_component_v2(next_button)
