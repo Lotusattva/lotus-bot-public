@@ -137,6 +137,6 @@ task<void> start_interactive_calculator(const slashcommand_t& event) {
     if (DEBUG)
         cerr << "Message ID: " << msg_id << endl;
 
-    calc_sessions.insert({ user_id, msg_id });
+    calc_sessions.insert({ user_id, make_pair(msg_id, calculator_client_t{}) });
     co_return;
 }

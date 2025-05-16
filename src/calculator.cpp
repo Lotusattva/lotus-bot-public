@@ -1,7 +1,7 @@
 #include "calculator.hpp"
 #include "calculator_constants.hpp"
 
-task<optional<unordered_map<snowflake, snowflake>::iterator>> verify_user(const button_click_t& event) {
+task<optional<unordered_map<snowflake, pair<snowflake, calculator_client_t>>::iterator>> verify_user(const button_click_t& event) {
     if (DEBUG)
         cerr << "Verifying user..." << endl;
 
@@ -26,7 +26,7 @@ task<optional<unordered_map<snowflake, snowflake>::iterator>> verify_user(const 
     if (DEBUG)
         cerr << "Message ID: " << msg_id << endl;
 
-    if (it->second != msg_id) {
+    if (it->second.first != msg_id) {
         if (DEBUG)
             cerr << "User ID: " << user_id << " is not the owner of this session." << endl;
         co_return nullopt;
@@ -43,7 +43,7 @@ task<void> cancel_calc(const button_click_t& event) {
     if (DEBUG)
         cerr << "Canceling calculator session..." << endl;
 
-    optional<unordered_map<snowflake, snowflake>::iterator> it{ co_await verify_user(event) };
+    auto it{ co_await verify_user(event) };
 
     if (!it.has_value())
         co_return;
@@ -104,7 +104,7 @@ task<void> ask_stage(const button_click_t& event) {
     if (DEBUG)
         cerr << "Asking for cultivation stage..." << endl;
 
-    optional<unordered_map<snowflake, snowflake>::iterator> it{ co_await verify_user(event) };
+    auto it{ co_await verify_user(event) };
 
     if (!it.has_value())
         co_return;
@@ -169,7 +169,7 @@ task<void> ask_percent_progress(const button_click_t& event) {
     if (DEBUG)
         cerr << "Asking for percent progress..." << endl;
 
-    optional<unordered_map<snowflake, snowflake>::iterator> it{ co_await verify_user(event) };
+    auto it{ co_await verify_user(event) };
 
     if (!it.has_value())
         co_return;
