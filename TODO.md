@@ -11,7 +11,7 @@ An interactive calculator that produces an estimate of how much longer it takes 
     - Functional:
         - [x] Data collection through select menu
         - [x] Data collection for more precise numerical values via complementary slash commands
-        - [ ] Action buttons for easier navigation between steps
+        - [x] Action buttons for easier navigation between steps
     - Peripheral:
         - [ ] Detailed how-to text descriptions for each step
         - [ ] Complementary in-game screenshots
@@ -20,9 +20,10 @@ An interactive calculator that produces an estimate of how much longer it takes 
 
 ## Backend
 - [x] Message ownership (for preventing other users from tempering with inputs of the command-initiating user)
-- [ ] Define calculator constants
+- [ ] Prevent a user from starting multiple calculator sessions
+- [x] Define calculator constants
 - [ ] Implement calculator logic
-- [ ] Temperary storage of user-data
+- [x] Temperary storage of user-data
 - [ ] Persistent storage of user-data
 
 # Sect-Clash Array Sign Up
