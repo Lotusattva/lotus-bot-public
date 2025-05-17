@@ -20,6 +20,7 @@ struct artifact_t {
  *
  * Invariants:
  * - percent_progress > 0
+ * - cosmosapsis > 0
  * - pill_bonus > 0
  * - sum(pill_quantity) == daily_pill_attempts
  * - (vase == null) => (mirror == null)
@@ -31,7 +32,8 @@ struct calculator_client_t {
     optional<unsigned> gate;
     double percent_progress;
 
-    // aura gem
+    // cosmosapsis and aura gem
+    double cosmosapsis;
     quality_t aura_gem_quality;
 
     // respira
