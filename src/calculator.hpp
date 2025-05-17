@@ -70,6 +70,8 @@ enum calc_event_t {
     CALC_CANCEL,
     CALC_ASK_STAGE,
     CALC_ASK_PERCENT_PROGRESS,
+    CALC_ASK_COSMOSAPSIS,
+    CALC_ASK_AURA_GEM,
 
     NUM_CALC_EVENTS
 };
@@ -77,7 +79,9 @@ enum calc_event_t {
 constexpr inline string_view const CALC_EVENT_IDS[NUM_CALC_EVENTS]{
     "calc_cancel",
     "calc_ask_stage",
-    "calc_ask_percent_progress"
+    "calc_ask_percent_progress",
+    "calc_ask_cosmosapsis",
+    "calc_ask_aura_gem"
 };
 
 enum calc_select_t {
@@ -112,5 +116,11 @@ task<void> calc_ask_stage(const button_click_t& event);
 task<void> calc_ask_percent_progress(const button_click_t& event);
 
 task<void> process_percent_progress(const slashcommand_t& event);
+
+task<void> calc_ask_cosmosapsis(const button_click_t& event);
+
+task<void> process_cosmosapsis(const slashcommand_t& event);
+
+task<void> calc_ask_aura_gem(const button_click_t& event);
 
 #endif // CALCULATOR_HPP

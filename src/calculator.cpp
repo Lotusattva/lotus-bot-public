@@ -4,7 +4,7 @@ static const component cancel_button{ component()
     .set_type(cot_button)
     .set_style(cos_danger)
     .set_label("CANCEL")
-    .set_id("calc_cancel")
+    .set_id(CALC_EVENT_IDS[CALC_CANCEL])
 };
 
 task<void> start_interactive_calculator(const slashcommand_t& event) {
@@ -25,7 +25,7 @@ task<void> start_interactive_calculator(const slashcommand_t& event) {
         .set_type(cot_button)
         .set_style(cos_primary)
         .set_label("NEXT")
-        .set_id("calc_ask_stage")
+        .set_id(CALC_EVENT_IDS[CALC_ASK_STAGE])
     };
 
     static component action_row{ component()
@@ -86,7 +86,11 @@ task<void> calculator_button_click_handler(const button_click_t& event) {
         } else
             // else continue to next step
             co_await calc_ask_percent_progress(event);
-    } else
+    } else if (id == CALC_EVENT_IDS[CALC_ASK_COSMOSAPSIS])
+        co_await calc_ask_cosmosapsis(event);
+    else if (id == CALC_EVENT_IDS[CALC_ASK_AURA_GEM])
+        co_await calc_ask_aura_gem(event);
+    else
         cerr << "Unhandled calculator event: " << id << endl;
 
     co_return;
@@ -117,7 +121,7 @@ task<void> calculator_select_click_handler(const select_click_t& event) {
 
 template<derived_from<interaction_create_t> T>
 task<optional<calc_session_map::iterator>> verify_user(const T& event) {
-    
+
 
     snowflake user_id{ event.command.usr.id };
 
@@ -231,7 +235,7 @@ task<void> calc_ask_stage(const button_click_t& event) {
         .set_type(cot_button)
         .set_style(cos_primary)
         .set_label("NEXT")
-        .set_id("calc_ask_percent_progress")
+        .set_id(CALC_EVENT_IDS[CALC_ASK_PERCENT_PROGRESS])
     };
 
     static message calc_ask_stage_message{ message()
@@ -329,7 +333,7 @@ task<void> process_percent_progress(const slashcommand_t& event) {
         .set_type(cot_button)
         .set_style(cos_primary)
         .set_label("NEXT")
-        .set_id("calc_aura_absorption")
+        .set_id(CALC_EVENT_IDS[CALC_ASK_COSMOSAPSIS])
     };
 
     message msg{ calc_sessions[user_id].first };
@@ -354,6 +358,105 @@ task<void> process_percent_progress(const slashcommand_t& event) {
     co_await reply;
     co_await event.co_delete_original_response();
     co_await edit_msg;
+
+    co_return;
+}
+
+task<void> calc_ask_cosmosapsis(const button_click_t& event) {
+    if (DEBUG)
+        cerr << "Asking for cosmosapsis..." << endl;
+
+    calculator_client_t& client{ calc_sessions[event.command.usr.id].second };
+    string stage_info{ "You have entered:\n"
+        "- Major Stage: " + string{MAJOR_STAGE_STR[client.major_stage]} + "\n"
+        "- Minor Stage: " + string{MINOR_STAGE_STR[client.minor_stage]} + "\n"
+        "- Percent Progress: " + to_string(client.percent_progress) + "%\n\n" };
+
+    component text_display{ component()
+        .set_type(cot_text_display)
+        .set_content(stage_info +
+            "Please input your cosmosapsis via `/calc cosmosapsis` command.\n\n"
+            "We will continue once your input is received."
+        )
+    };
+
+    co_await event.co_edit_response(message()
+        .set_flags(m_using_components_v2)
+        .add_component_v2(component()
+            // a container
+            .set_type(cot_container)
+            // ...with a text display
+            .add_component_v2(text_display)
+            // ...and a button
+            .add_component_v2(component()
+                .set_type(cot_action_row)
+                .add_component_v2(cancel_button)
+            )
+        )
+    );
+
+    co_return;
+}
+
+task<void> process_cosmosapsis(const slashcommand_t& event) {
+    snowflake user_id{ event.command.usr.id };
+    auto it{ calc_sessions.find(user_id) };
+    if (it == calc_sessions.end()) {
+        if (DEBUG)
+            cerr << "User ID: " << user_id << " is not in any session." << endl;
+
+        co_await event.co_reply(message("This command should be used in an interactive calculator session."
+            "Please start a new session with `/debug calc interactive`.").set_flags(m_ephemeral));
+        co_return;
+    }
+
+    // acknowledge the slash command
+    auto reply{ event.co_reply("input received, processing...") };
+
+    calculator_client_t& client{ it->second.second };
+    client.cosmosapsis = get<double>(event.get_parameter("cosmosapsis_val"));
+
+    component text_display{ component()
+        .set_type(cot_text_display)
+        .set_content("Your cosmosapsis is set to " + to_string(client.cosmosapsis) + ".\n\n"
+        "Please click **NEXT** to continue, or use `/calc cosmosapsis` to update your progress.\n\n")
+    };
+
+    static component next_button{ component()
+        .set_type(cot_button)
+        .set_style(cos_primary)
+        .set_label("NEXT")
+        .set_id(CALC_EVENT_IDS[CALC_ASK_AURA_GEM])
+    };
+
+    message msg{ calc_sessions[user_id].first };
+
+    // edit the message 
+    msg.components.clear();
+    msg.add_component_v2(component()
+        // a container
+        .set_type(cot_container)
+        // ...with a text display
+        .add_component_v2(text_display)
+        // ...and two buttons
+        .add_component_v2(component()
+            .set_type(cot_action_row)
+            .add_component_v2(next_button)
+            .add_component_v2(cancel_button)
+        )
+    );
+
+    auto edit_msg{ bot.co_message_edit(msg) };
+
+    co_await reply;
+    co_await event.co_delete_original_response();
+    co_await edit_msg;
+
+    co_return;
+}
+
+task<void> calc_ask_aura_gem(const button_click_t& event) {
+    // do nothing for now
 
     co_return;
 }

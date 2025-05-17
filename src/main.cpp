@@ -34,6 +34,8 @@ int main() {
                     co_await start_interactive_calculator(event);
                 else if (action.name == "percent") 
                     co_await process_percent_progress(event); 
+                else if (action.name == "cosmosapsis")
+                    co_await process_cosmosapsis(event);
                 
             }
         }
@@ -59,6 +61,13 @@ int main() {
                             .set_min_value(0.0)
                             .set_max_value(1000.0)
                         )                
+                    )
+                    .add_option(
+                        command_option(co_sub_command, "cosmosapsis", "report cosmosapsis during an interactive calc session")
+                        .add_option(
+                            command_option(co_number, "cosmosapsis_val", "cosmosapsis displayed in your abode", true)
+                            .set_min_value(0.0)
+                        )
                     )
                     // .add_option(
                     //     command_option(co_sub_command, "arg", "terminal-style calculator")
