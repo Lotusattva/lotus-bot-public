@@ -34,7 +34,7 @@ task<void> start_interactive_calculator(const slashcommand_t& event) {
         .add_component_v2(cancel_button)
     };
 
-    static message msg{ message()
+    static message calc_msg{ message()
         .set_flags(m_using_components_v2)
         .add_component_v2(component()
             .set_type(cot_container)
@@ -43,9 +43,12 @@ task<void> start_interactive_calculator(const slashcommand_t& event) {
         )
     };
 
-    co_await event.co_reply(msg);
+    co_await event.co_reply(calc_msg);
 
-    // logs session
+
+    if (DEBUG)
+        cerr << "Caching session..." << endl;
+
     snowflake user_id{ event.command.usr.id };
 
     if (DEBUG)
@@ -56,12 +59,9 @@ task<void> start_interactive_calculator(const slashcommand_t& event) {
         cerr << "Error: " << callback.get_error().message << endl;
         co_return;
     }
-    snowflake msg_id{ callback.get<message>().id };
+    const message& to_cache_msg{ callback.get<message>() };
 
-    if (DEBUG)
-        cerr << "Message ID: " << msg_id << endl;
-
-    calc_sessions.insert({ user_id, make_pair(msg_id, calculator_client_t{}) });
+    calc_sessions.insert({ user_id, make_pair(to_cache_msg, calculator_client_t{}) });
     co_return;
 }
 
@@ -78,9 +78,15 @@ task<void> calculator_button_click_handler(const button_click_t& event) {
         co_await calc_cancel(event);
     else if (id == CALC_EVENT_IDS[CALC_ASK_STAGE])
         co_await calc_ask_stage(event);
-    else if (id == CALC_EVENT_IDS[CALC_ASK_PERCENT_PROGRESS])
-        co_await calc_ask_percent_progress(event);
-    else
+    else if (id == CALC_EVENT_IDS[CALC_ASK_PERCENT_PROGRESS]) {
+        calculator_client_t& client{ calc_sessions[event.command.usr.id].second };
+        if (client.major_stage == NUM_MAJOR_STAGES || client.minor_stage == NUM_MINOR_STAGES) {
+            // do nothing and wait for user to finish selection
+            co_return;
+        } else
+            // else continue to next step
+            co_await calc_ask_percent_progress(event);
+    } else
         cerr << "Unhandled calculator event: " << id << endl;
 
     co_return;
@@ -110,34 +116,39 @@ task<void> calculator_select_click_handler(const select_click_t& event) {
 }
 
 template<derived_from<interaction_create_t> T>
-task<optional<unordered_map<snowflake, pair<snowflake, calculator_client_t>>::iterator>> verify_user(const T& event) {
-    if (DEBUG)
-        cerr << "Verifying user..." << endl;
+task<optional<calc_session_map::iterator>> verify_user(const T& event) {
+    
 
     snowflake user_id{ event.command.usr.id };
+
+    if (DEBUG)
+        cerr << "Verifying user: " << user_id << endl;
+
     auto it{ calc_sessions.find(user_id) };
     if (it == calc_sessions.end()) {
         if (DEBUG)
-            cerr << "User ID: " << user_id << " is not the owner of this session." << endl;
+            cerr << "this user is not the owner of this session." << endl;
         co_return nullopt;
     }
 
     if (DEBUG)
-        cerr << "querying message ID..." << endl;
+        cerr << "querying message and channel ID..." << endl;
 
     confirmation_callback_t callback{ co_await event.co_get_original_response() };
     if (callback.is_error()) {
         cerr << "Error: " << callback.get_error().message << endl;
         co_return nullopt;
     }
-    snowflake msg_id{ callback.get<message>().id };
+    message msg{ callback.get<message>() };
 
-    if (DEBUG)
-        cerr << "Message ID: " << msg_id << endl;
+    if (DEBUG) {
+        cerr << "Message ID: " << msg.id << endl;
+        cerr << "Channel ID: " << msg.channel_id << endl;
+    }
 
-    if (it->second.first != msg_id) {
+    if (it->second.first.id != msg.id) {
         if (DEBUG)
-            cerr << "User ID: " << user_id << " is not the owner of this session." << endl;
+            cerr << "Message ID: " << msg.id << " does not match the cached message ID: " << it->second.first.id << endl;
         co_return nullopt;
     }
 
@@ -230,8 +241,10 @@ task<void> calc_ask_stage(const button_click_t& event) {
             .set_type(cot_container)
             // ...with a text display
             .add_component_v2(text_display)
+            // ...and two select menus
             .add_component_v2(major_stage_selectmenu)
             .add_component_v2(minor_stage_selectmenu)
+            // ...and an action row with two buttons
             .add_component_v2(component()
                 .set_type(cot_action_row)
                 .add_component_v2(next_button)
@@ -257,14 +270,90 @@ task<void> calc_ask_percent_progress(const button_click_t& event) {
     if (DEBUG)
         cerr << "Asking for percent progress..." << endl;
 
-    //////////// Customize UI elements here! ////////////////
+    calculator_client_t& client{ calc_sessions[event.command.usr.id].second };
+    string stage_info{ "You have entered:\n"
+        "- Major Stage: " + string{MAJOR_STAGE_STR[client.major_stage]} + "\n"
+        "- Minor Stage: " + string{MINOR_STAGE_STR[client.minor_stage]} + "\n\n" };
 
-    static component text_display{ component()
+    component text_display{ component()
         .set_type(cot_text_display)
-        .set_content("WRITE SOME TEXT HERE")
+        .set_content(stage_info +
+            "Please input your percent progress (top left corner of the screen) via `/calc percent` command.\n\n"
+            "We will continue once your input is received."
+        )
     };
 
-    // TODO
+    co_await event.co_edit_response(message()
+        .set_flags(m_using_components_v2)
+        .add_component_v2(component()
+            // a container
+            .set_type(cot_container)
+            // ...with a text display
+            .add_component_v2(text_display)\
+            // ...and a button
+            .add_component_v2(component()
+                .set_type(cot_action_row)
+                .add_component_v2(cancel_button)
+            )
+        )
+    );
+
+    co_return;
+}
+
+task<void> process_percent_progress(const slashcommand_t& event) {
+    snowflake user_id{ event.command.usr.id };
+    auto it{ calc_sessions.find(user_id) };
+    if (it == calc_sessions.end()) {
+        if (DEBUG)
+            cerr << "User ID: " << user_id << " is not in any session." << endl;
+
+        co_await event.co_reply(message("This command should be used in an interactive calculator session."
+            "Please start a new session with `/debug calc interactive`.").set_flags(m_ephemeral));
+        co_return;
+    }
+
+    // acknowledge the slash command
+    auto reply{ event.co_reply("input received, processing...") };
+
+    calculator_client_t& client{ it->second.second };
+    client.percent_progress = get<double>(event.get_parameter("percentage"));
+
+    component text_display{ component()
+        .set_type(cot_text_display)
+        .set_content("Your percent progress is set to " + to_string(client.percent_progress) + "%.\n\n"
+        "Please click **NEXT** to continue, or use `/calc percent` to update your progress.\n\n")
+    };
+
+    static component next_button{ component()
+        .set_type(cot_button)
+        .set_style(cos_primary)
+        .set_label("NEXT")
+        .set_id("calc_aura_absorption")
+    };
+
+    message msg{ calc_sessions[user_id].first };
+
+    // edit the message 
+    msg.components.clear();
+    msg.add_component_v2(component()
+        // a container
+        .set_type(cot_container)
+        // ...with a text display
+        .add_component_v2(text_display)
+        // ...and two buttons
+        .add_component_v2(component()
+            .set_type(cot_action_row)
+            .add_component_v2(next_button)
+            .add_component_v2(cancel_button)
+        )
+    );
+
+    auto edit_msg{ bot.co_message_edit(msg) };
+
+    co_await reply;
+    co_await event.co_delete_original_response();
+    co_await edit_msg;
 
     co_return;
 }

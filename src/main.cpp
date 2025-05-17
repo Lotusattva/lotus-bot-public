@@ -32,6 +32,9 @@ int main() {
                 const auto& action{ subcommand.options[0] };
                 if (action.name == "interactive")
                     co_await start_interactive_calculator(event);
+                else if (action.name == "percent") 
+                    co_await process_percent_progress(event); 
+                
             }
         }
 
@@ -49,6 +52,14 @@ int main() {
                     // for testing cultivation calculator
                     command_option(co_sub_command_group, "calc", "cultivation calculator")
                     .add_option(command_option(co_sub_command, "interactive", "interactive step-by-step calculator"))
+                    .add_option(
+                        command_option(co_sub_command, "percent", "report percent progress during an interactive calc session")
+                        .add_option(
+                            command_option(co_number, "percentage", "percentage displayed on top left corner of the screen", true)
+                            .set_min_value(0.0)
+                            .set_max_value(1000.0)
+                        )                
+                    )
                     // .add_option(
                     //     command_option(co_sub_command, "arg", "terminal-style calculator")
                     // )

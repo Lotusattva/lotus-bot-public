@@ -26,8 +26,8 @@ struct artifact_t {
  */
 struct calculator_client_t {
     // culitivation progress
-    major_stage_t major_stage;
-    minor_stage_t minor_stage;
+    major_stage_t major_stage{ NUM_MAJOR_STAGES }; // default to invalid
+    minor_stage_t minor_stage{ NUM_MINOR_STAGES }; // default to invalid
     optional<unsigned> gate;
     double percent_progress;
 
@@ -56,11 +56,13 @@ struct calculator_client_t {
     optional<artifact_t> mirror;
 };
 
+typedef unordered_map<snowflake, pair<message, calculator_client_t>> calc_session_map;
+
 /**
  * Represents ownership of calculator sessions
- * maps user-id to (message-id, calculator_client_t)
+ * maps user-id to (message-id, channel-id, calculator_client_t)
  */
-inline unordered_map<snowflake, pair<snowflake, calculator_client_t>> calc_sessions;
+inline calc_session_map calc_sessions;
 
 enum calc_event_t {
     CALC_CANCEL,
@@ -99,12 +101,14 @@ task<void> calculator_select_click_handler(const select_click_t& event);
  * @returns an iterator to the session if the user is the owner, otherwise returns nullopt
  */
 template<std::derived_from<interaction_create_t> T>
-task<optional<unordered_map<snowflake, pair<snowflake, calculator_client_t>>::iterator>> verify_user(const T& event);
+task<optional<calc_session_map::iterator>> verify_user(const T& event);
 
 task<void> calc_cancel(const button_click_t& event);
 
 task<void> calc_ask_stage(const button_click_t& event);
 
 task<void> calc_ask_percent_progress(const button_click_t& event);
+
+task<void> process_percent_progress(const slashcommand_t& event);
 
 #endif // CALCULATOR_HPP
