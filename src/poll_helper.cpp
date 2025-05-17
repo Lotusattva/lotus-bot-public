@@ -55,7 +55,7 @@ string print_role_selections(const map<string_view, vector<string>>& role_select
 }
 
 string print_single_role_selection(const string_view& role, const vector<string>& vec) {
-    string result{ "## " + string(role) + "\n" };
+    string result{ "## " + string{role} + "\n" };
     if (vec.empty())
         result += "*No one signed up for this role.*\n";
     else for (const auto& name : vec)
