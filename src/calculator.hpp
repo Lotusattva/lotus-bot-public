@@ -72,6 +72,15 @@ enum calc_event_t {
     CALC_ASK_PERCENT_PROGRESS,
     CALC_ASK_COSMOSAPSIS,
     CALC_ASK_AURA_GEM,
+    CALC_ASK_RESPIRA, // both attempt and exp
+    CALC_ASK_PILL, // attempt, how many of each quality, bonus
+    CALC_ASK_EXTRACTOR_QUALITY,
+    CALC_ASK_EXTRACTOR_NODE_LVL,
+    CALC_ASK_MYRIMON_FRUIT,
+    CALC_ASK_VASE_OWN, // whether the user owns a vase
+    CALC_ASK_VASE_DETAIL,
+    CALC_ASK_MIRROR_OWN, // whether the user owns a mirror
+    CALC_ASK_MIRROR_DETAIL,
 
     NUM_CALC_EVENTS
 };
@@ -81,19 +90,51 @@ constexpr inline string_view const CALC_EVENT_IDS[NUM_CALC_EVENTS]{
     "calc_ask_stage",
     "calc_ask_percent_progress",
     "calc_ask_cosmosapsis",
-    "calc_ask_aura_gem"
+    "calc_ask_aura_gem",
+    "calc_ask_respira",
+    "calc_ask_pill",
+    "calc_ask_extractor_quality",
+    "calc_ask_extractor_node_lvl",
+    "calc_ask_myrimon_fruit",
+    "calc_ask_vase_own",
+    "calc_ask_vase_detail",
+    "calc_ask_mirror_own",
+    "calc_ask_mirror_detail",
 };
 
 enum calc_select_t {
+    // stage
     CALC_SELECT_MAJOR_STAGE,
     CALC_SELECT_MINOR_STAGE,
+
+    // aura gem
+    CALC_SELECT_AURA_GEM_QUALITY,
+
+    // extractor
+    CALC_SELECT_EXTRACTOR_QUALITY,
+
+    // vase detail
+    CALC_SELECT_VASE_STAR,
+    CALC_SELECT_VASE_DAILY_RECHARGE,
+    CALC_SELECT_VASE_TRANSMOG,
+
+    // mirror detail
+    CALC_SELECT_MIRROR_STAR,
+    CALC_SELECT_MIRROR_DAILY_RECHARGE,
 
     NUM_CALC_SELECTS
 };
 
 constexpr inline string_view const CALC_SELECT_IDS[NUM_CALC_SELECTS]{
     "calc_select_major_stage",
-    "calc_select_minor_stage"
+    "calc_select_minor_stage",
+    "calc_select_aura_gem_quality",
+    "calc_select_extractor_quality",
+    "calc_select_vase_star",
+    "calc_select_vase_daily_recharge",
+    "calc_select_vase_transmog",
+    "calc_select_mirror_star",
+    "calc_select_mirror_daily_recharge",
 };
 
 task<void> start_interactive_calculator(const slashcommand_t& event);
@@ -114,13 +155,32 @@ task<void> calc_cancel(const button_click_t& event);
 task<void> calc_ask_stage(const button_click_t& event);
 
 task<void> calc_ask_percent_progress(const button_click_t& event);
-
 task<void> process_percent_progress(const slashcommand_t& event);
 
 task<void> calc_ask_cosmosapsis(const button_click_t& event);
-
 task<void> process_cosmosapsis(const slashcommand_t& event);
 
 task<void> calc_ask_aura_gem(const button_click_t& event);
+
+task<void> calc_ask_respira(const button_click_t& event);
+task<void> process_respira(const slashcommand_t& event);
+
+
+task<void> calc_ask_pill(const button_click_t& event);
+task<void> process_pill(const slashcommand_t& event);
+
+task<void> calc_ask_extractor_quality(const button_click_t& event);
+
+task<void> calc_ask_extractor_node_lvl(const button_click_t& event);
+task<void> process_extractor_node_lvl(const slashcommand_t& event);
+
+task<void> calc_ask_myrimon_fruit(const button_click_t& event);
+task<void> process_myrimon_fruit(const slashcommand_t& event);
+
+task<void> calc_ask_vase_own(const button_click_t& event);
+task<void> calc_ask_vase_detail(const button_click_t& event);
+
+task<void> calc_ask_mirror_own(const button_click_t& event);
+task<void> calc_ask_mirror_detail(const button_click_t& event);
 
 #endif // CALCULATOR_HPP
