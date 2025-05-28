@@ -11,39 +11,41 @@ void select(vector<string>& vec, unsigned limit) {
     }
 }
 
-task<optional<map<string_view, vector<string>>>> get_voters(const message& msg, const members_container& members) {
+task<optional<map<string_view, vector<string>>>> get_voters(const message& msg,
+                                                            const members_container& members) {
     map<string_view, vector<string>> role_selections{
-        { ARRAY_ROLE_STR[MAGICAL_DRIVER], {} },
-        { ARRAY_ROLE_STR[MAGICAL_PASSENGER], {} },
-        { ARRAY_ROLE_STR[PHYSICAL_DRIVER], {} },
-        { ARRAY_ROLE_STR[PHYSICAL_PASSENGER], {} },
+        {ARRAY_ROLE_STR[MAGICAL_DRIVER], {}},
+        {ARRAY_ROLE_STR[MAGICAL_PASSENGER], {}},
+        {ARRAY_ROLE_STR[PHYSICAL_DRIVER], {}},
+        {ARRAY_ROLE_STR[PHYSICAL_PASSENGER], {}},
     };
 
-    const poll& poll{ msg.get_poll() };
+    const poll& poll{msg.get_poll()};
 
     for (const auto& [_, answer] : poll.answers) {
-        confirmation_callback_t callback{ co_await bot.co_poll_get_answer_voters(msg, answer.id, 0, 100) };
+        confirmation_callback_t callback{
+            co_await bot.co_poll_get_answer_voters(msg, answer.id, 0, 100)};
         if (callback.is_error()) {
             cerr << "Error: " << callback.get_error().message << endl;
-            co_return{};
+            co_return {};
         }
-        user_map voters{ callback.get<user_map>() };
+        user_map voters{callback.get<user_map>()};
         for (const auto& [_, user] : voters) {
-            string name{ user.global_name };
-            if (auto member{ members.find(user.id) }; member != members.end()) {
-                string nickname{ member->second.get_nickname() };
-                if (!nickname.empty()) name = nickname;
+            string name{user.global_name};
+            if (auto member{members.find(user.id)}; member != members.end()) {
+                string nickname{member->second.get_nickname()};
+                if (!nickname.empty())
+                    name = nickname;
             }
             role_selections[answer.media.text].push_back(name);
         }
-
     }
 
     co_return role_selections;
 }
 
 void make_selections(map<string_view, vector<string>>& role_selections) {
-    for (auto i{ 0 }; i < NUM_ARRAY_ROLES; ++i)
+    for (auto i{0}; i < NUM_ARRAY_ROLES; ++i)
         select(role_selections[ARRAY_ROLE_STR[i]], ARRAY_ROLE_LIMIT[i]);
 }
 
@@ -55,10 +57,10 @@ string print_role_selections(const map<string_view, vector<string>>& role_select
 }
 
 string print_single_role_selection(const string_view& role, const vector<string>& vec) {
-    string result{ "## " + string{role} + "\n" };
+    string result{"## " + string{role} + "\n"};
     if (vec.empty())
         result += "*No one signed up for this role.*\n";
-    else for (const auto& name : vec)
-        result += "> - " + name + "\n";
+    else
+        for (const auto& name : vec) result += "> - " + name + "\n";
     return result;
 }

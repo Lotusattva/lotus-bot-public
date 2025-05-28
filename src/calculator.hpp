@@ -1,8 +1,8 @@
 #ifndef CALCULATOR_HPP
 #define CALCULATOR_HPP
 
-#include "global.hpp"
 #include "calculator_constants.hpp"
+#include "global.hpp"
 
 /**
  * A struct that stores the necessary information for an artifact.
@@ -27,8 +27,8 @@ struct artifact_t {
  */
 struct calculator_client_t {
     // culitivation progress
-    major_stage_t major_stage{ NUM_MAJOR_STAGES }; // default to invalid
-    minor_stage_t minor_stage{ NUM_MINOR_STAGES }; // default to invalid
+    major_stage_t major_stage{NUM_MAJOR_STAGES}; // default to invalid
+    minor_stage_t minor_stage{NUM_MINOR_STAGES}; // default to invalid
     optional<unsigned> gate;
     double percent_progress;
 
@@ -43,7 +43,7 @@ struct calculator_client_t {
     // pills
     unsigned daily_pill_attempts;
     unsigned pill_quantity[3]; // 0: rare, 1: epic, 2: legendary
-    double pill_bonus; // needs to be calculated because game does not show it
+    double pill_bonus;         // needs to be calculated because game does not show it
 
     // extractor
     quality_t extractor_quality;
@@ -73,7 +73,7 @@ enum calc_event_t {
     CALC_ASK_COSMOSAPSIS,
     CALC_ASK_AURA_GEM,
     CALC_ASK_RESPIRA, // both attempt and exp
-    CALC_ASK_PILL, // attempt, how many of each quality, bonus
+    CALC_ASK_PILL,    // attempt, how many of each quality, bonus
     CALC_ASK_EXTRACTOR_QUALITY,
     CALC_ASK_EXTRACTOR_NODE_LVL,
     CALC_ASK_MYRIMON_FRUIT,
@@ -126,15 +126,9 @@ enum calc_select_t {
 };
 
 constexpr inline string_view const CALC_SELECT_IDS[NUM_CALC_SELECTS]{
-    "calc_select_major_stage",
-    "calc_select_minor_stage",
-    "calc_select_aura_gem_quality",
-    "calc_select_extractor_quality",
-    "calc_select_vase_star",
-    "calc_select_vase_daily_recharge",
-    "calc_select_vase_transmog",
-    "calc_select_mirror_star",
-    "calc_select_mirror_daily_recharge",
+    "calc_select_major_stage",       "calc_select_minor_stage", "calc_select_aura_gem_quality",
+    "calc_select_extractor_quality", "calc_select_vase_star",   "calc_select_vase_daily_recharge",
+    "calc_select_vase_transmog",     "calc_select_mirror_star", "calc_select_mirror_daily_recharge",
 };
 
 task<void> start_interactive_calculator(const slashcommand_t& event);
@@ -147,7 +141,7 @@ task<void> calculator_select_click_handler(const select_click_t& event);
  *
  * @returns an iterator to the session if the user is the owner, otherwise returns nullopt
  */
-template<std::derived_from<interaction_create_t> T>
+template <std::derived_from<interaction_create_t> T>
 task<optional<calc_session_map::iterator>> verify_user(const T& event);
 
 task<void> calc_cancel(const button_click_t& event);
@@ -164,7 +158,6 @@ task<void> calc_ask_aura_gem(const button_click_t& event);
 
 task<void> calc_ask_respira(const button_click_t& event);
 task<void> process_respira(const slashcommand_t& event);
-
 
 task<void> calc_ask_pill(const button_click_t& event);
 task<void> process_pill(const slashcommand_t& event);

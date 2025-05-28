@@ -13,7 +13,7 @@ task<void> create_polls(timer _);
  */
 task<void> process_poll_results(timer _);
 
-constexpr inline const uint64_t SECONDS_IN_WEEK{ 7 * 24 * 60 * 60 };
+constexpr inline const uint64_t SECONDS_IN_WEEK{7 * 24 * 60 * 60};
 
 task<void> schedule_next_create(timer _);
 

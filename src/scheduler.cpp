@@ -1,25 +1,25 @@
 #include "scheduler.hpp"
+
 #include "poll_helper.hpp"
 
 task<void> create_polls(timer _) {
-    static message POLL{
-       message().set_poll(poll()
-           .set_question("Sign up here for arrays")
-           .add_answer(ARRAY_ROLE_STR[MAGICAL_DRIVER])
-           .add_answer(ARRAY_ROLE_STR[MAGICAL_PASSENGER])
-           .add_answer(ARRAY_ROLE_STR[PHYSICAL_DRIVER])
-           .add_answer(ARRAY_ROLE_STR[PHYSICAL_PASSENGER])
-           .set_duration(DEBUG ? 1 : 24)) };
+    static message POLL{message().set_poll(poll()
+                                               .set_question("Sign up here for arrays")
+                                               .add_answer(ARRAY_ROLE_STR[MAGICAL_DRIVER])
+                                               .add_answer(ARRAY_ROLE_STR[MAGICAL_PASSENGER])
+                                               .add_answer(ARRAY_ROLE_STR[PHYSICAL_DRIVER])
+                                               .add_answer(ARRAY_ROLE_STR[PHYSICAL_PASSENGER])
+                                               .set_duration(DEBUG ? 1 : 24))};
 
-    for (auto i{ 0 }; i < NUM_GUILDS; ++i) {
-        message my_poll{ POLL };
+    for (auto i{0}; i < NUM_GUILDS; ++i) {
+        message my_poll{POLL};
 
         if (DEBUG)
             cerr << "Creating poll for channel: " << CHANNEL_IDS[i] << endl;
 
         my_poll.set_channel_id(CHANNEL_IDS[i]);
         my_poll.set_guild_id(GUILD_IDS[i]);
-        confirmation_callback_t confirmation{ co_await bot.co_message_create(my_poll) };
+        confirmation_callback_t confirmation{co_await bot.co_message_create(my_poll)};
         if (confirmation.is_error()) {
             cerr << "Error: " << confirmation.get_error().message << endl;
             continue;
@@ -32,7 +32,7 @@ task<void> create_polls(timer _) {
 
 task<void> process_poll_results(timer _) {
     for (const auto& [_, msg] : polls) {
-        confirmation_callback_t confirmation{ co_await bot.co_poll_end(msg) };
+        confirmation_callback_t confirmation{co_await bot.co_poll_end(msg)};
         if (confirmation.is_error()) {
             cerr << "Error: " << confirmation.get_error().message << endl;
             continue;
@@ -45,18 +45,20 @@ task<void> process_poll_results(timer _) {
         else
             members = confirmation.get<guild_member_map>();
 
-        optional<map<string_view, vector<string>>> voters{ co_await get_voters(msg, members) };
+        optional<map<string_view, vector<string>>> voters{co_await get_voters(msg, members)};
         if (!voters.has_value()) {
             cerr << "Error: " << confirmation.get_error().message << endl;
-            message error_msg{ message().set_content("Failed to fetch poll results.").set_channel_id(msg.channel_id) };
+            message error_msg{message()
+                                  .set_content("Failed to fetch poll results.")
+                                  .set_channel_id(msg.channel_id)};
             co_await bot.co_message_create(error_msg);
             continue;
         }
 
-        map<string_view, vector<string>> role_selections{ voters.value() };
+        map<string_view, vector<string>> role_selections{voters.value()};
         make_selections(role_selections);
-        string post{ "# Selections: \n" + print_role_selections(role_selections) };
-        message result_msg{ message().set_content(post).set_channel_id(msg.channel_id) };
+        string post{"# Selections: \n" + print_role_selections(role_selections)};
+        message result_msg{message().set_content(post).set_channel_id(msg.channel_id)};
         co_await bot.co_message_create(result_msg);
     }
 
@@ -82,12 +84,13 @@ task<void> schedule_next_process(timer _) {
 }
 
 task<void> mock_reminder(timer _) {
-    for (auto i{ 0 }; i < NUM_GUILDS; ++i) {
-        message reminder{ message()
-            .set_content("This is a mock reminder to test the automated scheduler.")
-            .set_channel_id(CHANNEL_IDS[i]) };
+    for (auto i{0}; i < NUM_GUILDS; ++i) {
+        message reminder{
+            message()
+                .set_content("This is a mock reminder to test the automated scheduler.")
+                .set_channel_id(CHANNEL_IDS[i])};
 
-        confirmation_callback_t confirmation{ co_await bot.co_message_create(reminder) };
+        confirmation_callback_t confirmation{co_await bot.co_message_create(reminder)};
         if (confirmation.is_error()) {
             cerr << "Error: " << confirmation.get_error().message << endl;
             continue;
