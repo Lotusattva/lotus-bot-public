@@ -27,35 +27,35 @@ struct artifact_t {
  */
 struct calculator_client_t {
     // culitivation progress
-    major_stage_t major_stage{NUM_MAJOR_STAGES}; // default to invalid
-    minor_stage_t minor_stage{NUM_MINOR_STAGES}; // default to invalid
+    major_stage_t major_stage{ NUM_MAJOR_STAGES }; // default to invalid
+    minor_stage_t minor_stage{ NUM_MINOR_STAGES }; // default to invalid
     optional<unsigned> gate;
     double percent_progress;
 
     // cosmosapsis and aura gem
     double cosmosapsis;
-    quality_t aura_gem_quality;
+    quality_t aura_gem_quality{ NUM_QUALITIES }; // default to invalid
 
     // respira
-    exp_t respira_exp;
-    unsigned daily_respira_attempts;
+    exp_t respira_exp{ 0 };
+    unsigned daily_respira_attempts{ 0 };
 
     // pills
-    unsigned daily_pill_attempts;
-    unsigned pill_quantity[3]; // 0: rare, 1: epic, 2: legendary
-    double pill_bonus;         // needs to be calculated because game does not show it
+    unsigned daily_pill_attempts{ 0 };
+    unsigned pill_quantity[3]{ 0, 0, 0 }; // 0: rare, 1: epic, 2: legendary
+    double pill_bonus{ 0.0 };         // needs to be calculated because game does not show it
 
     // extractor
-    quality_t extractor_quality;
-    unsigned node_levels[3]; // 0: cultiXP, 1: quality, 2: gush
+    quality_t extractor_quality{ NUM_QUALITIES }; // default to invalid
+    unsigned node_levels[3]{ 0, 0, 0 }; // 0: cultiXP, 1: quality, 2: gush
 
     // myrimon fruit
-    unsigned fruit_quantity;
+    unsigned fruit_quantity{ 0 };
 
     // artifact
-    optional<artifact_t> vase;
-    bool vase_transmog;
-    optional<artifact_t> mirror;
+    optional<artifact_t> vase{ nullopt };
+    bool vase_transmog{ false };
+    optional<artifact_t> mirror{ nullopt };
 };
 
 typedef unordered_map<snowflake, pair<message, calculator_client_t>> calc_session_map;
@@ -131,8 +131,11 @@ constexpr inline string_view const CALC_SELECT_IDS[NUM_CALC_SELECTS]{
     "calc_select_vase_transmog",     "calc_select_mirror_star", "calc_select_mirror_daily_recharge",
 };
 
+command_option calculator_commands();
+
 task<void> start_interactive_calculator(const slashcommand_t& event);
 
+task<void> calculator_subcommand_handler(const slashcommand_t& event, const command_data_option& subcommand);
 task<void> calculator_button_click_handler(const button_click_t& event);
 task<void> calculator_select_click_handler(const select_click_t& event);
 
