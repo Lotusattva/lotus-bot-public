@@ -3,9 +3,11 @@
 
 #include <cassert>
 #include <numeric>
-#include <map>
+#include <cstdint>
 #include <string>
 #include <string_view>
+
+using namespace std;
 
 ////////////// Utility functions //////////////
 
@@ -40,7 +42,7 @@ constexpr inline string_view QUALITY_STR[NUM_QUALITIES]{
     "Mythic"sv
 };
 
-constexpr quality_t get_quality(std::string_view name) {
+constexpr quality_t get_quality(string_view name) {
     const uint64_t hash{ hash_string(name) };
 
     switch (hash) {
@@ -90,7 +92,7 @@ constexpr inline string_view MAJOR_STAGE_STR[NUM_MAJOR_STAGES]{
     "Eternal"sv
 };
 
-constexpr major_stage_t get_major_stage(std::string_view name) {
+constexpr major_stage_t get_major_stage(string_view name) {
     const uint64_t hash{ hash_string(name) };
 
     switch (hash) {
@@ -122,7 +124,7 @@ constexpr inline string_view MINOR_STAGE_STR[NUM_MINOR_STAGES]{
     "Late"sv
 };
 
-constexpr minor_stage_t get_minor_stage(std::string_view name) {
+constexpr minor_stage_t get_minor_stage(string_view name) {
     const uint64_t hash{ hash_string(name) };
 
     switch (hash) {
