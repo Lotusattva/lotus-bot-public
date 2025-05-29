@@ -1,5 +1,10 @@
 #include "calculator.hpp"
 
+#include "calculator_constants.hpp"
+
+#include <dpp/message.h>
+#include <dpp/restresults.h>
+
 static const component cancel_button{component()
                                          .set_type(cot_button)
                                          .set_style(cos_danger)
@@ -184,7 +189,7 @@ component major_stage_selectmenu_factory() {
 
     for (size_t i{0}; i < NUM_MAJOR_STAGES; ++i)
         major_stage_selectmenu.add_select_option(
-            select_option(MAJOR_STAGE_STR[i], MAJOR_STAGE_STR[i], ""));
+            select_option{MAJOR_STAGE_STR[i], MAJOR_STAGE_STR[i], ""});
 
     return major_stage_selectmenu;
 }
@@ -198,7 +203,7 @@ component minor_stage_selectmenu_factory() {
 
     for (size_t i{0}; i < NUM_MINOR_STAGES; ++i)
         minor_stage_selectmenu.add_select_option(
-            select_option(MINOR_STAGE_STR[i], MINOR_STAGE_STR[i], ""));
+            select_option{MINOR_STAGE_STR[i], MINOR_STAGE_STR[i], ""});
 
     return minor_stage_selectmenu;
 }
@@ -443,8 +448,62 @@ task<void> process_cosmosapsis(const slashcommand_t& event) {
     co_return;
 }
 
+component aura_gem_quality_selectmenu_factory() {
+    component aura_gem_quality_selectmenu{component()
+                                              .set_type(cot_selectmenu)
+                                              .set_id(CALC_SELECT_IDS[CALC_SELECT_AURA_GEM_QUALITY])
+                                              .set_placeholder("Select quality of your aura gem")
+                                              .set_required(true)
+
+    };
+    for (size_t i{0}; i < NUM_QUALITIES; ++i)
+        aura_gem_quality_selectmenu.add_select_option(
+            select_option{QUALITY_STR[i], QUALITY_STR[i], ""});
+
+    return aura_gem_quality_selectmenu;
+}
+
 task<void> calc_ask_aura_gem(const button_click_t& event) {
-    // do nothing for now
+    if (DEBUG)
+        cerr << "Asking for aura gem quality" << endl;
+
+    static component aura_gem_quality_selectmenu{
+        component()
+            .set_type(cot_action_row)
+            .add_component_v2(aura_gem_quality_selectmenu_factory())};
+
+    static component next_button{component()
+                                     .set_type(cot_button)
+                                     .set_style(cos_primary)
+                                     .set_label("NEXT")
+                                     .set_id(CALC_EVENT_IDS[CALC_ASK_RESPIRA])};
+
+    static component text_display{component()
+                                      .set_type(cot_text_display)
+                                      .set_content("Please select the quality of your aura gem")};
+
+    static message calc_ask_aura_gem_messaege{
+        message()
+            .set_flags(m_using_components_v2)
+            .add_component_v2(component()
+                                  .set_type(cot_container)
+                                  .add_component_v2(text_display)
+                                  .add_component_v2(aura_gem_quality_selectmenu)
+                                  .add_component_v2(component()
+                                                        .set_type(cot_action_row)
+                                                        .add_component_v2(next_button)
+                                                        .add_component_v2(cancel_button)))};
+
+    if (DEBUG)
+        cerr << "Sending aura gem selection message..." << endl;
+
+    confirmation_callback_t confirmation{
+        co_await event.co_edit_response(calc_ask_aura_gem_messaege)};
+
+    if (confirmation.is_error()) {
+        cerr << "Error: " << confirmation.get_error().message << endl;
+        co_return;
+    }
 
     co_return;
 }
