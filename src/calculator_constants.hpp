@@ -30,6 +30,22 @@ enum quality_t {
     NUM_QUALITIES
 };
 
+constexpr inline string_view QUALITY_STR[NUM_QUALITIES]{"Common"sv, "Uncommon"sv,  "Rare"sv,
+                                                        "Epic"sv,   "Legendary"sv, "Mythic"sv};
+
+constexpr quality_t get_quality(string_view quality_str) {
+    const uint64_t hash{hash_string(quality_str)};
+    switch (hash) {
+        case hash_string(QUALITY_STR[COMMON]): return COMMON;
+        case hash_string(QUALITY_STR[UNCOMMON]): return UNCOMMON;
+        case hash_string(QUALITY_STR[RARE]): return RARE;
+        case hash_string(QUALITY_STR[EPIC]): return EPIC;
+        case hash_string(QUALITY_STR[LEGENDARY]): return LEGENDARY;
+        case hash_string(QUALITY_STR[MYTHIC]): return MYTHIC;
+        default: return NUM_QUALITIES; // An invalid quality, indicates an error
+    }
+}
+
 ///////////////// Cultivation stages and exp requirements /////////////////
 
 enum major_stage_t {
@@ -57,8 +73,8 @@ constexpr inline string_view MAJOR_STAGE_STR[NUM_MAJOR_STAGES]{
     "Foundation"sv, "Virtuoso"sv,   "Nascence"sv, "Incarnation"sv, "Voidbreak"sv,
     "Wholeness"sv,  "Perfection"sv, "Nirvana"sv,  "Celestial"sv,   "Eternal"sv};
 
-constexpr major_stage_t get_major_stage(std::string_view name) {
-    const uint64_t hash = hash_string(name);
+constexpr major_stage_t get_major_stage(string_view major_stage_str) {
+    const uint64_t hash{hash_string(major_stage_str)};
 
     switch (hash) {
         case hash_string(MAJOR_STAGE_STR[FOUNDATION]): return FOUNDATION;
@@ -85,8 +101,8 @@ enum minor_stage_t {
 
 constexpr inline string_view MINOR_STAGE_STR[NUM_MINOR_STAGES]{"Early"sv, "Middle"sv, "Late"sv};
 
-constexpr minor_stage_t get_minor_stage(std::string_view name) {
-    const uint64_t hash = hash_string(name);
+constexpr minor_stage_t get_minor_stage(string_view minor_stage_str) {
+    const uint64_t hash{hash_string(minor_stage_str)};
 
     switch (hash) {
         case hash_string(MINOR_STAGE_STR[EARLY]): return EARLY;
