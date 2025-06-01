@@ -9,6 +9,8 @@ See [TODO.md](TODO.md) for progress.
 Help automate sign up process by scheduling polls where players can vote to sign up for certain roles (such as physical array passenger) in arrays before sect clash happens.
 
 ## Cultivation Caculator (under construction)
+[click here to see calculator documentation](docs/Calculator.md)
+
 An interactive calculator that produces an estimate of how much longer it takes to breakthrough to the next major cultivation stage.
 
 ***Work in progress!!!*** To try out partly implemented features, use `/debug calc start`
