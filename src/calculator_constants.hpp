@@ -34,12 +34,12 @@ enum quality_t {
 };
 
 constexpr inline string_view QUALITY_STR[NUM_QUALITIES]{
-    "Common"sv,
-    "Uncommon"sv,
-    "Rare"sv,
-    "Epic"sv,
-    "Legendary"sv,
-    "Mythic"sv
+    "Common",
+    "Uncommon",
+    "Rare",
+    "Epic",
+    "Legendary",
+    "Mythic"
 };
 
 constexpr quality_t get_quality(string_view name) {
@@ -80,16 +80,16 @@ enum major_stage_t {
 };
 
 constexpr inline string_view MAJOR_STAGE_STR[NUM_MAJOR_STAGES]{
-    "Foundation"sv,
-    "Virtuoso"sv,
-    "Nascence"sv,
-    "Incarnation"sv,
-    "Voidbreak"sv,
-    "Wholeness"sv,
-    "Perfection"sv,
-    "Nirvana"sv,
-    "Celestial"sv,
-    "Eternal"sv
+    "Foundation",
+    "Virtuoso",
+    "Nascence",
+    "Incarnation",
+    "Voidbreak",
+    "Wholeness",
+    "Perfection",
+    "Nirvana",
+    "Celestial",
+    "Eternal"
 };
 
 constexpr major_stage_t get_major_stage(string_view name) {
@@ -119,9 +119,9 @@ enum minor_stage_t {
 };
 
 constexpr inline string_view MINOR_STAGE_STR[NUM_MINOR_STAGES]{
-    "Early"sv,
-    "Middle"sv,
-    "Late"sv
+    "Early",
+    "Middle",
+    "Late"
 };
 
 constexpr minor_stage_t get_minor_stage(string_view name) {
