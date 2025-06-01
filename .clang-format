@@ -31,8 +31,10 @@ BasedOnStyle: Google
 
 # PointerAlignment: Left
 
-# ColumnLimit: 128
+ColumnLimit: 100
 # UseTab: Never
 IndentWidth: 4
 # TabWidth: 4
 # ContinuationIndentWidth: 0
+
+AlignTrailingComments: true
