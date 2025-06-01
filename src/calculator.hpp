@@ -32,28 +32,29 @@ struct calculator_client_t {
     major_stage_t major_stage{NUM_MAJOR_STAGES};  // default to invalid
     minor_stage_t minor_stage{NUM_MINOR_STAGES};  // default to invalid
     optional<unsigned> gate;
-    double percent_progress;
+    double percent_progress{-1.0};  // default to invalid, should be a non-negative number
 
     // cosmosapsis and aura gem
-    double cosmosapsis;
+    double cosmosapsis{-1.0};  // default to invalid, should be a non-negative number
     quality_t aura_gem_quality{NUM_QUALITIES};  // default to invalid
 
     // respira
-    exp_t respira_exp{0};
-    unsigned daily_respira_attempts{0};
+    exp_t respira_exp{0};                // default to 0, should be a positive number
+    unsigned daily_respira_attempts{0};  // default to 0, should be a positive number
 
     // pills
-    unsigned daily_pill_attempts{0};
+    unsigned daily_pill_attempts{0};     // default to 0, should be a positive number
     unsigned pill_quantity[3]{0, 0, 0};  // 0: rare, 1: epic, 2: legendary
-    double pill_bonus{
-        0.0};  // needs to be calculated because game does not show it
+    double pill_bonus{0.0};              // needs to be calculated because game does not show it
 
     // extractor
     quality_t extractor_quality{NUM_QUALITIES};  // default to invalid
-    unsigned node_levels[3]{0, 0, 0};  // 0: cultiXP, 1: quality, 2: gush
+
+    // 0: cultiXP, 1: quality, 2: gush; default to 31, should be in the range [0, 30]
+    unsigned node_levels[3]{31, 31, 31};
 
     // myrimon fruit
-    unsigned fruit_quantity{0};
+    unsigned fruit_quantity{0};  // default to 0, should be a positive number
 
     // artifact
     optional<artifact_t> vase{nullopt};
@@ -61,8 +62,7 @@ struct calculator_client_t {
     optional<artifact_t> mirror{nullopt};
 };
 
-typedef unordered_map<snowflake, pair<message, calculator_client_t>>
-    calc_session_map;
+typedef unordered_map<snowflake, pair<message, calculator_client_t>> calc_session_map;
 
 /**
  * Represents ownership of calculator sessions
@@ -130,15 +130,9 @@ enum calc_select_t {
 };
 
 constexpr inline string_view const CALC_SELECT_IDS[NUM_CALC_SELECTS]{
-    "calc_select_major_stage",
-    "calc_select_minor_stage",
-    "calc_select_aura_gem_quality",
-    "calc_select_extractor_quality",
-    "calc_select_vase_star",
-    "calc_select_vase_daily_recharge",
-    "calc_select_vase_transmog",
-    "calc_select_mirror_star",
-    "calc_select_mirror_daily_recharge",
+    "calc_select_major_stage",       "calc_select_minor_stage", "calc_select_aura_gem_quality",
+    "calc_select_extractor_quality", "calc_select_vase_star",   "calc_select_vase_daily_recharge",
+    "calc_select_vase_transmog",     "calc_select_mirror_star", "calc_select_mirror_daily_recharge",
 };
 
 #define SUBCOMMAND_AND_DESCRIPTION 2
@@ -155,14 +149,11 @@ enum CALC_SUBCMD_t {
     NUM_CALC_SUBCMDS
 };
 
-constexpr inline string_view
-    CALC_SUBCMDS[NUM_CALC_SUBCMDS][SUBCOMMAND_AND_DESCRIPTION]{
-        {"start", "start an interactive cultivation calculator session"},
-        {"percent",
-         "report percent progress during an interactive calc session"},
-        {"cosmosapsis",
-         "report cosmosapsis during an interactive calc session"},
-        {"respira", "report respira during an interactive calc session"}};
+constexpr inline string_view CALC_SUBCMDS[NUM_CALC_SUBCMDS][SUBCOMMAND_AND_DESCRIPTION]{
+    {"start", "start an interactive cultivation calculator session"},
+    {"percent", "report percent progress during an interactive calc session"},
+    {"cosmosapsis", "report cosmosapsis during an interactive calc session"},
+    {"respira", "report respira during an interactive calc session"}};
 
 constexpr inline unsigned short CALC_SUBCMD_NUM_PARAM[NUM_CALC_SUBCMDS]{
     0,  // start
@@ -171,29 +162,29 @@ constexpr inline unsigned short CALC_SUBCMD_NUM_PARAM[NUM_CALC_SUBCMDS]{
     2,  // respira
 };
 
-constexpr inline string_view** CALC_SUBCMD_PARAM[NUM_CALC_SUBCMDS]{
+constexpr inline string_view **CALC_SUBCMD_PARAM[NUM_CALC_SUBCMDS]{
     (string_view * [CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_START]]){},
-    (string_view * [CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_PERCENT]]){
-        (string_view[SUBCOMMAND_AND_DESCRIPTION]){
-            "percentage_val", "percentage displayed on top left corner of the screen"}},
-    (string_view * [CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_COSMOSAPSIS]]){
-        (string_view[SUBCOMMAND_AND_DESCRIPTION]){
-            "cosmosapsis_val", "cosmosapsis displayed in your abode"}},
+    (string_view *
+     [CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_PERCENT]]){(string_view[SUBCOMMAND_AND_DESCRIPTION]){
+        "percentage_val", "percentage displayed on top left corner of the screen"}},
+    (string_view *
+     [CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_COSMOSAPSIS]]){(string_view[SUBCOMMAND_AND_DESCRIPTION]){
+        "cosmosapsis_val", "cosmosapsis displayed in your abode"}},
     (string_view * [CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_RESPIRA]]){
-        (string_view[SUBCOMMAND_AND_DESCRIPTION]){
-            "respira_exp_per_attempt", "respira exp per attempt"},
-        (string_view[SUBCOMMAND_AND_DESCRIPTION]){
-            "num_daily_respira_attempts", "number of daily respira attempts"}},
+        (string_view[SUBCOMMAND_AND_DESCRIPTION]){"respira_exp_per_attempt",
+                                                  "respira exp per attempt"},
+        (string_view[SUBCOMMAND_AND_DESCRIPTION]){"num_daily_respira_attempts",
+                                                  "number of daily respira attempts"}},
 };
 
 command_option calculator_commands();
 
-task<void> start_interactive_calculator(const slashcommand_t& event);
+task<void> start_interactive_calculator(const slashcommand_t &event);
 
-task<void> calculator_subcommand_handler(const slashcommand_t& event,
-                                         const command_data_option& subcommand);
-task<void> calculator_button_click_handler(const button_click_t& event);
-task<void> calculator_select_click_handler(const select_click_t& event);
+task<void> calculator_subcommand_handler(const slashcommand_t &event,
+                                         const command_data_option &subcommand);
+task<void> calculator_button_click_handler(const button_click_t &event);
+task<void> calculator_select_click_handler(const select_click_t &event);
 
 /**
  * @brief verify whether the user causing the interaction is the owner of the
@@ -203,38 +194,41 @@ task<void> calculator_select_click_handler(const select_click_t& event);
  * returns nullopt
  */
 template <std::derived_from<interaction_create_t> T>
-task<optional<calc_session_map::iterator>> verify_user(const T& event);
+task<optional<calc_session_map::iterator>> verify_user(const T &event);
+string print_client_info(const calculator_client_t &client);
 
-task<void> calc_cancel(const button_click_t& event);
+task<void> calc_cancel(const button_click_t &event);
 
-task<void> calc_ask_stage(const button_click_t& event);
+task<void> calc_ask_stage(const button_click_t &event);
 
-task<void> calc_ask_percent_progress(const button_click_t& event);
-task<void> process_percent_progress(const slashcommand_t& event);
+task<void> calc_ask_percent_progress(const button_click_t &event);
+task<void> process_percent_progress(const slashcommand_t &event);
 
-task<void> calc_ask_cosmosapsis(const button_click_t& event);
-task<void> process_cosmosapsis(const slashcommand_t& event);
+task<void> calc_ask_cosmosapsis(const button_click_t &event);
+task<void> process_cosmosapsis(const slashcommand_t &event);
 
-task<void> calc_ask_aura_gem(const button_click_t& event);
+task<void> calc_ask_aura_gem(const button_click_t &event);
 
-task<void> calc_ask_respira(const button_click_t& event);
-task<void> process_respira(const slashcommand_t& event);
+task<void> calc_ask_respira(const button_click_t &event);
+task<void> process_respira(const slashcommand_t &event);
 
-task<void> calc_ask_pill(const button_click_t& event);
-task<void> process_pill(const slashcommand_t& event);
+task<void> calc_ask_pill(const button_click_t &event);
+task<void> process_pill(const slashcommand_t &event);
 
-task<void> calc_ask_extractor_quality(const button_click_t& event);
+task<void> calc_ask_extractor_quality(const button_click_t &event);
 
-task<void> calc_ask_extractor_node_lvl(const button_click_t& event);
-task<void> process_extractor_node_lvl(const slashcommand_t& event);
+task<void> calc_ask_extractor_node_lvl(const button_click_t &event);
+task<void> process_extractor_node_lvl(const slashcommand_t &event);
 
-task<void> calc_ask_myrimon_fruit(const button_click_t& event);
-task<void> process_myrimon_fruit(const slashcommand_t& event);
+task<void> calc_ask_myrimon_fruit(const button_click_t &event);
+task<void> process_myrimon_fruit(const slashcommand_t &event);
 
-task<void> calc_ask_vase_own(const button_click_t& event);
-task<void> calc_ask_vase_detail(const button_click_t& event);
+task<void> calc_ask_vase_own(const button_click_t &event);
+task<void> calc_ask_vase_detail(const button_click_t &event);
 
-task<void> calc_ask_mirror_own(const button_click_t& event);
-task<void> calc_ask_mirror_detail(const button_click_t& event);
+task<void> calc_ask_mirror_own(const button_click_t &event);
+task<void> calc_ask_mirror_detail(const button_click_t &event);
+
+task<void> calc_under_construction(const button_click_t &event);
 
 #endif  // CALCULATOR_HPP
