@@ -13,14 +13,16 @@ An interactive calculator that produces an estimate of how much longer it takes 
         - [x] Data collection for more precise numerical values via complementary slash commands
         - [x] Action buttons for easier navigation between steps
     - Peripheral:
-        - [ ] Detailed how-to text descriptions for each step
-        - [ ] Complementary in-game screenshots
+        - [ ] Detailed how-to text descriptions for each step (need help with this :D)
+        - [ ] Complementary in-game screenshots (need help with this :D)
 - [ ] Slash command calculator for inputting all data at once
     - [ ] a `/help` subcommand that provides a detailed how-to
 
 ## Backend
 - [x] Message ownership (for preventing other users from tempering with inputs of the command-initiating user)
-- [ ] Prevent a user from starting multiple calculator sessions
+- [x] Prevent a user from starting multiple calculator sessions
+- [x] Placeholder functions
+- [ ] Auto clean up stale calculator sessions
 - [x] Define calculator constants
 - [ ] Implement calculator logic
 - [x] Temperary storage of user-data
