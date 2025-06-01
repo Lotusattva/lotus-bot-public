@@ -6,6 +6,10 @@
 # Cultivation Caculator
 An interactive calculator that produces an estimate of how much longer it takes to breakthrough to the next major cultivation stage.
 
+## Documentation
+- [ ] Add section about respira
+- [ ] Refine
+
 ## Frontend
 - [ ] Step-by-step chatbot style calculator
     - Functional:
