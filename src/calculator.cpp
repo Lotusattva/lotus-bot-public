@@ -82,6 +82,14 @@ task<void> start_interactive_calculator(const slashcommand_t &event) {
 
     snowflake user_id{event.command.usr.id};
 
+    if (calc_sessions.find(user_id) != calc_sessions.end()) {
+        if (DEBUG) cerr << "User ID: " << user_id << " already has an active session." << endl;
+        co_await event.co_reply(
+            message("You already have an active calculator session. Please finish it first.")
+                .set_flags(m_ephemeral));
+        co_return;
+    }
+
     if (DEBUG) cerr << "User ID: " << user_id << endl;
 
     confirmation_callback_t callback{co_await event.co_get_original_response()};
