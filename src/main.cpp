@@ -72,7 +72,7 @@ int main() {
     });
 
     bot.on_message_create([](const message_create_t& event) {
-        // do nothing if message was sent by the bot itself
+        // do nothing if message was sent by a bot
         if (event.msg.author.is_bot()) return;
 
         static emoji lotus_feet{"LotusFeet", 1357213347761885325};
