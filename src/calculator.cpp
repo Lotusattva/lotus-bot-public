@@ -9,37 +9,33 @@ static const component cancel_button{component()
                                          .set_id(CALC_EVENT_IDS[CALC_CANCEL])};
 
 command_option calculator_commands() {
-    command_option calc_command{
-        command_option{co_sub_command_group, string{CALC_MAIN_COMMAND[0]},
-                       string{CALC_MAIN_COMMAND[1]}}
-            .add_option(command_option{co_sub_command, string{CALC_SUBCMDS[CALC_SUBCMD_START][0]},
-                                       string{CALC_SUBCMDS[CALC_SUBCMD_START][1]}})
-            .add_option(command_option{co_sub_command, string{CALC_SUBCMDS[CALC_SUBCMD_PERCENT][0]},
-                                       string{CALC_SUBCMDS[CALC_SUBCMD_PERCENT][1]}}
-                            .add_option(command_option{
-                                co_number, string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PERCENT][0][0]},
-                                string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PERCENT][0][1]}, true}
-                                            .set_min_value(0.0)
-                                            .set_max_value(1000.0)))
-            .add_option(command_option{co_sub_command,
-                                       string{CALC_SUBCMDS[CALC_SUBCMD_COSMOSAPSIS][0]},
-                                       string{CALC_SUBCMDS[CALC_SUBCMD_COSMOSAPSIS][1]}}
-                            .add_option(command_option{
-                                co_number, string{CALC_SUBCMD_PARAM[CALC_SUBCMD_COSMOSAPSIS][0][0]},
-                                string{CALC_SUBCMD_PARAM[CALC_SUBCMD_COSMOSAPSIS][0][1]}, true}
-                                            .set_min_value(0.0)))
-            .add_option(command_option{co_sub_command, string{CALC_SUBCMDS[CALC_SUBCMD_RESPIRA][0]},
-                                       string{CALC_SUBCMDS[CALC_SUBCMD_RESPIRA][1]}}
-                            .add_option(command_option{
-                                co_integer, string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][0][0]},
-                                string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][0][1]}, true}
-                                            .set_min_value(0))
-                            .add_option(command_option{
-                                co_integer, string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][1][0]},
-                                string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][1][1]}, true}
-                                            .set_min_value(0)))};
-
-    return calc_command;
+    return command_option{co_sub_command_group, string{CALC_MAIN_COMMAND[0]},
+                          string{CALC_MAIN_COMMAND[1]}}
+        .add_option(command_option{co_sub_command, string{CALC_SUBCMDS[CALC_SUBCMD_START][0]},
+                                   string{CALC_SUBCMDS[CALC_SUBCMD_START][1]}})
+        .add_option(command_option{co_sub_command, string{CALC_SUBCMDS[CALC_SUBCMD_PERCENT][0]},
+                                   string{CALC_SUBCMDS[CALC_SUBCMD_PERCENT][1]}}
+                        .add_option(command_option{
+                            co_number, string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PERCENT][0][0]},
+                            string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PERCENT][0][1]}, true}
+                                        .set_min_value(0.0)
+                                        .set_max_value(1000.0)))
+        .add_option(command_option{co_sub_command, string{CALC_SUBCMDS[CALC_SUBCMD_COSMOSAPSIS][0]},
+                                   string{CALC_SUBCMDS[CALC_SUBCMD_COSMOSAPSIS][1]}}
+                        .add_option(command_option{
+                            co_number, string{CALC_SUBCMD_PARAM[CALC_SUBCMD_COSMOSAPSIS][0][0]},
+                            string{CALC_SUBCMD_PARAM[CALC_SUBCMD_COSMOSAPSIS][0][1]}, true}
+                                        .set_min_value(0.0)))
+        .add_option(command_option{co_sub_command, string{CALC_SUBCMDS[CALC_SUBCMD_RESPIRA][0]},
+                                   string{CALC_SUBCMDS[CALC_SUBCMD_RESPIRA][1]}}
+                        .add_option(command_option{
+                            co_integer, string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][0][0]},
+                            string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][0][1]}, true}
+                                        .set_min_value(0))
+                        .add_option(command_option{
+                            co_integer, string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][1][0]},
+                            string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][1][1]}, true}
+                                        .set_min_value(0)));
 }
 
 task<void> start_interactive_calculator(const slashcommand_t &event) {
@@ -156,7 +152,24 @@ task<void> calculator_button_click_handler(const button_click_t &event) {
         else
             // else continue to next step
             co_await calc_ask_respira(event);
-    } else
+    } else if (id == CALC_EVENT_IDS[CALC_ASK_PILL]) {
+        co_await calc_ask_pill(event);
+    } else if (id == CALC_EVENT_IDS[CALC_ASK_EXTRACTOR_QUALITY])
+        co_await calc_ask_extractor_quality(event);
+    else if (id == CALC_EVENT_IDS[CALC_ASK_EXTRACTOR_NODE_LVL])
+        co_await calc_ask_extractor_node_lvl(event);
+    else if (id == CALC_EVENT_IDS[CALC_ASK_MYRIMON_FRUIT])
+        co_await calc_ask_myrimon_fruit(event);
+    else if (id == CALC_EVENT_IDS[CALC_ASK_VASE_OWN])
+        co_await calc_ask_vase_own(event);
+    else if (id == CALC_EVENT_IDS[CALC_ASK_VASE_DETAIL])
+        co_await calc_ask_vase_detail(event);
+    else if (id == CALC_EVENT_IDS[CALC_ASK_MIRROR_OWN])
+        co_await calc_ask_mirror_own(event);
+    else if (id == CALC_EVENT_IDS[CALC_ASK_MIRROR_DETAIL])
+        co_await calc_ask_mirror_detail(event);
+
+    else
         cerr << "Unhandled calculator event: " << id << endl;
 
     co_return;
@@ -765,6 +778,8 @@ task<void> calc_under_construction(const button_click_t &event) {
                                          "under construction. Please check back later.")))};
 
     co_await event.co_edit_response(under_construction_message);
+
+    calc_sessions.erase(event.command.usr.id);
 
     co_return;
 }
