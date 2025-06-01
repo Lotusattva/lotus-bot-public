@@ -1,7 +1,7 @@
 # Funnies
 
-## `!feet` shenanigans
-- [ ] Make bot produce message with a configuration of feet emojis mirroring the construction of the user command
+## `feet` shenanigans
+- [x] Make bot produce message with a configuration of feet emojis mirroring the construction of the user command || Currently able to echo `feet` ||
 
 # Cultivation Caculator
 An interactive calculator that produces an estimate of how much longer it takes to breakthrough to the next major cultivation stage.
