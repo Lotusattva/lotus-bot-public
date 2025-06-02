@@ -2,8 +2,9 @@
 #include <dpp/message.h>
 
 #include "calculator.hpp"
-#include "commands.hpp"
+#include "feet.hpp"
 #include "global.hpp"
+#include "poll.hpp"
 #include "scheduler.hpp"
 
 void sigint_handler(int _) {
@@ -17,33 +18,22 @@ int main() {
     bot.on_log(utility::cout_logger());
 
     bot.on_slashcommand([](const slashcommand_t& event) -> task<void> {
-        command_interaction cmd_data{event.command.get_command_interaction()};
+        const command_interaction cmd_interaction{event.command.get_command_interaction()};
 
         if (event.command.get_command_name() == "debug") {
-            const auto& subcommand{cmd_data.options[0]};
-            if (subcommand.name == "poll") {
-                const auto& action{subcommand.options[0]};
-                if (action.name == "start")
-                    co_await start_debug_poll(event);
-                else if (action.name == "end")
-                    co_await end_debug_poll(event);
-            } else if (subcommand.name == "calc") {
-                co_await calculator_subcommand_handler(event, subcommand.options[0]);
-            }
+            const command_data_option& options{cmd_interaction.options[0]};
+            if (options.name == "poll")
+                co_await poll_subcommand_handler(event, options);
+            else if (options.name == "calc")
+                co_await calculator_subcommand_handler(event, options);
         }
     });
 
     bot.on_ready([](const ready_t& event) {
         if (run_once<struct register_bot_commands>()) {
-            slashcommand debug_cmd{
-                slashcommand("debug", "debug commands", bot.me.id)
-                    .add_option(
-                        // for testing polls
-                        command_option(co_sub_command_group, "poll",
-                                       "sect clash array sign up polls")
-                            .add_option(command_option(co_sub_command, "start", "start a poll"))
-                            .add_option(command_option(co_sub_command, "end", "end a poll")))
-                    .add_option(calculator_commands())};
+            slashcommand debug_cmd{slashcommand("debug", "debug commands", bot.me.id)
+                                       .add_option(poll_commands())
+                                       .add_option(calculator_commands())};
 
             bot.global_bulk_command_create({debug_cmd});
         }
@@ -71,50 +61,7 @@ int main() {
         }
     });
 
-    bot.on_message_create([](const message_create_t& event) {
-        // do nothing if message was sent by a bot
-        if (event.msg.author.is_bot()) return;
-
-        static emoji lotus_feet{"LotusFeet", 1357213347761885325};
-
-        // // Count feet mentions
-        int feet_count{0};
-
-        string lowercase_no_space{
-            string_view{event.msg.content} | views::filter([](const char& c) { return c != ' '; }) |
-            views::transform([](const char& c) { return std::tolower(c); }) | ranges::to<string>()};
-
-        size_t pos{0};
-        while ((pos = lowercase_no_space.find("feet", pos)) != string::npos) {
-            ++feet_count;
-            pos += 4;  // Move past the word "feet"
-
-            // check if consecutive characters are digits
-            if (pos < lowercase_no_space.size() && std::isdigit(lowercase_no_space[pos])) {
-                feet_count--; // Decrement feet_count if a number follows "feet"
-                size_t end_pos{pos};
-                while (end_pos < lowercase_no_space.size() &&
-                       std::isdigit(lowercase_no_space[end_pos]))
-                    ++end_pos;
-
-                // Convert the number to an integer and add to feet_count
-                feet_count += max(std::stoi(lowercase_no_space.substr(pos, end_pos - pos)),
-                                  0);  // Use max() to prevent integer overflow
-                pos = end_pos;         // Move past the number
-            }
-        }
-
-        feet_count = min(feet_count, 20);
-
-        if (feet_count > 0) {
-            string response{};
-            while (feet_count > 0) {
-                response += lotus_feet.get_mention();
-                --feet_count;
-            }
-            bot.message_create(message{event.msg.channel_id, response});
-        }
-    });
+    bot.on_message_create(&feet);
 
     if (DEBUG) {
         // nothing for now

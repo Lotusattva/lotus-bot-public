@@ -1,6 +1,25 @@
-#include "commands.hpp"
+#include "poll.hpp"
+#include <dpp/appcommand.h>
 
-#include "poll_helper.hpp"
+#include <random>
+
+command_option poll_commands() {
+    return command_option(co_sub_command_group, "poll", "sect clash array sign up polls")
+        .add_option(command_option(co_sub_command, "start", "start a poll"))
+        .add_option(command_option(co_sub_command, "end", "end a poll"));
+}
+
+task<void> poll_subcommand_handler(const slashcommand_t& event,
+                                   const command_data_option& options) {
+    const command_data_option& subcommand{options.options[0]};
+
+    if (subcommand.name == "start")
+        co_await start_debug_poll(event);
+    else if (subcommand.name == "end")
+        co_await end_debug_poll(event);
+
+    co_return;
+}
 
 task<void> start_debug_poll(const slashcommand_t& event) {
     // remove finalized polls
@@ -77,4 +96,66 @@ task<void> end_debug_poll(const slashcommand_t& event) {
     string post{"# Selections: \n" + print_role_selections(role_selections)};
     co_await thinking;
     event.edit_original_response(message{post});
+}
+
+void select(vector<string>& vec, unsigned limit) {
+    if (vec.size() > limit) {
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(vec.begin(), vec.end(), g);
+        vec.resize(limit);
+    }
+}
+
+task<optional<map<string_view, vector<string>>>> get_voters(const message& msg,
+                                                            const members_container& members) {
+    map<string_view, vector<string>> role_selections{
+        {ARRAY_ROLE_STR[MAGICAL_DRIVER], {}},
+        {ARRAY_ROLE_STR[MAGICAL_PASSENGER], {}},
+        {ARRAY_ROLE_STR[PHYSICAL_DRIVER], {}},
+        {ARRAY_ROLE_STR[PHYSICAL_PASSENGER], {}},
+    };
+
+    const poll& poll{msg.get_poll()};
+
+    for (const auto& [_, answer] : poll.answers) {
+        confirmation_callback_t callback{
+            co_await bot.co_poll_get_answer_voters(msg, answer.id, 0, 100)};
+        if (callback.is_error()) {
+            cerr << "Error: " << callback.get_error().message << endl;
+            co_return {};
+        }
+        user_map voters{callback.get<user_map>()};
+        for (const auto& [_, user] : voters) {
+            string name{user.global_name};
+            if (auto member{members.find(user.id)}; member != members.end()) {
+                string nickname{member->second.get_nickname()};
+                if (!nickname.empty()) name = nickname;
+            }
+            role_selections[answer.media.text].push_back(name);
+        }
+    }
+
+    co_return role_selections;
+}
+
+void make_selections(map<string_view, vector<string>>& role_selections) {
+    for (auto i{0}; i < NUM_ARRAY_ROLES; ++i)
+        select(role_selections[ARRAY_ROLE_STR[i]], ARRAY_ROLE_LIMIT[i]);
+}
+
+string print_role_selections(const map<string_view, vector<string>>& role_selections) {
+    string result;
+    for (const auto& [role, names] : role_selections)
+        result += print_single_role_selection(role, names);
+    return result;
+}
+
+string print_single_role_selection(const string_view& role, const vector<string>& vec) {
+    string result{"## " + string{role} + "\n"};
+    if (vec.empty())
+        result += "*No one signed up for this role.*\n";
+    else
+        for (const auto& name : vec) result += "> - " + name + "\n";
+    return result;
 }

@@ -1,6 +1,7 @@
 #ifndef CALCULATOR_HPP
 #define CALCULATOR_HPP
 
+#include <dpp/appcommand.h>
 #include <string>
 
 #include "calculator_constants.hpp"
@@ -182,7 +183,7 @@ command_option calculator_commands();
 task<void> start_interactive_calculator(const slashcommand_t &event);
 
 task<void> calculator_subcommand_handler(const slashcommand_t &event,
-                                         const command_data_option &subcommand);
+                                         const command_data_option &options);
 task<void> calculator_button_click_handler(const button_click_t &event);
 task<void> calculator_select_click_handler(const select_click_t &event);
 

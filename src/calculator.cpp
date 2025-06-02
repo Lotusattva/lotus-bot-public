@@ -1,4 +1,5 @@
 #include "calculator.hpp"
+#include <dpp/appcommand.h>
 
 #include <string>
 
@@ -100,7 +101,9 @@ task<void> start_interactive_calculator(const slashcommand_t &event) {
 }
 
 task<void> calculator_subcommand_handler(const slashcommand_t &event,
-                                         const command_data_option &subcommand) {
+                                         const command_data_option &options) {
+    const command_data_option & subcommand{options.options[0]};
+
     if (DEBUG) cerr << "Handling calculator subcommand: " << subcommand.name << endl;
 
     if (subcommand.name == CALC_SUBCMDS[CALC_SUBCMD_START][0])
