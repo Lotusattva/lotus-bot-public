@@ -26,6 +26,7 @@ An interactive calculator that produces an estimate of how much longer it takes 
 - [x] Message ownership (for preventing other users from tempering with inputs of the command-initiating user)
 - [x] Prevent a user from starting multiple calculator sessions
 - [x] Placeholder functions
+- [ ] Handle premature calling of slashcommands during a session
 - [ ] Auto clean up stale calculator sessions
 - [x] Define calculator constants
 - [ ] Implement calculator logic
