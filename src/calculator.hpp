@@ -2,10 +2,47 @@
 #define CALCULATOR_HPP
 
 #include <dpp/appcommand.h>
+
 #include <string>
 
 #include "calculator_constants.hpp"
 #include "global.hpp"
+
+enum calc_state_t {
+    CALC_CANCEL,
+    CALC_ASK_STAGE,
+    CALC_ASK_PERCENT_PROGRESS,
+    CALC_ASK_COSMOSAPSIS,
+    CALC_ASK_AURA_GEM,
+    CALC_ASK_RESPIRA,  // both attempt and exp
+    CALC_ASK_PILL,     // attempt, how many of each quality, bonus
+    CALC_ASK_EXTRACTOR_QUALITY,
+    CALC_ASK_EXTRACTOR_NODE_LVL,
+    CALC_ASK_MYRIMON_FRUIT,
+    CALC_ASK_VASE_OWN,  // whether the user owns a vase
+    CALC_ASK_VASE_DETAIL,
+    CALC_ASK_MIRROR_OWN,  // whether the user owns a mirror
+    CALC_ASK_MIRROR_DETAIL,
+
+    NUM_CALC_STATES
+};
+
+constexpr inline string_view const CALC_STATE_IDS[NUM_CALC_STATES]{
+    "calc_cancel",
+    "calc_ask_stage",
+    "calc_ask_percent_progress",
+    "calc_ask_cosmosapsis",
+    "calc_ask_aura_gem",
+    "calc_ask_respira",
+    "calc_ask_pill",
+    "calc_ask_extractor_quality",
+    "calc_ask_extractor_node_lvl",
+    "calc_ask_myrimon_fruit",
+    "calc_ask_vase_own",
+    "calc_ask_vase_detail",
+    "calc_ask_mirror_own",
+    "calc_ask_mirror_detail",
+};
 
 /**
  * A struct that stores the necessary information for an artifact.
@@ -29,6 +66,8 @@ struct artifact_t {
  * - (vase == null) => (mirror == null)
  */
 struct calculator_client_t {
+    calc_state_t calc_state{NUM_CALC_STATES};
+
     // culitivation progress
     major_stage_t major_stage{NUM_MAJOR_STAGES};  // default to invalid
     minor_stage_t minor_stage{NUM_MINOR_STAGES};  // default to invalid
@@ -67,45 +106,9 @@ typedef unordered_map<snowflake, pair<message, calculator_client_t>> calc_sessio
 
 /**
  * Represents ownership of calculator sessions
- * maps user-id to (message-id, channel-id, calculator_client_t)
+ * maps user-id to (message, calculator_client_t)
  */
 inline calc_session_map calc_sessions;
-
-enum calc_event_t {
-    CALC_CANCEL,
-    CALC_ASK_STAGE,
-    CALC_ASK_PERCENT_PROGRESS,
-    CALC_ASK_COSMOSAPSIS,
-    CALC_ASK_AURA_GEM,
-    CALC_ASK_RESPIRA,  // both attempt and exp
-    CALC_ASK_PILL,     // attempt, how many of each quality, bonus
-    CALC_ASK_EXTRACTOR_QUALITY,
-    CALC_ASK_EXTRACTOR_NODE_LVL,
-    CALC_ASK_MYRIMON_FRUIT,
-    CALC_ASK_VASE_OWN,  // whether the user owns a vase
-    CALC_ASK_VASE_DETAIL,
-    CALC_ASK_MIRROR_OWN,  // whether the user owns a mirror
-    CALC_ASK_MIRROR_DETAIL,
-
-    NUM_CALC_EVENTS
-};
-
-constexpr inline string_view const CALC_EVENT_IDS[NUM_CALC_EVENTS]{
-    "calc_cancel",
-    "calc_ask_stage",
-    "calc_ask_percent_progress",
-    "calc_ask_cosmosapsis",
-    "calc_ask_aura_gem",
-    "calc_ask_respira",
-    "calc_ask_pill",
-    "calc_ask_extractor_quality",
-    "calc_ask_extractor_node_lvl",
-    "calc_ask_myrimon_fruit",
-    "calc_ask_vase_own",
-    "calc_ask_vase_detail",
-    "calc_ask_mirror_own",
-    "calc_ask_mirror_detail",
-};
 
 enum calc_select_t {
     // stage
@@ -134,6 +137,42 @@ constexpr inline string_view const CALC_SELECT_IDS[NUM_CALC_SELECTS]{
     "calc_select_major_stage",       "calc_select_minor_stage", "calc_select_aura_gem_quality",
     "calc_select_extractor_quality", "calc_select_vase_star",   "calc_select_vase_daily_recharge",
     "calc_select_vase_transmog",     "calc_select_mirror_star", "calc_select_mirror_daily_recharge",
+};
+
+enum calc_button_t {
+    CALC_BUTTON_START,
+    CALC_BUTTON_CANCEL,
+    CALC_BUTTON_STAGE,
+    CALC_BUTTON_PERCENT,
+    CALC_BUTTON_COSMOSAPSIS,
+    CALC_BUTTON_AURA_GEM,
+    CALC_BUTTON_RESPIRA,
+    CALC_BUTTON_EXTRACTOR_QUALITY,
+    CALC_BUTTON_VASE_YES,
+    CALC_BUTTON_VASE_NO,
+    CALC_BUTTON_VASE_DETAIL,
+    CALC_BUTTON_MIRROR_YES,
+    CALC_BUTTON_MIRROR_NO,
+    CALC_BUTTON_MIRROR_DETAIL,
+
+    NUM_CALC_BUTTONS
+};
+
+constexpr inline string_view const CALC_BUTTON_IDS[NUM_CALC_BUTTONS]{
+    "calc_start",
+    "calc_cancel",
+    "calc_stage",
+    "calc_percent",
+    "calc_cosmosapsis",
+    "calc_aura_gem",
+    "calc_respira",
+    "calc_extractor_quality",
+    "calc_vase_yes",
+    "calc_vase_no",
+    "calc_vase_detail",
+    "calc_mirror_yes",
+    "calc_mirror_no",
+    "calc_mirror_detail",
 };
 
 #define SUBCOMMAND_AND_DESCRIPTION 2
@@ -195,8 +234,11 @@ task<void> calculator_select_click_handler(const select_click_t &event);
  * returns nullopt
  */
 template <std::derived_from<interaction_create_t> T>
-task<optional<calc_session_map::iterator>> verify_user(const T &event);
+task<optional<pair<message, calculator_client_t> *>> verify_user(const T &event);
+task<optional<pair<message, calculator_client_t> *>> verify_user(const slashcommand_t &event);
 string print_client_info(const calculator_client_t &client);
+
+task<void> non_session_interaction(const slashcommand_t &event);
 
 task<void> calc_cancel(const button_click_t &event);
 

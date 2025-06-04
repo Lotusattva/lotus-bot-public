@@ -1,13 +1,16 @@
 #include "calculator.hpp"
+
 #include <dpp/appcommand.h>
 
 #include <string>
+
+#include "calculator_constants.hpp"
 
 static const component cancel_button{component()
                                          .set_type(cot_button)
                                          .set_style(cos_danger)
                                          .set_label("CANCEL")
-                                         .set_id(CALC_EVENT_IDS[CALC_CANCEL])};
+                                         .set_id(CALC_BUTTON_IDS[CALC_BUTTON_CANCEL])};
 
 command_option calculator_commands() {
     return command_option{co_sub_command_group, string{CALC_MAIN_COMMAND[0]},
@@ -59,7 +62,7 @@ task<void> start_interactive_calculator(const slashcommand_t &event) {
                                      .set_type(cot_button)
                                      .set_style(cos_primary)
                                      .set_label("NEXT")
-                                     .set_id(CALC_EVENT_IDS[CALC_ASK_STAGE])};
+                                     .set_id(CALC_BUTTON_IDS[CALC_BUTTON_START])};
 
     static component action_row{component()
                                     .set_type(cot_action_row)
@@ -102,13 +105,16 @@ task<void> start_interactive_calculator(const slashcommand_t &event) {
 
 task<void> calculator_subcommand_handler(const slashcommand_t &event,
                                          const command_data_option &options) {
-    const command_data_option & subcommand{options.options[0]};
+    const command_data_option &subcommand{options.options[0]};
 
     if (DEBUG) cerr << "Handling calculator subcommand: " << subcommand.name << endl;
 
-    if (subcommand.name == CALC_SUBCMDS[CALC_SUBCMD_START][0])
+    if (subcommand.name == CALC_SUBCMDS[CALC_SUBCMD_START][0]) {
         co_await start_interactive_calculator(event);
-    else if (subcommand.name == CALC_SUBCMDS[CALC_SUBCMD_PERCENT][0])
+        co_return;
+    }
+
+    if (subcommand.name == CALC_SUBCMDS[CALC_SUBCMD_PERCENT][0])
         co_await process_percent_progress(event);
     else if (subcommand.name == CALC_SUBCMDS[CALC_SUBCMD_COSMOSAPSIS][0])
         co_await process_cosmosapsis(event);
@@ -131,58 +137,91 @@ task<void> calculator_button_click_handler(const button_click_t &event) {
 
     if (DEBUG) cerr << "Handling calculator event: " << id << endl;
 
-    if (id == CALC_EVENT_IDS[CALC_CANCEL])
-        co_await calc_cancel(event);
-    else if (id == CALC_EVENT_IDS[CALC_ASK_STAGE])
+    if (id == CALC_BUTTON_IDS[CALC_BUTTON_START]) {
         co_await calc_ask_stage(event);
-    else if (id == CALC_EVENT_IDS[CALC_ASK_PERCENT_PROGRESS]) {
-        calculator_client_t &client{calc_sessions[event.command.usr.id].second};
-        if (client.major_stage == NUM_MAJOR_STAGES || client.minor_stage == NUM_MINOR_STAGES)
-            // do nothing and wait for user to finish selection
-            co_return;
-        else
-            // else continue to next step
-            co_await calc_ask_percent_progress(event);
-    } else if (id == CALC_EVENT_IDS[CALC_ASK_COSMOSAPSIS])
-        co_await calc_ask_cosmosapsis(event);
-    else if (id == CALC_EVENT_IDS[CALC_ASK_AURA_GEM])
-        co_await calc_ask_aura_gem(event);
-    else if (id == CALC_EVENT_IDS[CALC_ASK_RESPIRA]) {
-        calculator_client_t &client{calc_sessions[event.command.usr.id].second};
-        if (client.aura_gem_quality == NUM_QUALITIES)
-            // do nothing and wait for user to finish selection
-            co_return;
-        else
-            // else continue to next step
-            co_await calc_ask_respira(event);
-    } else if (id == CALC_EVENT_IDS[CALC_ASK_PILL]) {
-        co_await calc_ask_pill(event);
-    } else if (id == CALC_EVENT_IDS[CALC_ASK_EXTRACTOR_QUALITY])
-        co_await calc_ask_extractor_quality(event);
-    else if (id == CALC_EVENT_IDS[CALC_ASK_EXTRACTOR_NODE_LVL])
-        co_await calc_ask_extractor_node_lvl(event);
-    else if (id == CALC_EVENT_IDS[CALC_ASK_MYRIMON_FRUIT])
-        co_await calc_ask_myrimon_fruit(event);
-    else if (id == CALC_EVENT_IDS[CALC_ASK_VASE_OWN])
-        co_await calc_ask_vase_own(event);
-    else if (id == CALC_EVENT_IDS[CALC_ASK_VASE_DETAIL])
-        co_await calc_ask_vase_detail(event);
-    else if (id == CALC_EVENT_IDS[CALC_ASK_MIRROR_OWN])
-        co_await calc_ask_mirror_own(event);
-    else if (id == CALC_EVENT_IDS[CALC_ASK_MIRROR_DETAIL])
-        co_await calc_ask_mirror_detail(event);
+        co_return;
+    }
 
-    else
-        cerr << "Unhandled calculator event: " << id << endl;
+    if (id == CALC_BUTTON_IDS[CALC_BUTTON_CANCEL]) {
+        co_await calc_cancel(event);
+        co_return;
+    }
+
+    const calculator_client_t &client{calc_sessions[event.command.usr.id].second};
+    if (id == CALC_BUTTON_IDS[CALC_BUTTON_STAGE]) {
+        if (client.major_stage == NUM_MAJOR_STAGES || client.minor_stage == NUM_MINOR_STAGES)
+            co_return;  // do nothing since user has not finished selecting both stages
+        else {
+            // both stages are set, then...
+            if (client.percent_progress == -1.0)
+                // ask for percent progress if not set
+                co_await calc_ask_percent_progress(event);
+            else if (client.cosmosapsis == -1.0)
+                // ask for cosmosapsis if not set
+                co_await calc_ask_cosmosapsis(event);
+            else
+                // ask for aura gem quality if both percent progress and cosmosapsis are set
+                co_await calc_ask_aura_gem(event);
+        }
+    } else if (id == CALC_BUTTON_IDS[CALC_BUTTON_PERCENT]) {
+        if (client.cosmosapsis == -1.0) {
+            // ask for cosmosapsis if not set
+            co_await calc_ask_cosmosapsis(event);
+        } else {
+            // ask for aura gem quality if both percent progress and cosmosapsis are set
+            co_await calc_ask_aura_gem(event);
+        }
+    } else if (id == CALC_BUTTON_IDS[CALC_BUTTON_COSMOSAPSIS]) {
+        co_await calc_ask_aura_gem(event);
+    } else if (id == CALC_BUTTON_IDS[CALC_BUTTON_AURA_GEM]) {
+        if (client.aura_gem_quality == NUM_QUALITIES)
+            co_return;  // do nothing since user has not selected aura gem quality
+        else if (client.respira_exp == 0 || client.daily_respira_attempts == 0)
+            // ask for respira if not set
+            co_await calc_ask_respira(event);
+        else if (client.daily_pill_attempts == 0 ||
+                 (client.pill_quantity[0] == 0 && client.pill_quantity[1] == 0 &&
+                  client.pill_quantity[2] == 0) ||
+                 client.pill_bonus == 0.0)
+            // ask for pill if not set
+            co_await calc_ask_pill(event);
+        else
+            // ask for extractor quality if all previous data are set
+            co_await calc_ask_extractor_quality(event);
+    } else if (id == CALC_BUTTON_IDS[CALC_BUTTON_RESPIRA]) {
+        if (client.daily_pill_attempts == 0 ||
+            (client.pill_quantity[0] == 0 && client.pill_quantity[1] == 0 &&
+             client.pill_quantity[2] == 0) ||
+            client.pill_bonus == 0.0)
+            // ask for pill if not set
+            co_await calc_ask_pill(event);
+        else
+            // ask for extractor quality if all previous data are set
+            co_await calc_ask_extractor_quality(event);
+    } else if (id == CALC_BUTTON_IDS[CALC_BUTTON_EXTRACTOR_QUALITY]) {
+        if (client.extractor_quality == NUM_QUALITIES)
+            co_return;  // do nothing since user has not selected extractor quality
+        else if (client.node_levels[0] == 31 || client.node_levels[1] == 31 ||
+                 client.node_levels[2] == 31)
+            // ask for extractor node levels if not set
+            co_await calc_ask_extractor_node_lvl(event);
+        else if (client.fruit_quantity == 0)
+            // ask for myrimon fruit quantity if not set
+            co_await calc_ask_myrimon_fruit(event);
+        else
+            // ask for vase ownership if all previous data are set
+            co_await calc_ask_vase_own(event);
+    } else
+        co_await calc_under_construction(event);
 
     co_return;
 }
 
 task<void> calculator_select_click_handler(const select_click_t &event) {
-    auto it{co_await verify_user(event)};
-    if (!it) co_return;
+    optional<pair<message, calculator_client_t> *> user{co_await verify_user(event)};
+    if (!user) co_return;
 
-    calculator_client_t &client{it.value()->second.second};
+    calculator_client_t &client{user.value()->second};
 
     if (event.custom_id == CALC_SELECT_IDS[CALC_SELECT_MAJOR_STAGE]) {
         if (DEBUG) cerr << "Major stage selected: " << event.values[0] << endl;
@@ -203,7 +242,7 @@ task<void> calculator_select_click_handler(const select_click_t &event) {
 }
 
 template <derived_from<interaction_create_t> T>
-task<optional<calc_session_map::iterator>> verify_user(const T &event) {
+task<optional<pair<message, calculator_client_t> *>> verify_user(const T &event) {
     snowflake user_id{event.command.usr.id};
 
     if (DEBUG) cerr << "Verifying user: " << user_id << endl;
@@ -236,7 +275,7 @@ task<optional<calc_session_map::iterator>> verify_user(const T &event) {
     }
 
     if (DEBUG) cerr << "User ID: " << user_id << " is the owner of this session." << endl;
-    co_return it;
+    co_return &it->second;
 }
 
 task<void> calc_cancel(const button_click_t &event) {
@@ -289,6 +328,8 @@ component minor_stage_selectmenu_factory() {
 }
 
 task<void> calc_ask_stage(const button_click_t &event) {
+    calc_sessions[event.command.usr.id].second.calc_state = CALC_ASK_STAGE;
+
     if (DEBUG) cerr << "Asking for cultivation stage..." << endl;
 
     static component text_display{component()
@@ -305,7 +346,7 @@ task<void> calc_ask_stage(const button_click_t &event) {
                                      .set_type(cot_button)
                                      .set_style(cos_primary)
                                      .set_label("NEXT")
-                                     .set_id(CALC_EVENT_IDS[CALC_ASK_PERCENT_PROGRESS])};
+                                     .set_id(CALC_BUTTON_IDS[CALC_BUTTON_STAGE])};
 
     static message calc_ask_stage_message{
         message()
@@ -385,7 +426,31 @@ string print_client_info(const calculator_client_t &client) {
     return info + "\n\n";
 }
 
+task<void> non_session_interaction(const slashcommand_t &event) {
+    co_await event.co_reply(message("This command should be used in an interactive calculator "
+                                    "session."
+                                    "Please start a new session with `/" +
+                                    string{CALC_MAIN_COMMAND[0]} + " " +
+                                    string{CALC_SUBCMDS[CALC_SUBCMD_START][0]} + "`")
+                                .set_flags(m_ephemeral));
+}
+
+task<optional<pair<message, calculator_client_t> *>> verify_user(const slashcommand_t &event) {
+    snowflake user_id{event.command.usr.id};
+    auto it{calc_sessions.find(user_id)};
+
+    if (it == calc_sessions.end()) {
+        if (DEBUG) cerr << "User ID: " << user_id << " is not in any session." << endl;
+        co_await non_session_interaction(event);
+        co_return nullopt;
+    }
+
+    co_return &it->second;
+}
+
 task<void> calc_ask_percent_progress(const button_click_t &event) {
+    calc_sessions[event.command.usr.id].second.calc_state = CALC_ASK_PERCENT_PROGRESS;
+
     if (DEBUG) cerr << "Asking for percent progress..." << endl;
 
     string client_info{print_client_info(calc_sessions[event.command.usr.id].second)};
@@ -413,65 +478,61 @@ task<void> calc_ask_percent_progress(const button_click_t &event) {
 }
 
 task<void> process_percent_progress(const slashcommand_t &event) {
-    snowflake user_id{event.command.usr.id};
-    auto it{calc_sessions.find(user_id)};
-    if (it == calc_sessions.end()) {
-        if (DEBUG) cerr << "User ID: " << user_id << " is not in any session." << endl;
-
-        co_await event.co_reply(message("This command should be used in an interactive calculator "
-                                        "session."
-                                        "Please start a new session with `/debug calc "
-                                        "interactive`.")
-                                    .set_flags(m_ephemeral));
-        co_return;
-    }
-
     // acknowledge the slash command
     auto reply{event.co_reply("input received, processing...")};
 
-    calculator_client_t &client{it->second.second};
+    optional<pair<message, calculator_client_t> *> user{co_await verify_user(event)};
+
+    if (!user) co_return;
+
+    calculator_client_t &client{user.value()->second};
     client.percent_progress =
         get<double>(event.get_parameter(string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PERCENT][0][0]}));
 
-    component text_display{component()
-                               .set_type(cot_text_display)
-                               .set_content("Your percent progress is set to " +
-                                            to_string(client.percent_progress) +
-                                            "%.\n\n"
-                                            "Please click **NEXT** to continue, or use `/calc "
-                                            "percent` to update your progress.\n\n")};
+    if (client.calc_state == CALC_ASK_PERCENT_PROGRESS) {
+        // if the user is in the percent progress state, then we can edit the message
+        string client_info{print_client_info(client)};
 
-    static component next_button{component()
-                                     .set_type(cot_button)
-                                     .set_style(cos_primary)
-                                     .set_label("NEXT")
-                                     .set_id(CALC_EVENT_IDS[CALC_ASK_COSMOSAPSIS])};
+        component text_display{component()
+                                   .set_type(cot_text_display)
+                                   .set_content(client_info +
+                                                "Please click **NEXT** to continue, or use `/calc "
+                                                "percent` to update your progress.\n\n")};
 
-    message msg{calc_sessions[user_id].first};
+        static component next_button{component()
+                                         .set_type(cot_button)
+                                         .set_style(cos_primary)
+                                         .set_label("NEXT")
+                                         .set_id(CALC_BUTTON_IDS[CALC_BUTTON_PERCENT])};
 
-    // edit the message
-    msg.components.clear();
-    msg.add_component_v2(component()
-                             // a container
-                             .set_type(cot_container)
-                             // ...with a text display
-                             .add_component_v2(text_display)
-                             // ...and two buttons
-                             .add_component_v2(component()
-                                                   .set_type(cot_action_row)
-                                                   .add_component_v2(next_button)
-                                                   .add_component_v2(cancel_button)));
+        message msg{user.value()->first};
 
-    auto edit_msg{bot.co_message_edit(msg)};
+        // edit the message
+        msg.components.clear();
+        msg.add_component_v2(component()
+                                 // a container
+                                 .set_type(cot_container)
+                                 // ...with a text display
+                                 .add_component_v2(text_display)
+                                 // ...and two buttons
+                                 .add_component_v2(component()
+                                                       .set_type(cot_action_row)
+                                                       .add_component_v2(next_button)
+                                                       .add_component_v2(cancel_button)));
 
+        co_await bot.co_message_edit(msg);
+    }
+
+    // otherwise proceed silently
     co_await reply;
-    co_await event.co_delete_original_response();
-    co_await edit_msg;
+    event.co_delete_original_response();
 
     co_return;
 }
 
 task<void> calc_ask_cosmosapsis(const button_click_t &event) {
+    calc_sessions[event.command.usr.id].second.calc_state = CALC_ASK_COSMOSAPSIS;
+
     if (DEBUG) cerr << "Asking for cosmosapsis..." << endl;
 
     string client_info{print_client_info(calc_sessions[event.command.usr.id].second)};
@@ -500,59 +561,54 @@ task<void> calc_ask_cosmosapsis(const button_click_t &event) {
 }
 
 task<void> process_cosmosapsis(const slashcommand_t &event) {
-    snowflake user_id{event.command.usr.id};
-    auto it{calc_sessions.find(user_id)};
-    if (it == calc_sessions.end()) {
-        if (DEBUG) cerr << "User ID: " << user_id << " is not in any session." << endl;
-
-        co_await event.co_reply(
-            message("This command should be used in an interactive calculator session."
-                    "Please start a new session with `/debug calc interactive`.")
-                .set_flags(m_ephemeral));
-        co_return;
-    }
-
     // acknowledge the slash command
     auto reply{event.co_reply("input received, processing...")};
 
-    calculator_client_t &client{it->second.second};
+    optional<pair<message, calculator_client_t> *> user{co_await verify_user(event)};
+
+    if (!user) co_return;
+
+    calculator_client_t &client{user.value()->second};
     client.cosmosapsis =
         get<double>(event.get_parameter(string{CALC_SUBCMD_PARAM[CALC_SUBCMD_COSMOSAPSIS][0][0]}));
 
-    component text_display{component()
-                               .set_type(cot_text_display)
-                               .set_content("Your cosmosapsis is set to " +
-                                            to_string(client.cosmosapsis) +
-                                            ".\n\n"
-                                            "Please click **NEXT** to continue, or use `/calc "
-                                            "cosmosapsis` to update your progress.\n\n")};
+    if (client.calc_state == CALC_ASK_COSMOSAPSIS) {
+        // if the user is in the cosmosapsis state, then we can edit the message
+        string client_info{print_client_info(calc_sessions[event.command.usr.id].second)};
 
-    static component next_button{component()
-                                     .set_type(cot_button)
-                                     .set_style(cos_primary)
-                                     .set_label("NEXT")
-                                     .set_id(CALC_EVENT_IDS[CALC_ASK_AURA_GEM])};
+        component text_display{component()
+                                   .set_type(cot_text_display)
+                                   .set_content(client_info +
+                                                "Please click **NEXT** to continue, or use `/calc "
+                                                "cosmosapsis` to update your progress.\n\n")};
 
-    message msg{calc_sessions[user_id].first};
+        static component next_button{component()
+                                         .set_type(cot_button)
+                                         .set_style(cos_primary)
+                                         .set_label("NEXT")
+                                         .set_id(CALC_BUTTON_IDS[CALC_BUTTON_COSMOSAPSIS])};
 
-    // edit the message
-    msg.components.clear();
-    msg.add_component_v2(component()
-                             // a container
-                             .set_type(cot_container)
-                             // ...with a text display
-                             .add_component_v2(text_display)
-                             // ...and two buttons
-                             .add_component_v2(component()
-                                                   .set_type(cot_action_row)
-                                                   .add_component_v2(next_button)
-                                                   .add_component_v2(cancel_button)));
+        message msg{user.value()->first};
 
-    auto edit_msg{bot.co_message_edit(msg)};
+        // edit the message
+        msg.components.clear();
+        msg.add_component_v2(component()
+                                 // a container
+                                 .set_type(cot_container)
+                                 // ...with a text display
+                                 .add_component_v2(text_display)
+                                 // ...and two buttons
+                                 .add_component_v2(component()
+                                                       .set_type(cot_action_row)
+                                                       .add_component_v2(next_button)
+                                                       .add_component_v2(cancel_button)));
 
+        co_await bot.co_message_edit(msg);
+    }
+
+    // otherwise proceed silently
     co_await reply;
-    co_await event.co_delete_original_response();
-    co_await edit_msg;
+    event.co_delete_original_response();
 
     co_return;
 }
@@ -586,7 +642,7 @@ task<void> calc_ask_aura_gem(const button_click_t &event) {
                                      .set_type(cot_button)
                                      .set_style(cos_primary)
                                      .set_label("NEXT")
-                                     .set_id(CALC_EVENT_IDS[CALC_ASK_RESPIRA])};
+                                     .set_id(CALC_BUTTON_IDS[CALC_BUTTON_AURA_GEM])};
 
     component text_display{
         component()
@@ -615,6 +671,8 @@ task<void> calc_ask_aura_gem(const button_click_t &event) {
 }
 
 task<void> calc_ask_respira(const button_click_t &event) {
+    calc_sessions[event.command.usr.id].second.calc_state = CALC_ASK_RESPIRA;
+
     if (DEBUG) cerr << "Asking for respira" << endl;
 
     string client_info{print_client_info(calc_sessions[event.command.usr.id].second)};
@@ -644,64 +702,56 @@ task<void> calc_ask_respira(const button_click_t &event) {
 }
 
 task<void> process_respira(const slashcommand_t &event) {
-    snowflake user_id{event.command.usr.id};
-    auto it{calc_sessions.find(user_id)};
-    if (it == calc_sessions.end()) {
-        if (DEBUG) cerr << "User ID: " << user_id << " is not in any session." << endl;
-
-        co_await event.co_reply(message("This command should be used in an interactive calculator "
-                                        "session."
-                                        "Please start a new session with `/debug calc "
-                                        "interactive`.")
-                                    .set_flags(m_ephemeral));
-        co_return;
-    }
-
     // acknowledge the slash command
     auto reply{event.co_reply("input received, processing...")};
 
-    calculator_client_t &client{it->second.second};
+    optional<pair<message, calculator_client_t> *> user{co_await verify_user(event)};
+
+    if (!user) co_return;
+
+    calculator_client_t &client{user.value()->second};
     client.respira_exp = static_cast<exp_t>(
         get<int64_t>(event.get_parameter(string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][0][0]})));
-    client.daily_respira_attempts = static_cast<exp_t>(
+    client.daily_respira_attempts = static_cast<unsigned>(
         get<int64_t>(event.get_parameter(string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][1][0]})));
 
-    component text_display{component()
-                               .set_type(cot_text_display)
-                               .set_content("Your respira exp is set to " +
-                                            to_string(client.respira_exp) +
-                                            ", and daily attempts are set to " +
-                                            to_string(client.daily_respira_attempts) +
-                                            ".\n\n"
-                                            "Please click **NEXT** to continue, or use `/calc "
-                                            "respira` to update your progress.\n\n")};
+    if (client.calc_state == CALC_ASK_RESPIRA) {
+        // if the user is in the respira state, then we can edit the message
+        string client_info{print_client_info(calc_sessions[event.command.usr.id].second)};
 
-    static component next_button{component()
-                                     .set_type(cot_button)
-                                     .set_style(cos_primary)
-                                     .set_label("NEXT")
-                                     .set_id(CALC_EVENT_IDS[CALC_ASK_PILL])};
+        component text_display{component()
+                                   .set_type(cot_text_display)
+                                   .set_content(client_info +
+                                                "Please click **NEXT** to continue, or use `/calc "
+                                                "respira` to update your progress.\n\n")};
 
-    message msg{calc_sessions[user_id].first};
+        static component next_button{component()
+                                         .set_type(cot_button)
+                                         .set_style(cos_primary)
+                                         .set_label("NEXT")
+                                         .set_id(CALC_BUTTON_IDS[CALC_BUTTON_RESPIRA])};
 
-    // edit the message
-    msg.components.clear();
-    msg.add_component_v2(component()
-                             // a container
-                             .set_type(cot_container)
-                             // ...with a text display
-                             .add_component_v2(text_display)
-                             // ...and two buttons
-                             .add_component_v2(component()
-                                                   .set_type(cot_action_row)
-                                                   .add_component_v2(next_button)
-                                                   .add_component_v2(cancel_button)));
+        message msg{user.value()->first};
 
-    auto edit_msg{bot.co_message_edit(msg)};
+        // edit the message
+        msg.components.clear();
+        msg.add_component_v2(component()
+                                 // a container
+                                 .set_type(cot_container)
+                                 // ...with a text display
+                                 .add_component_v2(text_display)
+                                 // ...and two buttons
+                                 .add_component_v2(component()
+                                                       .set_type(cot_action_row)
+                                                       .add_component_v2(next_button)
+                                                       .add_component_v2(cancel_button)));
 
+        co_await bot.co_message_edit(msg);
+    }
+
+    // otherwise proceed silently
     co_await reply;
-    co_await event.co_delete_original_response();
-    co_await edit_msg;
+    event.co_delete_original_response();
 
     co_return;
 }
