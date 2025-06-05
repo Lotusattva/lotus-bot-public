@@ -55,6 +55,14 @@ struct artifact_t {
     bool daily_recharge;
 };
 
+#define INVALID_CALC_STATE calc_state_t::NUM_CALC_STATES
+#define INVALID_MAJOR_STAGE major_stage_t::NUM_MAJOR_STAGES
+#define INVALID_MINOR_STAGE minor_stage_t::NUM_MINOR_STAGES
+#define INVALID_QUALITY quality_t::NUM_QUALITIES
+#define INVALID_UNSIGNED_VAL 0
+#define INVALID_DOUBLE_VAL -1.0
+#define INVALID_EXTRACTOR_NODE_LVL 31
+
 /**
  * A struct that stores the necessary information for a calculator client.
  *
@@ -66,35 +74,41 @@ struct artifact_t {
  * - (vase == null) => (mirror == null)
  */
 struct calculator_client_t {
-    calc_state_t calc_state{NUM_CALC_STATES};
+    calc_state_t calc_state{INVALID_CALC_STATE};  // default to invalid
 
     // culitivation progress
-    major_stage_t major_stage{NUM_MAJOR_STAGES};  // default to invalid
-    minor_stage_t minor_stage{NUM_MINOR_STAGES};  // default to invalid
+    major_stage_t major_stage{INVALID_MAJOR_STAGE};  // default to invalid
+    minor_stage_t minor_stage{INVALID_MINOR_STAGE};  // default to invalid
     optional<unsigned> gate;
-    double percent_progress{-1.0};  // default to invalid, should be a non-negative number
+    double percent_progress{
+        INVALID_DOUBLE_VAL};  // default to invalid, should be a non-negative number
 
     // cosmosapsis and aura gem
-    double cosmosapsis{-1.0};  // default to invalid, should be a non-negative number
-    quality_t aura_gem_quality{NUM_QUALITIES};  // default to invalid
+    double cosmosapsis{INVALID_DOUBLE_VAL};  // default to invalid, should be a non-negative number
+    quality_t aura_gem_quality{INVALID_QUALITY};  // default to invalid
 
     // respira
-    exp_t respira_exp{0};                // default to 0, should be a positive number
-    unsigned daily_respira_attempts{0};  // default to 0, should be a positive number
+    exp_t respira_exp{INVALID_UNSIGNED_VAL};  // default to 0, should be a positive number
+    unsigned daily_respira_attempts{
+        INVALID_UNSIGNED_VAL};  // default to 0, should be a positive number
 
     // pills
-    unsigned daily_pill_attempts{0};     // default to 0, should be a positive number
-    unsigned pill_quantity[3]{0, 0, 0};  // 0: rare, 1: epic, 2: legendary
-    double pill_bonus{0.0};              // needs to be calculated because game does not show it
+    unsigned daily_pill_attempts{
+        INVALID_UNSIGNED_VAL};  // default to 0, should be a positive number
+
+    // 0: rare, 1: epic, 2: legendary
+    unsigned pill_quantity[3]{INVALID_UNSIGNED_VAL, INVALID_UNSIGNED_VAL, INVALID_UNSIGNED_VAL};
+    double pill_bonus{INVALID_DOUBLE_VAL};  // needs to be calculated because game does not show it
 
     // extractor
-    quality_t extractor_quality{NUM_QUALITIES};  // default to invalid
+    quality_t extractor_quality{INVALID_QUALITY};  // default to invalid
 
     // 0: cultiXP, 1: quality, 2: gush; default to 31, should be in the range [0, 30]
-    unsigned node_levels[3]{31, 31, 31};
+    unsigned node_levels[3]{INVALID_EXTRACTOR_NODE_LVL, INVALID_EXTRACTOR_NODE_LVL,
+                            INVALID_EXTRACTOR_NODE_LVL};
 
     // myrimon fruit
-    unsigned fruit_quantity{0};  // default to 0, should be a positive number
+    unsigned fruit_quantity{INVALID_UNSIGNED_VAL};  // default to 0, should be a positive number
 
     // artifact
     optional<artifact_t> vase{nullopt};
@@ -147,6 +161,7 @@ enum calc_button_t {
     CALC_BUTTON_COSMOSAPSIS,
     CALC_BUTTON_AURA_GEM,
     CALC_BUTTON_RESPIRA,
+    CALC_BUTTON_PILL,
     CALC_BUTTON_EXTRACTOR_QUALITY,
     CALC_BUTTON_VASE_YES,
     CALC_BUTTON_VASE_NO,
@@ -159,20 +174,11 @@ enum calc_button_t {
 };
 
 constexpr inline string_view const CALC_BUTTON_IDS[NUM_CALC_BUTTONS]{
-    "calc_start",
-    "calc_cancel",
-    "calc_stage",
-    "calc_percent",
-    "calc_cosmosapsis",
-    "calc_aura_gem",
-    "calc_respira",
-    "calc_extractor_quality",
-    "calc_vase_yes",
-    "calc_vase_no",
-    "calc_vase_detail",
-    "calc_mirror_yes",
-    "calc_mirror_no",
-    "calc_mirror_detail",
+    "calc_start",      "calc_cancel",      "calc_stage",
+    "calc_percent",    "calc_cosmosapsis", "calc_aura_gem",
+    "calc_respira",    "calc_pill",        "calc_extractor_quality",
+    "calc_vase_yes",   "calc_vase_no",     "calc_vase_detail",
+    "calc_mirror_yes", "calc_mirror_no",   "calc_mirror_detail",
 };
 
 #define SUBCOMMAND_AND_DESCRIPTION 2
@@ -185,6 +191,7 @@ enum CALC_SUBCMD_t {
     CALC_SUBCMD_PERCENT,
     CALC_SUBCMD_COSMOSAPSIS,
     CALC_SUBCMD_RESPIRA,
+    CALC_SUBCMD_PILL,
 
     NUM_CALC_SUBCMDS
 };
@@ -193,13 +200,15 @@ constexpr inline string_view CALC_SUBCMDS[NUM_CALC_SUBCMDS][SUBCOMMAND_AND_DESCR
     {"start", "start an interactive cultivation calculator session"},
     {"percent", "report percent progress during an interactive calc session"},
     {"cosmosapsis", "report cosmosapsis during an interactive calc session"},
-    {"respira", "report respira during an interactive calc session"}};
+    {"respira", "report respira during an interactive calc session"},
+    {"pill", "report pill data during an interactive calc session"}};
 
 constexpr inline unsigned short CALC_SUBCMD_NUM_PARAM[NUM_CALC_SUBCMDS]{
     0,  // start
     1,  // percent
     1,  // cosmoapsis
     2,  // respira
+    5,  // pill
 };
 
 constexpr inline string_view **CALC_SUBCMD_PARAM[NUM_CALC_SUBCMDS]{
@@ -215,15 +224,30 @@ constexpr inline string_view **CALC_SUBCMD_PARAM[NUM_CALC_SUBCMDS]{
                                                   "respira exp per attempt"},
         (string_view[SUBCOMMAND_AND_DESCRIPTION]){"num_daily_respira_attempts",
                                                   "number of daily respira attempts"}},
+    (string_view * [CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_PILL]]){
+        (string_view[SUBCOMMAND_AND_DESCRIPTION]){"num_daily_pill_attempts",
+                                                  "number of daily pill attempts"},
+        (string_view[SUBCOMMAND_AND_DESCRIPTION]){"num_rare_pills",
+                                                  "number of rare pills consumed"},
+        (string_view[SUBCOMMAND_AND_DESCRIPTION]){"num_epic_pills",
+                                                  "number of epic pills consumed"},
+        (string_view[SUBCOMMAND_AND_DESCRIPTION]){"num_legendary_pills",
+                                                  "number of legendary pills consumed"},
+        (string_view[SUBCOMMAND_AND_DESCRIPTION]){"pill_exp_bonus",
+                                                  "pill experience bonus in percent"}},
 };
 
+// Register slashcommands for the calculator
 command_option calculator_commands();
 
-task<void> start_interactive_calculator(const slashcommand_t &event);
-
+// Control flow for calculator subcommands
 task<void> calculator_subcommand_handler(const slashcommand_t &event,
                                          const command_data_option &options);
+
+// Control flow for calculator button clicks
 task<void> calculator_button_click_handler(const button_click_t &event);
+
+// Control flow for calculator select clicks
 task<void> calculator_select_click_handler(const select_click_t &event);
 
 /**
@@ -238,7 +262,12 @@ task<optional<pair<message, calculator_client_t> *>> verify_user(const T &event)
 task<optional<pair<message, calculator_client_t> *>> verify_user(const slashcommand_t &event);
 string print_client_info(const calculator_client_t &client);
 
+// Notify non-users that they should only use certain commands while in a session
 task<void> non_session_interaction(const slashcommand_t &event);
+
+///////// Below are calculator events/states
+
+task<void> start_interactive_calculator(const slashcommand_t &event);
 
 task<void> calc_cancel(const button_click_t &event);
 

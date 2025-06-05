@@ -1,6 +1,7 @@
 #include "calculator.hpp"
 
 #include <dpp/appcommand.h>
+#include <dpp/restresults.h>
 
 #include <string>
 
@@ -15,31 +16,75 @@ static const component cancel_button{component()
 command_option calculator_commands() {
     return command_option{co_sub_command_group, string{CALC_MAIN_COMMAND[0]},
                           string{CALC_MAIN_COMMAND[1]}}
+        // starting an interactive calculator session
         .add_option(command_option{co_sub_command, string{CALC_SUBCMDS[CALC_SUBCMD_START][0]},
                                    string{CALC_SUBCMDS[CALC_SUBCMD_START][1]}})
+        // subcommand for reporting percent progress
         .add_option(command_option{co_sub_command, string{CALC_SUBCMDS[CALC_SUBCMD_PERCENT][0]},
                                    string{CALC_SUBCMDS[CALC_SUBCMD_PERCENT][1]}}
+                        // Parameters
+                        // 1. percentage value
                         .add_option(command_option{
                             co_number, string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PERCENT][0][0]},
                             string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PERCENT][0][1]}, true}
-                                        .set_min_value(0.0)
-                                        .set_max_value(1000.0)))
+                                        .set_min_value(0.0)))
+        // subcommand for reporting cosmosapsis
         .add_option(command_option{co_sub_command, string{CALC_SUBCMDS[CALC_SUBCMD_COSMOSAPSIS][0]},
                                    string{CALC_SUBCMDS[CALC_SUBCMD_COSMOSAPSIS][1]}}
+                        // Parameters
+                        // 1. cosmosapsis value
                         .add_option(command_option{
                             co_number, string{CALC_SUBCMD_PARAM[CALC_SUBCMD_COSMOSAPSIS][0][0]},
                             string{CALC_SUBCMD_PARAM[CALC_SUBCMD_COSMOSAPSIS][0][1]}, true}
                                         .set_min_value(0.0)))
+        // subcommand for reporting respira
         .add_option(command_option{co_sub_command, string{CALC_SUBCMDS[CALC_SUBCMD_RESPIRA][0]},
                                    string{CALC_SUBCMDS[CALC_SUBCMD_RESPIRA][1]}}
+                        // Parameters
+                        // 1. respira exp per attempt
                         .add_option(command_option{
                             co_integer, string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][0][0]},
                             string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][0][1]}, true}
-                                        .set_min_value(0))
+                                        .set_min_value(1))
+                        // 2. number of daily respira attempts
                         .add_option(command_option{
                             co_integer, string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][1][0]},
                             string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][1][1]}, true}
-                                        .set_min_value(0)));
+                                        .set_min_value(1)))
+        // subcommand for reporting pill data
+        .add_option(
+            command_option{co_sub_command, string{CALC_SUBCMDS[CALC_SUBCMD_PILL][0]},
+                           string{CALC_SUBCMDS[CALC_SUBCMD_PILL][1]}}
+                // Parameters
+                // 1. number of daily pill attempts
+                .add_option(command_option{co_integer,
+                                           string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PILL][0][0]},
+                                           string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PILL][0][1]}, true}
+                                .set_min_value(1)
+                                .set_max_value(30))
+                // 2. number of rare pills consumed per day
+                .add_option(command_option{co_integer,
+                                           string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PILL][1][0]},
+                                           string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PILL][1][1]}, true}
+                                .set_min_value(0)
+                                .set_max_value(30))
+                // 3. number of epic pills consumed per day
+                .add_option(command_option{co_integer,
+                                           string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PILL][2][0]},
+                                           string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PILL][2][1]}, true}
+                                .set_min_value(0)
+                                .set_max_value(30))
+                // 4. number of legendary pills consumed per day
+                .add_option(command_option{co_integer,
+                                           string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PILL][3][0]},
+                                           string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PILL][3][1]}, true}
+                                .set_min_value(0)
+                                .set_max_value(30))
+                // 5. pill experience bonus in percent
+                .add_option(command_option{co_number,
+                                           string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PILL][4][0]},
+                                           string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PILL][4][1]}, true}
+                                .set_min_value(0)));
 }
 
 task<void> start_interactive_calculator(const slashcommand_t &event) {
@@ -76,10 +121,6 @@ task<void> start_interactive_calculator(const slashcommand_t &event) {
                                                       .add_component_v2(calc_overview_text)
                                                       .add_component_v2(action_row))};
 
-    co_await event.co_reply(calc_msg);
-
-    if (DEBUG) cerr << "Caching session..." << endl;
-
     snowflake user_id{event.command.usr.id};
 
     if (calc_sessions.find(user_id) != calc_sessions.end()) {
@@ -90,6 +131,8 @@ task<void> start_interactive_calculator(const slashcommand_t &event) {
         co_return;
     }
 
+    co_await event.co_reply(calc_msg);
+
     if (DEBUG) cerr << "User ID: " << user_id << endl;
 
     confirmation_callback_t callback{co_await event.co_get_original_response()};
@@ -99,6 +142,7 @@ task<void> start_interactive_calculator(const slashcommand_t &event) {
     }
     const message &to_cache_msg{callback.get<message>()};
 
+    if (DEBUG) cerr << "Caching session..." << endl;
     calc_sessions.insert({user_id, make_pair(to_cache_msg, calculator_client_t{})});
     co_return;
 }
@@ -120,6 +164,8 @@ task<void> calculator_subcommand_handler(const slashcommand_t &event,
         co_await process_cosmosapsis(event);
     else if (subcommand.name == CALC_SUBCMDS[CALC_SUBCMD_RESPIRA][0])
         co_await process_respira(event);
+    else if (subcommand.name == CALC_SUBCMDS[CALC_SUBCMD_PILL][0])
+        co_await process_pill(event);
     else {
         if (DEBUG) cerr << "Unhandled calculator subcommand: " << subcommand.name << endl;
 
@@ -149,14 +195,14 @@ task<void> calculator_button_click_handler(const button_click_t &event) {
 
     const calculator_client_t &client{calc_sessions[event.command.usr.id].second};
     if (id == CALC_BUTTON_IDS[CALC_BUTTON_STAGE]) {
-        if (client.major_stage == NUM_MAJOR_STAGES || client.minor_stage == NUM_MINOR_STAGES)
+        if (client.major_stage == INVALID_MAJOR_STAGE || client.minor_stage == INVALID_MINOR_STAGE)
             co_return;  // do nothing since user has not finished selecting both stages
         else {
             // both stages are set, then...
-            if (client.percent_progress == -1.0)
+            if (client.percent_progress == INVALID_DOUBLE_VAL)
                 // ask for percent progress if not set
                 co_await calc_ask_percent_progress(event);
-            else if (client.cosmosapsis == -1.0)
+            else if (client.cosmosapsis == INVALID_DOUBLE_VAL)
                 // ask for cosmosapsis if not set
                 co_await calc_ask_cosmosapsis(event);
             else
@@ -164,48 +210,52 @@ task<void> calculator_button_click_handler(const button_click_t &event) {
                 co_await calc_ask_aura_gem(event);
         }
     } else if (id == CALC_BUTTON_IDS[CALC_BUTTON_PERCENT]) {
-        if (client.cosmosapsis == -1.0) {
+        if (client.cosmosapsis == INVALID_DOUBLE_VAL)
             // ask for cosmosapsis if not set
             co_await calc_ask_cosmosapsis(event);
-        } else {
+        else
             // ask for aura gem quality if both percent progress and cosmosapsis are set
             co_await calc_ask_aura_gem(event);
-        }
-    } else if (id == CALC_BUTTON_IDS[CALC_BUTTON_COSMOSAPSIS]) {
+
+    } else if (id == CALC_BUTTON_IDS[CALC_BUTTON_COSMOSAPSIS])
         co_await calc_ask_aura_gem(event);
-    } else if (id == CALC_BUTTON_IDS[CALC_BUTTON_AURA_GEM]) {
-        if (client.aura_gem_quality == NUM_QUALITIES)
+    else if (id == CALC_BUTTON_IDS[CALC_BUTTON_AURA_GEM]) {
+        if (client.aura_gem_quality == INVALID_QUALITY)
             co_return;  // do nothing since user has not selected aura gem quality
-        else if (client.respira_exp == 0 || client.daily_respira_attempts == 0)
+        else if (client.respira_exp == INVALID_UNSIGNED_VAL ||
+                 client.daily_respira_attempts == INVALID_UNSIGNED_VAL)
             // ask for respira if not set
             co_await calc_ask_respira(event);
-        else if (client.daily_pill_attempts == 0 ||
-                 (client.pill_quantity[0] == 0 && client.pill_quantity[1] == 0 &&
-                  client.pill_quantity[2] == 0) ||
-                 client.pill_bonus == 0.0)
+        else if (client.daily_pill_attempts == INVALID_UNSIGNED_VAL ||
+                 (client.pill_quantity[0] == INVALID_UNSIGNED_VAL &&
+                  client.pill_quantity[1] == INVALID_UNSIGNED_VAL &&
+                  client.pill_quantity[2] == INVALID_UNSIGNED_VAL) ||
+                 client.pill_bonus == INVALID_DOUBLE_VAL)
             // ask for pill if not set
             co_await calc_ask_pill(event);
         else
             // ask for extractor quality if all previous data are set
             co_await calc_ask_extractor_quality(event);
     } else if (id == CALC_BUTTON_IDS[CALC_BUTTON_RESPIRA]) {
-        if (client.daily_pill_attempts == 0 ||
-            (client.pill_quantity[0] == 0 && client.pill_quantity[1] == 0 &&
-             client.pill_quantity[2] == 0) ||
-            client.pill_bonus == 0.0)
+        if (client.daily_pill_attempts == INVALID_UNSIGNED_VAL ||
+            (client.pill_quantity[0] == INVALID_UNSIGNED_VAL &&
+             client.pill_quantity[1] == INVALID_UNSIGNED_VAL &&
+             client.pill_quantity[2] == INVALID_UNSIGNED_VAL) ||
+            client.pill_bonus == INVALID_DOUBLE_VAL)
             // ask for pill if not set
             co_await calc_ask_pill(event);
         else
             // ask for extractor quality if all previous data are set
             co_await calc_ask_extractor_quality(event);
     } else if (id == CALC_BUTTON_IDS[CALC_BUTTON_EXTRACTOR_QUALITY]) {
-        if (client.extractor_quality == NUM_QUALITIES)
+        if (client.extractor_quality == INVALID_QUALITY)
             co_return;  // do nothing since user has not selected extractor quality
-        else if (client.node_levels[0] == 31 || client.node_levels[1] == 31 ||
-                 client.node_levels[2] == 31)
+        else if (client.node_levels[0] == INVALID_EXTRACTOR_NODE_LVL ||
+                 client.node_levels[1] == INVALID_EXTRACTOR_NODE_LVL ||
+                 client.node_levels[2] == INVALID_EXTRACTOR_NODE_LVL)
             // ask for extractor node levels if not set
             co_await calc_ask_extractor_node_lvl(event);
-        else if (client.fruit_quantity == 0)
+        else if (client.fruit_quantity == INVALID_UNSIGNED_VAL)
             // ask for myrimon fruit quantity if not set
             co_await calc_ask_myrimon_fruit(event);
         else
@@ -379,46 +429,51 @@ task<void> calc_ask_stage(const button_click_t &event) {
 
 string print_client_info(const calculator_client_t &client) {
     string info{"You have entered:\n"};
-    if (client.major_stage != NUM_MAJOR_STAGES)
+    if (client.major_stage != INVALID_MAJOR_STAGE)
         info += "- Major Stage: " + string{MAJOR_STAGE_STR[client.major_stage]} + "\n";
-    if (client.minor_stage != NUM_MINOR_STAGES)
+    if (client.minor_stage != INVALID_MINOR_STAGE)
         info += "- Minor Stage: " + string{MINOR_STAGE_STR[client.minor_stage]} + "\n";
 
     // TODO: handle gate
 
-    if (client.percent_progress != -1.0)
-        info += "- Percent Progress: " + to_string(client.percent_progress) + "\n";
-    if (client.cosmosapsis != -1.0)
+    if (client.percent_progress != INVALID_DOUBLE_VAL)
+        info += "- Percent Progress: " + to_string(client.percent_progress) + "%\n";
+    if (client.cosmosapsis != INVALID_DOUBLE_VAL)
         info += "- Cosmosapsis: " + to_string(client.cosmosapsis) + "\n";
 
-    if (client.aura_gem_quality != NUM_QUALITIES)
+    if (client.aura_gem_quality != INVALID_QUALITY)
         info += "- Aura Gem Quality: " + string{QUALITY_STR[client.aura_gem_quality]} + "\n";
 
-    if (client.respira_exp != 0) info += "- Respira Exp: " + to_string(client.respira_exp) + "\n";
+    if (client.respira_exp != INVALID_UNSIGNED_VAL)
+        info += "- Respira Exp: " + to_string(client.respira_exp) + "\n";
 
-    if (client.daily_respira_attempts != 0)
+    if (client.daily_respira_attempts != INVALID_UNSIGNED_VAL)
         info += "- Daily Respira Attempts: " + to_string(client.daily_respira_attempts) + "\n";
 
-    if (client.daily_pill_attempts != 0)
+    if (client.daily_pill_attempts != INVALID_UNSIGNED_VAL)
         info += "- Daily Pill Attempts: " + to_string(client.daily_pill_attempts) + "\n";
 
-    if (client.pill_quantity[0] != 0 || client.pill_quantity[1] != 0 ||
-        client.pill_quantity[2] != 0)
+    if (!(client.pill_quantity[0] == INVALID_UNSIGNED_VAL &&
+          client.pill_quantity[1] == INVALID_UNSIGNED_VAL &&
+          client.pill_quantity[2] == INVALID_UNSIGNED_VAL))
         info += "- Pill Quantity: " + to_string(client.pill_quantity[0]) + " (Rare), " +
                 to_string(client.pill_quantity[1]) + " (Epic), " +
                 to_string(client.pill_quantity[2]) + " (Legendary)\n";
 
-    if (client.pill_bonus != 0.0) info += "- Pill Bonus: " + to_string(client.pill_bonus) + "%\n";
+    if (client.pill_bonus != INVALID_DOUBLE_VAL)
+        info += "- Pill Bonus: " + to_string(client.pill_bonus) + "%\n";
 
-    if (client.extractor_quality != NUM_QUALITIES)
+    if (client.extractor_quality != INVALID_QUALITY)
         info += "- Extractor Quality: " + string{QUALITY_STR[client.extractor_quality]} + "\n";
 
-    if (client.node_levels[0] != 31 && client.node_levels[1] != 31 && client.node_levels[2] != 31)
+    if (client.node_levels[0] != INVALID_EXTRACTOR_NODE_LVL &&
+        client.node_levels[1] != INVALID_EXTRACTOR_NODE_LVL &&
+        client.node_levels[2] != INVALID_EXTRACTOR_NODE_LVL)
         info += "- Node Levels: " + to_string(client.node_levels[0]) + " (Cultivation XP), " +
                 to_string(client.node_levels[1]) + " (Quality), " +
                 to_string(client.node_levels[2]) + " (Gush)\n";
 
-    if (client.fruit_quantity != 0)
+    if (client.fruit_quantity != INVALID_UNSIGNED_VAL)
         info += "- Myrimon Fruit Quantity: " + to_string(client.fruit_quantity) + "\n";
 
     // TODO: handle artifacts
@@ -478,12 +533,12 @@ task<void> calc_ask_percent_progress(const button_click_t &event) {
 }
 
 task<void> process_percent_progress(const slashcommand_t &event) {
-    // acknowledge the slash command
-    auto reply{event.co_reply("input received, processing...")};
-
     optional<pair<message, calculator_client_t> *> user{co_await verify_user(event)};
 
     if (!user) co_return;
+
+    // acknowledge the slash command
+    auto reply{event.co_reply("input received, processing...")};
 
     calculator_client_t &client{user.value()->second};
     client.percent_progress =
@@ -561,12 +616,12 @@ task<void> calc_ask_cosmosapsis(const button_click_t &event) {
 }
 
 task<void> process_cosmosapsis(const slashcommand_t &event) {
-    // acknowledge the slash command
-    auto reply{event.co_reply("input received, processing...")};
-
     optional<pair<message, calculator_client_t> *> user{co_await verify_user(event)};
 
     if (!user) co_return;
+
+    // acknowledge the slash command
+    auto reply{event.co_reply("input received, processing...")};
 
     calculator_client_t &client{user.value()->second};
     client.cosmosapsis =
@@ -702,12 +757,12 @@ task<void> calc_ask_respira(const button_click_t &event) {
 }
 
 task<void> process_respira(const slashcommand_t &event) {
-    // acknowledge the slash command
-    auto reply{event.co_reply("input received, processing...")};
-
     optional<pair<message, calculator_client_t> *> user{co_await verify_user(event)};
 
     if (!user) co_return;
+
+    // acknowledge the slash command
+    auto reply{event.co_reply("input received, processing...")};
 
     calculator_client_t &client{user.value()->second};
     client.respira_exp = static_cast<exp_t>(
@@ -757,14 +812,120 @@ task<void> process_respira(const slashcommand_t &event) {
 }
 
 task<void> calc_ask_pill(const button_click_t &event) {
-    // TODO
+    calc_sessions[event.command.usr.id].second.calc_state = CALC_ASK_PILL;
 
-    co_await calc_under_construction(event);
+    if (DEBUG) cerr << "Asking for pill data..." << endl;
+
+    string client_info{print_client_info(calc_sessions[event.command.usr.id].second)};
+
+    component text_display{
+        component()
+            .set_type(cot_text_display)
+            .set_content(client_info + "Please input the following data: \n"
+                                       "- Number of daily pill attempts \n"
+                                       "- Average number of rare pills consumed everyday \n"
+                                       "- Average number of epic pills consumed everyday \n"
+                                       "- Average number of legendary pills consumed everyday \n"
+                                       "- Pill exp bonus in percent \n"
+                                       "via `/calc pill` command.\n\n"
+                                       "Note that the number of rare, epic and legendary pills "
+                                       "must add up to the number of daily pill attempts.\n\n"
+                                       "We will continue once your input is received.")};
+
+    co_await event.co_edit_response(
+        message()
+            .set_flags(m_using_components_v2)
+            .add_component_v2(
+                component()
+                    // a container
+                    .set_type(cot_container)
+                    // ...with a text display
+                    .add_component_v2(text_display)
+                    // ...and a button
+                    .add_component_v2(
+                        component().set_type(cot_action_row).add_component_v2(cancel_button))));
+
     co_return;
 }
 
 task<void> process_pill(const slashcommand_t &event) {
-    co_await event.co_reply(message("This command is not implemented yet.").set_flags(m_ephemeral));
+    optional<pair<message, calculator_client_t> *> user{co_await verify_user(event)};
+
+    if (!user) co_return;
+
+    // acknowledge the slash command
+    co_await event.co_reply("input received, processing...");
+
+    calculator_client_t &client{user.value()->second};
+
+    unsigned daily_pill_attempts{static_cast<unsigned>(
+        get<int64_t>(event.get_parameter(string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PILL][0][0]})))};
+    unsigned num_rare{static_cast<unsigned>(
+        get<int64_t>(event.get_parameter(string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PILL][1][0]})))};
+    unsigned num_epic{static_cast<unsigned>(
+        get<int64_t>(event.get_parameter(string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PILL][2][0]})))};
+    unsigned num_legendary{static_cast<unsigned>(
+        get<int64_t>(event.get_parameter(string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PILL][3][0]})))};
+
+    if (num_rare + num_epic + num_legendary != daily_pill_attempts) {
+        confirmation_callback_t confirmation{co_await event.co_get_original_response()};
+        if (confirmation.is_error()) {
+            cerr << "Error: " << confirmation.get_error().message << endl;
+            co_return;
+        }
+        message msg{confirmation.get<message>()};
+        msg.set_content(
+            "The number of rare, epic and legendary pills must add up to the number of daily "
+            "pill attempts. Please try again.");
+        co_await bot.co_message_edit(msg);
+        co_return;
+    }
+
+    // else if the number of rare, epic and legendary pills add up to the number of daily pill]
+    client.daily_pill_attempts = daily_pill_attempts;
+    client.pill_quantity[0] = num_rare;
+    client.pill_quantity[1] = num_epic;
+    client.pill_quantity[2] = num_legendary;
+    client.pill_bonus =
+        get<double>(event.get_parameter(string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PILL][4][0]}));
+
+    if (client.calc_state == CALC_ASK_PILL) {
+        // if the user is in the pill state, then we can edit the message
+        string client_info{print_client_info(calc_sessions[event.command.usr.id].second)};
+
+        component text_display{component()
+                                   .set_type(cot_text_display)
+                                   .set_content(client_info +
+                                                "Please click **NEXT** to continue, or use `/calc "
+                                                "pill` to update your progress.\n\n")};
+
+        static component next_button{component()
+                                         .set_type(cot_button)
+                                         .set_style(cos_primary)
+                                         .set_label("NEXT")
+                                         .set_id(CALC_BUTTON_IDS[CALC_BUTTON_PILL])};
+
+        message msg{user.value()->first};
+
+        // edit the message
+        msg.components.clear();
+        msg.add_component_v2(component()
+                                 // a container
+                                 .set_type(cot_container)
+                                 // ...with a text display
+                                 .add_component_v2(text_display)
+                                 // ...and two buttons
+                                 .add_component_v2(component()
+                                                       .set_type(cot_action_row)
+                                                       .add_component_v2(next_button)
+                                                       .add_component_v2(cancel_button)));
+
+        co_await bot.co_message_edit(msg);
+    }
+
+    // otherwise proceed silently
+    event.co_delete_original_response();
+
     co_return;
 }
 
