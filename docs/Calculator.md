@@ -74,11 +74,11 @@ Additionally, each respira attempt has a chance to be multiplied by a factor of 
 Thus, each respira attempt has an expected value of:
 
 $$ 
-/begin{align*}
+\begin{align*}
 Exp_{expected} & = Exp \times (0.55 + 0.3 \cdot 2 + 0.1475 \cdot 5 + 0.0025 \cdot 10) \\
                & = Exp \times 1.9125 \\
                & = RespiraBaseExp \times (1 + PlayerRespiraBonus) \times 1.9125
-/end{align*}
+\end{align*}
 $$
 
 Where:
