@@ -44,17 +44,6 @@ constexpr inline string_view const CALC_STATE_IDS[NUM_CALC_STATES]{
     "calc_ask_mirror_detail",
 };
 
-/**
- * A struct that stores the necessary information for an artifact.
- *
- * Invariants:
- * - star is in the range [0, MAX_ARTIFACT_STAR]
- */
-struct artifact_t {
-    unsigned star;
-    bool daily_recharge;
-};
-
 #define INVALID_CALC_STATE calc_state_t::NUM_CALC_STATES
 #define INVALID_MAJOR_STAGE major_stage_t::NUM_MAJOR_STAGES
 #define INVALID_MINOR_STAGE minor_stage_t::NUM_MINOR_STAGES
@@ -62,26 +51,46 @@ struct artifact_t {
 #define INVALID_UNSIGNED_VAL 0
 #define INVALID_DOUBLE_VAL -1.0
 #define INVALID_EXTRACTOR_NODE_LVL 31
+#define INVALID_STAR NUM_ARTIFACT_STARS  // default to invalid, should be in the range [0, 5]
+
+/**
+ * A struct that stores the necessary information for an artifact.
+ *
+ * Invariants:
+ * - star is in the range [0, 5]
+ */
+struct artifact_t {
+    unsigned short star{INVALID_STAR};  // default to invalid, should be in the range [0, 5]
+    
+    // invalid(0): has not been set, 1: no daily recharge, 2: daily recharge
+    unsigned daily_recharge{INVALID_UNSIGNED_VAL}; 
+};
 
 /**
  * A struct that stores the necessary information for a calculator client.
  *
- * Invariants:
+ * Invariants of a fully initialized calculator client:
  * - percent_progress > 0
  * - cosmosapsis > 0
  * - pill_bonus > 0
+ * - daiily_respira_attempts > 0
  * - sum(pill_quantity) == daily_pill_attempts
- * - (vase == null) => (mirror == null)
+ * - pill_bonus is non-negative
+ * - node_levels[i] is in the range [0, 30] for i in [0, 1, 2]
+ * - fruit_quantity > 0
+ * - (vase == null) -> (trans_mog == false) AND (mirror == null)
+ * - any field should not contain an invalid value
  */
 struct calculator_client_t {
     calc_state_t calc_state{INVALID_CALC_STATE};  // default to invalid
 
-    // culitivation progress
+    // cultivation progress
     major_stage_t major_stage{INVALID_MAJOR_STAGE};  // default to invalid
     minor_stage_t minor_stage{INVALID_MINOR_STAGE};  // default to invalid
     optional<unsigned> gate;
-    double percent_progress{
-        INVALID_DOUBLE_VAL};  // default to invalid, should be a non-negative number
+
+    // default to invalid, should be a non-negative number
+    double percent_progress{INVALID_DOUBLE_VAL};
 
     // cosmosapsis and aura gem
     double cosmosapsis{INVALID_DOUBLE_VAL};  // default to invalid, should be a non-negative number
@@ -163,6 +172,8 @@ enum calc_button_t {
     CALC_BUTTON_RESPIRA,
     CALC_BUTTON_PILL,
     CALC_BUTTON_EXTRACTOR_QUALITY,
+    CALC_BUTTON_EXTRACTOR_NODE,
+    CALC_BUTTON_FRUIT,
     CALC_BUTTON_VASE_YES,
     CALC_BUTTON_VASE_NO,
     CALC_BUTTON_VASE_DETAIL,
@@ -174,11 +185,12 @@ enum calc_button_t {
 };
 
 constexpr inline string_view const CALC_BUTTON_IDS[NUM_CALC_BUTTONS]{
-    "calc_start",      "calc_cancel",      "calc_stage",
-    "calc_percent",    "calc_cosmosapsis", "calc_aura_gem",
-    "calc_respira",    "calc_pill",        "calc_extractor_quality",
-    "calc_vase_yes",   "calc_vase_no",     "calc_vase_detail",
-    "calc_mirror_yes", "calc_mirror_no",   "calc_mirror_detail",
+    "calc_start",          "calc_cancel",        "calc_stage",
+    "calc_percent",        "calc_cosmosapsis",   "calc_aura_gem",
+    "calc_respira",        "calc_pill",          "calc_extractor_quality",
+    "calc_extractor_node", "calc_fruit",         "calc_vase_yes",
+    "calc_vase_no",        "calc_vase_detail",   "calc_mirror_yes",
+    "calc_mirror_no",      "calc_mirror_detail",
 };
 
 #define SUBCOMMAND_AND_DESCRIPTION 2
@@ -264,6 +276,17 @@ string print_client_info(const calculator_client_t &client);
 
 // Notify non-users that they should only use certain commands while in a session
 task<void> non_session_interaction(const slashcommand_t &event);
+
+// component factories
+
+inline const component cancel_button{component()
+                                         .set_type(cot_button)
+                                         .set_style(cos_danger)
+                                         .set_label("CANCEL")
+                                         .set_id(CALC_BUTTON_IDS[CALC_BUTTON_CANCEL])};
+component major_stage_selectmenu_factory();
+component minor_stage_selectmenu_factory();
+component quality_selectmenu_factory(const string_view &id, const string_view &placeholder);
 
 ///////// Below are calculator events/states
 

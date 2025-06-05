@@ -6,12 +6,7 @@
 #include <string>
 
 #include "calculator_constants.hpp"
-
-static const component cancel_button{component()
-                                         .set_type(cot_button)
-                                         .set_style(cos_danger)
-                                         .set_label("CANCEL")
-                                         .set_id(CALC_BUTTON_IDS[CALC_BUTTON_CANCEL])};
+#include "global.hpp"
 
 command_option calculator_commands() {
     return command_option{co_sub_command_group, string{CALC_MAIN_COMMAND[0]},
@@ -247,7 +242,9 @@ task<void> calculator_button_click_handler(const button_click_t &event) {
         else
             // ask for extractor quality if all previous data are set
             co_await calc_ask_extractor_quality(event);
-    } else if (id == CALC_BUTTON_IDS[CALC_BUTTON_EXTRACTOR_QUALITY]) {
+    } else if (id == CALC_BUTTON_IDS[CALC_BUTTON_PILL])
+        co_await calc_ask_extractor_quality(event);
+    else if (id == CALC_BUTTON_IDS[CALC_BUTTON_EXTRACTOR_QUALITY]) {
         if (client.extractor_quality == INVALID_QUALITY)
             co_return;  // do nothing since user has not selected extractor quality
         else if (client.node_levels[0] == INVALID_EXTRACTOR_NODE_LVL ||
@@ -261,8 +258,43 @@ task<void> calculator_button_click_handler(const button_click_t &event) {
         else
             // ask for vase ownership if all previous data are set
             co_await calc_ask_vase_own(event);
-    } else
+    } else if (id == CALC_BUTTON_IDS[CALC_BUTTON_EXTRACTOR_NODE]) {
+        if (client.fruit_quantity == INVALID_UNSIGNED_VAL)
+            // ask for myrimon fruit quantity if not set
+            co_await calc_ask_myrimon_fruit(event);
+        else
+            // ask for vase ownership if all previous data are set
+            co_await calc_ask_vase_own(event);
+    } else if (id == CALC_BUTTON_IDS[CALC_BUTTON_FRUIT])
+        co_await calc_ask_vase_own(event);
+    else if (id == CALC_BUTTON_IDS[CALC_BUTTON_VASE_YES])
+        // ask about vase details if user owns a vase
+        co_await calc_ask_vase_detail(event);
+    else if (id == CALC_BUTTON_IDS[CALC_BUTTON_VASE_NO])
+        // skip asking mirror
+        co_await calc_under_construction(event);  // TODO: replace with calc_result
+    else if (id == CALC_BUTTON_IDS[CALC_BUTTON_VASE_DETAIL]) {
+        if (client.vase.has_value() && client.vase->star != INVALID_STAR &&
+            client.vase->daily_recharge != INVALID_UNSIGNED_VAL)
+            // ask about mirror ownership if vase details are set
+            co_await calc_ask_mirror_own(event);
+        else
+            co_return;  // do nothing since user has not set vase details
+    } else if (id == CALC_BUTTON_IDS[CALC_BUTTON_MIRROR_YES])
+        // ask about mirror details if user owns a mirror
+        co_await calc_ask_mirror_detail(event);
+    else if (id == CALC_BUTTON_IDS[CALC_BUTTON_MIRROR_NO])
+        // skip asking mirror details
+        co_await calc_under_construction(event);  // TODO: replace with calc_result
+    else if (id == CALC_BUTTON_IDS[CALC_BUTTON_MIRROR_DETAIL]) {
+        if (client.mirror.has_value() && client.mirror->star != INVALID_STAR &&
+            client.mirror->daily_recharge != INVALID_UNSIGNED_VAL)
+            // all data are set, then calculate result
+            co_await calc_under_construction(event);  // TODO: replace with calc_result
+    } else {
+        if (DEBUG) cerr << "Unhandled calculator button click event: " << id << endl;
         co_await calc_under_construction(event);
+    }
 
     co_return;
 }
@@ -285,6 +317,10 @@ task<void> calculator_select_click_handler(const select_click_t &event) {
         if (DEBUG) cerr << "Aura gem quality selected: " << event.values[0] << endl;
 
         client.aura_gem_quality = get_quality(event.values[0]);
+    } else if (event.custom_id == CALC_SELECT_IDS[CALC_SELECT_EXTRACTOR_QUALITY]) {
+        if (DEBUG) cerr << "Extractor quality selected: " << event.values[0] << endl;
+
+        client.extractor_quality = get_quality(event.values[0]);
     } else
         cerr << "Unhandled select event: " << event.custom_id << endl;
 
@@ -668,22 +704,21 @@ task<void> process_cosmosapsis(const slashcommand_t &event) {
     co_return;
 }
 
-component aura_gem_quality_selectmenu_factory() {
-    component aura_gem_quality_selectmenu{component()
-                                              .set_type(cot_selectmenu)
-                                              .set_id(CALC_SELECT_IDS[CALC_SELECT_AURA_GEM_QUALITY])
-                                              .set_placeholder("Select quality of your aura gem")
-                                              .set_required(true)
-
-    };
+component quality_selectmenu_factory(const string_view &id, const string_view &placeholder) {
+    component quality_selectmenu{component()
+                                     .set_type(cot_selectmenu)
+                                     .set_id(id)
+                                     .set_placeholder(placeholder)
+                                     .set_required(true)};
     for (size_t i{0}; i < NUM_QUALITIES; ++i)
-        aura_gem_quality_selectmenu.add_select_option(
-            select_option{QUALITY_STR[i], QUALITY_STR[i], ""});
+        quality_selectmenu.add_select_option(select_option{QUALITY_STR[i], QUALITY_STR[i], ""});
 
-    return aura_gem_quality_selectmenu;
+    return quality_selectmenu;
 }
 
 task<void> calc_ask_aura_gem(const button_click_t &event) {
+    calc_sessions[event.command.usr.id].second.calc_state = CALC_ASK_AURA_GEM;
+
     if (DEBUG) cerr << "Asking for aura gem quality" << endl;
 
     string client_info{print_client_info(calc_sessions[event.command.usr.id].second)};
@@ -691,7 +726,8 @@ task<void> calc_ask_aura_gem(const button_click_t &event) {
     static component aura_gem_quality_selectmenu{
         component()
             .set_type(cot_action_row)
-            .add_component_v2(aura_gem_quality_selectmenu_factory())};
+            .add_component_v2(quality_selectmenu_factory(
+                CALC_SELECT_IDS[CALC_SELECT_AURA_GEM_QUALITY], "Select quality of your aura gem"))};
 
     static component next_button{component()
                                      .set_type(cot_button)
@@ -930,7 +966,48 @@ task<void> process_pill(const slashcommand_t &event) {
 }
 
 task<void> calc_ask_extractor_quality(const button_click_t &event) {
-    co_await calc_under_construction(event);
+    calc_sessions[event.command.usr.id].second.calc_state = CALC_ASK_EXTRACTOR_QUALITY;
+
+    if (DEBUG) cerr << "Asking for extractor quality..." << endl;
+
+    string client_info{print_client_info(calc_sessions[event.command.usr.id].second)};
+
+    static component extractor_quality_selectmenu{
+        component()
+            .set_type(cot_action_row)
+            .add_component_v2(
+                quality_selectmenu_factory(CALC_SELECT_IDS[CALC_SELECT_EXTRACTOR_QUALITY],
+                                           "Select quality of your extractor"))};
+
+    static component next_button{component()
+                                     .set_type(cot_button)
+                                     .set_style(cos_primary)
+                                     .set_label("NEXT")
+                                     .set_id(CALC_BUTTON_IDS[CALC_BUTTON_EXTRACTOR_QUALITY])};
+
+    component text_display{
+        component()
+            .set_type(cot_text_display)
+            .set_content(client_info + "Please select the quality of your extractor. ")};
+
+    if (DEBUG) cerr << "Sending extractor quality selection message..." << endl;
+
+    co_await event.co_edit_response(
+        message()
+            .set_flags(m_using_components_v2)
+            // a container
+            .add_component_v2(component()
+                                  .set_type(cot_container)
+                                  // ...with a text display
+                                  .add_component_v2(text_display)
+                                  // ...and a select menu for extractor quality
+                                  .add_component_v2(extractor_quality_selectmenu)
+                                  // ...and an action row with two buttons
+                                  .add_component_v2(component()
+                                                        .set_type(cot_action_row)
+                                                        .add_component_v2(next_button)
+                                                        .add_component_v2(cancel_button))));
+
     co_return;
 }
 
