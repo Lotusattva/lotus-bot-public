@@ -23,6 +23,7 @@ command_option calculator_commands() {
                             co_number, string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PERCENT][0][0]},
                             string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PERCENT][0][1]}, true}
                                         .set_min_value(0.0)))
+
         // subcommand for reporting cosmosapsis
         .add_option(command_option{co_sub_command, string{CALC_SUBCMDS[CALC_SUBCMD_COSMOSAPSIS][0]},
                                    string{CALC_SUBCMDS[CALC_SUBCMD_COSMOSAPSIS][1]}}
@@ -32,6 +33,7 @@ command_option calculator_commands() {
                             co_number, string{CALC_SUBCMD_PARAM[CALC_SUBCMD_COSMOSAPSIS][0][0]},
                             string{CALC_SUBCMD_PARAM[CALC_SUBCMD_COSMOSAPSIS][0][1]}, true}
                                         .set_min_value(0.0)))
+
         // subcommand for reporting respira
         .add_option(command_option{co_sub_command, string{CALC_SUBCMDS[CALC_SUBCMD_RESPIRA][0]},
                                    string{CALC_SUBCMDS[CALC_SUBCMD_RESPIRA][1]}}
@@ -46,6 +48,7 @@ command_option calculator_commands() {
                             co_integer, string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][1][0]},
                             string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][1][1]}, true}
                                         .set_min_value(1)))
+
         // subcommand for reporting pill data
         .add_option(
             command_option{co_sub_command, string{CALC_SUBCMDS[CALC_SUBCMD_PILL][0]},
@@ -79,7 +82,33 @@ command_option calculator_commands() {
                 .add_option(command_option{co_number,
                                            string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PILL][4][0]},
                                            string{CALC_SUBCMD_PARAM[CALC_SUBCMD_PILL][4][1]}, true}
-                                .set_min_value(0)));
+                                .set_min_value(0)))
+
+        // subcommand for reporting extractor node levels
+        .add_option(command_option{co_sub_command, string{CALC_SUBCMDS[CALC_SUBCMD_EXTRACTOR][0]},
+                                   string{CALC_SUBCMDS[CALC_SUBCMD_EXTRACTOR][1]}}
+                        // Parameters
+                        // 1. cultivation xp node level
+                        .add_option(command_option{
+                            co_integer, string{CALC_SUBCMD_PARAM[CALC_SUBCMD_EXTRACTOR][0][0]},
+                            string{CALC_SUBCMD_PARAM[CALC_SUBCMD_EXTRACTOR][0][1]}, true}
+                                        .set_min_value(0)
+                                        .set_max_value(30))
+                        // 2. quality node level
+                        .add_option(command_option{
+                            co_integer, string{CALC_SUBCMD_PARAM[CALC_SUBCMD_EXTRACTOR][1][0]},
+                            string{CALC_SUBCMD_PARAM[CALC_SUBCMD_EXTRACTOR][1][1]}, true}
+                                        .set_min_value(0)
+                                        .set_max_value(30))
+                        // 3. gush node level
+                        .add_option(command_option{
+                            co_integer, string{CALC_SUBCMD_PARAM[CALC_SUBCMD_EXTRACTOR][2][0]},
+                            string{CALC_SUBCMD_PARAM[CALC_SUBCMD_EXTRACTOR][2][1]}, true}
+                                        .set_min_value(0)
+                                        .set_max_value(30))
+
+                    /////// end of subcommands
+        );
 }
 
 task<void> start_interactive_calculator(const slashcommand_t &event) {
@@ -1012,12 +1041,99 @@ task<void> calc_ask_extractor_quality(const button_click_t &event) {
 }
 
 task<void> calc_ask_extractor_node_lvl(const button_click_t &event) {
-    co_await calc_under_construction(event);
+    calc_sessions[event.command.usr.id].second.calc_state = CALC_ASK_EXTRACTOR_NODE_LVL;
+
+    if (DEBUG) cerr << "Asking for extractor node levels..." << endl;
+
+    string client_info{print_client_info(calc_sessions[event.command.usr.id].second)};
+
+    component text_display{
+        component()
+            .set_type(cot_text_display)
+            .set_content(
+                client_info +
+                "Please indicate the levels of the following extractor nodes"
+                "**WHEN YOU INTEND TO EAT YOUR MYRIMON FRUITS**"
+                " (your extractor node levels might be lower than the numbers you enter):\n"
+                "- Cultivation XP \n"
+                "- Quality \n"
+                "- Gush \n"
+                "via `/calc extractor` command.\n\n"
+                "Note that the levels must be between 0 and 30.\n\n"
+                "For example, if you intend to eat your myrimon fruits when all extractor nodes "
+                "are at leve 25, you should enter `25 25 25`.\n\n"
+                "We will continue once your input is received.")};
+
+    co_await event.co_edit_response(
+        message()
+            .set_flags(m_using_components_v2)
+            .add_component_v2(
+                component()
+                    // a container
+                    .set_type(cot_container)
+                    // ...with a text display
+                    .add_component_v2(text_display)
+                    // ...and a button
+                    .add_component_v2(
+                        component().set_type(cot_action_row).add_component_v2(cancel_button))));
+
     co_return;
 }
 
 task<void> process_extractor_node_lvl(const slashcommand_t &event) {
-    co_await event.co_reply(message("This command is not implemented yet.").set_flags(m_ephemeral));
+    optional<pair<message, calculator_client_t> *> user{co_await verify_user(event)};
+
+    if (!user) co_return;
+
+    // acknowledge the slash command
+    co_await event.co_reply("input received, processing...");
+
+    calculator_client_t &client{user.value()->second};
+
+    client.node_levels[0] = static_cast<unsigned short>(
+        get<int64_t>(event.get_parameter(string{CALC_SUBCMD_PARAM[CALC_SUBCMD_EXTRACTOR][0][0]})));
+    client.node_levels[1] = static_cast<unsigned short>(
+        get<int64_t>(event.get_parameter(string{CALC_SUBCMD_PARAM[CALC_SUBCMD_EXTRACTOR][1][0]})));
+    client.node_levels[2] = static_cast<unsigned short>(
+        get<int64_t>(event.get_parameter(string{CALC_SUBCMD_PARAM[CALC_SUBCMD_EXTRACTOR][2][0]})));
+
+    if (client.calc_state == CALC_ASK_EXTRACTOR_NODE_LVL) {
+        // if the user is in the extractor node levels state, then we can edit the message
+        string client_info{print_client_info(calc_sessions[event.command.usr.id].second)};
+
+        component text_display{component()
+                                   .set_type(cot_text_display)
+                                   .set_content(client_info +
+                                                "Please click **NEXT** to continue, or use `/calc "
+                                                "extractor` to update your progress.\n\n")};
+
+        static component next_button{component()
+                                         .set_type(cot_button)
+                                         .set_style(cos_primary)
+                                         .set_label("NEXT")
+                                         .set_id(CALC_BUTTON_IDS[CALC_BUTTON_EXTRACTOR_NODE])};
+
+        message msg{user.value()->first};
+
+        // edit the message
+        msg.components.clear();
+        msg.add_component_v2(component()
+                                 // a container
+                                 .set_type(cot_container)
+                                 // ...with a text display
+                                 .add_component_v2(text_display)
+                                 // ...and two buttons
+                                 .add_component_v2(component()
+                                                       .set_type(cot_action_row)
+                                                       .add_component_v2(next_button)
+                                                       .add_component_v2(cancel_button)));
+
+        co_await bot.co_message_edit(msg);
+    }
+
+    // otherwise proceed silently
+    event.co_delete_original_response();
+
     co_return;
 }
 

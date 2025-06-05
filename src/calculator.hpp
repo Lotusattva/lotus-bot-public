@@ -61,9 +61,9 @@ constexpr inline string_view const CALC_STATE_IDS[NUM_CALC_STATES]{
  */
 struct artifact_t {
     unsigned short star{INVALID_STAR};  // default to invalid, should be in the range [0, 5]
-    
+
     // invalid(0): has not been set, 1: no daily recharge, 2: daily recharge
-    unsigned daily_recharge{INVALID_UNSIGNED_VAL}; 
+    unsigned short daily_recharge{INVALID_UNSIGNED_VAL};
 };
 
 /**
@@ -87,7 +87,7 @@ struct calculator_client_t {
     // cultivation progress
     major_stage_t major_stage{INVALID_MAJOR_STAGE};  // default to invalid
     minor_stage_t minor_stage{INVALID_MINOR_STAGE};  // default to invalid
-    optional<unsigned> gate;
+    optional<unsigned short> gate;
 
     // default to invalid, should be a non-negative number
     double percent_progress{INVALID_DOUBLE_VAL};
@@ -98,30 +98,33 @@ struct calculator_client_t {
 
     // respira
     exp_t respira_exp{INVALID_UNSIGNED_VAL};  // default to 0, should be a positive number
-    unsigned daily_respira_attempts{
+    unsigned short daily_respira_attempts{
         INVALID_UNSIGNED_VAL};  // default to 0, should be a positive number
 
     // pills
-    unsigned daily_pill_attempts{
+    unsigned short daily_pill_attempts{
         INVALID_UNSIGNED_VAL};  // default to 0, should be a positive number
 
     // 0: rare, 1: epic, 2: legendary
-    unsigned pill_quantity[3]{INVALID_UNSIGNED_VAL, INVALID_UNSIGNED_VAL, INVALID_UNSIGNED_VAL};
+    unsigned short pill_quantity[3]{INVALID_UNSIGNED_VAL, INVALID_UNSIGNED_VAL,
+                                    INVALID_UNSIGNED_VAL};
     double pill_bonus{INVALID_DOUBLE_VAL};  // needs to be calculated because game does not show it
 
     // extractor
     quality_t extractor_quality{INVALID_QUALITY};  // default to invalid
 
     // 0: cultiXP, 1: quality, 2: gush; default to 31, should be in the range [0, 30]
-    unsigned node_levels[3]{INVALID_EXTRACTOR_NODE_LVL, INVALID_EXTRACTOR_NODE_LVL,
-                            INVALID_EXTRACTOR_NODE_LVL};
+    unsigned short node_levels[3]{INVALID_EXTRACTOR_NODE_LVL, INVALID_EXTRACTOR_NODE_LVL,
+                                  INVALID_EXTRACTOR_NODE_LVL};
 
     // myrimon fruit
-    unsigned fruit_quantity{INVALID_UNSIGNED_VAL};  // default to 0, should be a positive number
+    unsigned short fruit_quantity{
+        INVALID_UNSIGNED_VAL};  // default to 0, should be a positive number
 
-    // artifact
+    // artifacts
     optional<artifact_t> vase{nullopt};
-    bool vase_transmog{false};
+    // invalid(0): has not been set, 1: no transmog, 2: has vase transmog
+    unsigned short vase_transmog{INVALID_UNSIGNED_VAL};
     optional<artifact_t> mirror{nullopt};
 };
 
@@ -204,6 +207,7 @@ enum CALC_SUBCMD_t {
     CALC_SUBCMD_COSMOSAPSIS,
     CALC_SUBCMD_RESPIRA,
     CALC_SUBCMD_PILL,
+    CALC_SUBCMD_EXTRACTOR,
 
     NUM_CALC_SUBCMDS
 };
@@ -213,7 +217,8 @@ constexpr inline string_view CALC_SUBCMDS[NUM_CALC_SUBCMDS][SUBCOMMAND_AND_DESCR
     {"percent", "report percent progress during an interactive calc session"},
     {"cosmosapsis", "report cosmosapsis during an interactive calc session"},
     {"respira", "report respira during an interactive calc session"},
-    {"pill", "report pill data during an interactive calc session"}};
+    {"pill", "report pill data during an interactive calc session"},
+    {"extractor", "report extractor node levels during an interactive calc session"}};
 
 constexpr inline unsigned short CALC_SUBCMD_NUM_PARAM[NUM_CALC_SUBCMDS]{
     0,  // start
@@ -221,6 +226,7 @@ constexpr inline unsigned short CALC_SUBCMD_NUM_PARAM[NUM_CALC_SUBCMDS]{
     1,  // cosmoapsis
     2,  // respira
     5,  // pill
+    3,  // extractor
 };
 
 constexpr inline string_view **CALC_SUBCMD_PARAM[NUM_CALC_SUBCMDS]{
@@ -247,6 +253,10 @@ constexpr inline string_view **CALC_SUBCMD_PARAM[NUM_CALC_SUBCMDS]{
                                                   "number of legendary pills consumed"},
         (string_view[SUBCOMMAND_AND_DESCRIPTION]){"pill_exp_bonus",
                                                   "pill experience bonus in percent"}},
+    (string_view * [CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_EXTRACTOR]]){
+        (string_view[SUBCOMMAND_AND_DESCRIPTION]){"culti_xp", "level of the cultivation xp node"},
+        (string_view[SUBCOMMAND_AND_DESCRIPTION]){"quality", "level of the extractor quality node"},
+        (string_view[SUBCOMMAND_AND_DESCRIPTION]){"gush", "level of the extractor gush node"}},
 };
 
 // Register slashcommands for the calculator
