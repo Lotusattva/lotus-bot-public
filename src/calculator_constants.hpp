@@ -372,13 +372,26 @@ constexpr inline const double AURA_GEM_MULT[NUM_QUALITIES]{
 
 ////////////////////////// Artifacts ///////////////////////////
 
-#define MAX_ARTIFACT_STAR 5
+enum artifact_star_t {
+    STAR_0,
+    STAR_1,
+    STAR_2,
+    STAR_3,
+    STAR_4,
+    STAR_5,
+
+    NUM_ARTIFACT_STARS
+};
+
+constexpr inline string_view const ARTIFACT_STAR_STR[NUM_ARTIFACT_STARS]{
+    "0_star", "1_star", "2_star", "3_star", "4_star", "5_star"
+};
 
 /**
  * Artifact energy recovery rate per star
  * Unit: points per 15 mins
  */
-constexpr inline const double ARTIFACT_ENERGY_RECOVERY_RATE[MAX_ARTIFACT_STAR + 1]{
+constexpr inline const double ARTIFACT_ENERGY_RECOVERY_RATE[NUM_ARTIFACT_STARS]{
     1., // 0 star
     1.3, // 1 star
     1.6, // 2 star
