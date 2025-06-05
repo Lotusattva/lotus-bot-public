@@ -15,6 +15,7 @@ void feet(const message_create_t& event) {
         views::transform([](const char& c) { return std::tolower(c); }) | ranges::to<string>()};
 
     size_t pos{0};
+    size_t left_bound{0};
 
     // find all occurrences of "feet" or "foot" in the message
     while ((pos = min(lowercase_no_space.find("feet", pos),
@@ -22,7 +23,7 @@ void feet(const message_create_t& event) {
         bool digit_found{false};
 
         // Check if preceding characters are digits
-        if (pos > 0 && std::isdigit(lowercase_no_space[pos - 1])) {
+        if (pos > 0 && std::isdigit(lowercase_no_space[pos - 1]) && pos > left_bound) {
             // If a digit precedes "feet" or "foot", decrement feet_count
             digit_found = true;
             size_t start_pos{pos - 1};  // start position of the number
@@ -35,7 +36,7 @@ void feet(const message_create_t& event) {
         pos += 4;  // Move past the word "feet" or "foot"
 
         // check if consecutive characters are digits
-        if (pos < lowercase_no_space.size() && std::isdigit(lowercase_no_space[pos])) {
+        if (!digit_found && pos < lowercase_no_space.size() && std::isdigit(lowercase_no_space[pos])) {
             digit_found = true;
 
             size_t end_pos{pos};  // end position of the number
@@ -46,6 +47,7 @@ void feet(const message_create_t& event) {
             feet_count += max(std::stoi(lowercase_no_space.substr(pos, end_pos - pos)),
                               0);  // Use max() to prevent integer overflow
             pos = end_pos;         // Move past the number
+            left_bound = pos;  // Update left_bound to the end of the number
         }
 
         if (!digit_found)
