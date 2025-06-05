@@ -42,7 +42,8 @@ $$ Exp = RespiraBaseExp \times (1 + PlayerRespiraBonus)$$
 
 where:
 - $RespiraBaseExp$ is dependent on the player's major stage, as defined in the table below:
-
+    <details><summary><ins>Click to show table</ins></summary>
+    
     | Major Stage  | $RespiraBaseExp$ |
     |--------------|------------------|
     | Novice       | 6                |
@@ -56,6 +57,8 @@ where:
     | Perfection   | 13500            |
     | Nirvana      | 25000            |
     | Celestial    | 37500            |
+    
+    </details>
 
 - $PlayerRespiraBonus$ is the player's sum of all respira bonuses they gain from various sources such as techniques and immortal friends.
 
