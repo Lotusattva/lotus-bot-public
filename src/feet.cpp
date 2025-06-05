@@ -19,13 +19,26 @@ void feet(const message_create_t& event) {
     // find all occurrences of "feet" or "foot" in the message
     while ((pos = min(lowercase_no_space.find("feet", pos),
                       lowercase_no_space.find("foot", pos))) != string::npos) {
-        ++feet_count;
+        bool digit_found{false};
+
+        // Check if preceding characters are digits
+        if (pos > 0 && std::isdigit(lowercase_no_space[pos - 1])) {
+            // If a digit precedes "feet" or "foot", decrement feet_count
+            digit_found = true;
+            size_t start_pos{pos - 1};  // start position of the number
+            while (start_pos > 0 && std::isdigit(lowercase_no_space[start_pos - 1])) --start_pos;
+
+            feet_count += max(std::stoi(lowercase_no_space.substr(start_pos, pos - start_pos)),
+                              0);  // Use max() to prevent integer overflow
+        }
+
         pos += 4;  // Move past the word "feet" or "foot"
 
         // check if consecutive characters are digits
         if (pos < lowercase_no_space.size() && std::isdigit(lowercase_no_space[pos])) {
-            feet_count--;  // Decrement feet_count if a number follows "feet" or "foot"
-            size_t end_pos{pos};
+            digit_found = true;
+
+            size_t end_pos{pos};  // end position of the number
             while (end_pos < lowercase_no_space.size() && std::isdigit(lowercase_no_space[end_pos]))
                 ++end_pos;
 
@@ -34,6 +47,10 @@ void feet(const message_create_t& event) {
                               0);  // Use max() to prevent integer overflow
             pos = end_pos;         // Move past the number
         }
+
+        if (!digit_found)
+            // If no digit was found before "feet" or "foot", increment feet_count by 1
+            ++feet_count;
     }
 
     feet_count = min(feet_count, 20);
