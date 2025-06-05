@@ -1,5 +1,7 @@
 # Cultivation Calculator Overview
 
+**THIS DOCUMENT IS WORK IN PROGRESS**
+
 This document outlines the calculation which would be performed by the bot to produce an estimate of how much longer it takes for a player to reach the next major cultivation stage.
 
 This document will be divided into four sections, each focuses on a crucial source of cultivation exp income:
