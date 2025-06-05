@@ -6,9 +6,10 @@ This document outlines the calculation which would be performed by the bot to pr
 
 This document will be divided into four sections, each focuses on a crucial source of cultivation exp income:
 1. [Cultivation™ and Aura Gem](#cultivation-and-aura-gem)
-2. [Cultivation Pills](#cultivation-pills)
-3. [Myrimon Fruits and the Aura Extractor](#myrimon-fruits-and-the-aura-extractor)
-4. [Creation Aftifacts: the Vase and the Mirror](#creation-artifacts-the-vase-and-the-mirror)
+2. [Respira](#respira)
+3. [Cultivation Pills](#cultivation-pills)
+4. [Myrimon Fruits and the Aura Extractor](#myrimon-fruits-and-the-aura-extractor)
+5. [Creation Aftifacts: the Vase and the Mirror](#creation-artifacts-the-vase-and-the-mirror)
 
 ## Cultivation™ and Aura Gem
 
@@ -32,6 +33,52 @@ Where $AuraGemMultiplier$ depends on the quality of the aura gem, and is defined
 | Epic             | 0.2                 |
 | Legendary        | 0.24                |
 | Mythic           | 0.28                |
+
+## Respira
+
+A player can perform a number of respira per day. Each respira attempt offers an amount of cultivation exp calculated as follows:
+
+$$ Exp = RespiraBaseExp \times (1 + PlayerRespiraBonus)$$
+
+where:
+- $RespiraBaseExp$ is dependent on the player's major stage, as defined in the table below:
+
+    | Major Stage  | $RespiraBaseExp$ |
+    |--------------|------------------|
+    | Novice       | 6                |
+    | Virtuoso     | 20               |
+    | Foundation   | 110              |
+    | Virtuoso     | 650              |
+    | Nascent      | 3200             |
+    | Incarnation  | 5300             |
+    | Voidbreak    | 7800             |
+    | Wholeness    | 10500            |
+    | Perfection   | 13500            |
+    | Nirvana      | 25000            |
+    | Celestial    | 37500            |
+
+- $PlayerRespiraBonus$ is the player's sum of all respira bonuses they gain from various sources such as techniques and immortal friends.
+
+Additionally, each respira attempt has a chance to be multiplied by a factor of 1, 2, 5, or 10, which chances defined in the table below:
+
+| Respira Multiplier | Chance |
+|--------------------|--------|
+| 1x                 | 55%    |
+| 2x                 | 30%    |
+| 5x                 | 14.75% |
+| 10x                | 0.25%  |
+
+Thus, each respira attempt has an expected value of:
+$$ 
+/begin{align*}
+Exp_{expected} & = Exp \times (0.55 + 0.3 \cdot 2 + 0.1475 \cdot 5 + 0.0025 \cdot 10) \\
+               & = Exp \times 1.9125 \\
+               & = RespiraBaseExp \times (1 + PlayerRespiraBonus) \times 1.9125
+/end{align*}
+$$
+
+Where:
+- $Exp_{expected}$ is the expected cultivation exp gained from a single respira attempt
 
 ## Cultivation Pills
 
