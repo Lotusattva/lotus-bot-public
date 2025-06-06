@@ -4,12 +4,12 @@
 
 This document outlines the calculation which would be performed by the bot to produce an estimate of how much longer it takes for a player to reach the next major cultivation stage.
 
-This document will be divided into four sections, each focuses on a crucial source of cultivation exp income:
+This document will be divided into five sections, each focuses on a crucial source of cultivation exp income:
 1. [Cultivation™ and Aura Gem](#cultivation-and-aura-gem)
 2. [Respira](#respira)
 3. [Cultivation Pills](#cultivation-pills)
 4. [Myrimon Fruits and the Aura Extractor](#myrimon-fruits-and-the-aura-extractor)
-5. [Creation Aftifacts: the Vase and the Mirror](#creation-artifacts-the-vase-and-the-mirror)
+5. [Creation Artifacts: the Vase and the Mirror](#creation-artifacts-the-vase-and-the-mirror)
 
 ## Cultivation™ and Aura Gem
 
