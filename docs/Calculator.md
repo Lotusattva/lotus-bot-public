@@ -66,10 +66,10 @@ Additionally, each respira attempt has a chance to be multiplied by a factor of 
 
 | Respira Multiplier | Chance |
 |--------------------|--------|
-| 1x                 | 55%    |
-| 2x                 | 30%    |
-| 5x                 | 14.75% |
-| 10x                | 0.25%  |
+| 1                  | 55%    |
+| 2                  | 30%    |
+| 5                  | 14.75% |
+| 10                 | 0.25%  |
 
 Thus, each respira attempt has an expected value of:
 
@@ -121,9 +121,21 @@ Where:
 
 ## Myrimon Fruits and the Aura Extractor
 
-### Gush chance
+### Gush
 
-Consuming a myrimon fruit has a chance to gush, and there is also a pity system such that a gush is guaranteed to trigger on the 6th fruit if consuming the first 5 fruits did not gush. Collecting information about the player's current position in the pity cycle and doing calculations from there is cumbersome for both the bot and the player. Therefore, to simplify this process, we will use a consolidated per-use gush chance.
+Consuming a myrimon fruit has a chance to gush. When a gush occurs, a multiplicative bonus based on the level of the "Gush" extractor node is applied to the exp of the resulting orb. This bonus is dependent on the level of the "Gush" node, which is calculated as follows:
+
+$$ GushMult = BaseGushMult + GushNodeLevel \cdot GushMultPerNodeLevel $$
+
+Where:
+- $GushMult$ is the multiplicative bonus applied to the exp of the resulting orb when a gush occurs
+- $BaseGushMult$ is the base gush multiplier, which is 1.50
+- $GushNodeLevel$ is the level of the "Gush" extractor node
+- $GushMultPerNodeLevel$ is the gush multiplier per node level, which is 0.04
+
+For reference, when the "Gush" node is maxed (level 30), the gush multiplier is 2.70.
+
+The chance to gush is somewhat complicated. There is also a pity system such that a gush is guaranteed to trigger on the 6th fruit if consuming the first 5 fruits did not gush. Collecting information about the player's current position in the pity cycle and doing calculations from there is cumbersome for both the bot and the player. Therefore, to simplify this process, we will use a consolidated per-use gush chance.
 
 To derive the consolidated per-use gush chance, we first consider the probability of getting a gush before the 6th fruit. Let $k$ be the number of fruits consumed, and $k \in [1, 5], k \in \mathbb{Z}$. Let $P$ be the chance to gush. The probability of getting a gush before the 6th fruit is given by:
 
@@ -174,6 +186,15 @@ The chance to gush $P$ is dependent on the quality of the "Quality" aura extract
 | Mythic       | 0.35 |
 
 ### Exp orb quality
+Another multiplicative bonus is applied to the exp of the resulting orb based on the quality of that orb, as defined in the following table:
+| Orb Quality | Multiplier |
+|-------------|------------|
+| Common      | 1.0        |
+| Uncommon    | 1.3        |
+| Rare        | 1.6        |
+| Epic        | 2.0        |
+| Legendary   | 2.4        |
+| Mythic      | 3.0        |
 
 The quality of the exp orb produced by the aura extractor upon consuming a myrimon fruit is dependent on 1) the quality of the aura extractor itself, and 2) the level of the "Quality" node:
     
