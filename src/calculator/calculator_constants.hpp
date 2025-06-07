@@ -11,7 +11,7 @@ using namespace std;
 ////////////// Utility functions //////////////
 
 // Compile-time string hash
-constexpr uint64_t hash_string(string_view str) {
+constexpr uint64_t hash_string(const string_view &str) {
     uint64_t hash = 5381;
     for (char c : str) {
         hash = ((hash << 5) + hash) + static_cast<unsigned char>(c);
@@ -41,7 +41,7 @@ constexpr inline string_view QUALITY_STR[NUM_QUALITIES]{
     "Mythic"
 };
 
-constexpr quality_t get_quality(string_view name) {
+constexpr quality_t get_quality(const string_view &name) {
     const uint64_t hash{ hash_string(name) };
 
     switch (hash) {
@@ -91,7 +91,7 @@ constexpr inline string_view MAJOR_STAGE_STR[NUM_MAJOR_STAGES]{
     "Eternal"
 };
 
-constexpr major_stage_t get_major_stage(string_view name) {
+constexpr major_stage_t get_major_stage(const string_view &name) {
     const uint64_t hash{ hash_string(name) };
 
     switch (hash) {
@@ -123,7 +123,7 @@ constexpr inline string_view MINOR_STAGE_STR[NUM_MINOR_STAGES]{
     "Late"
 };
 
-constexpr minor_stage_t get_minor_stage(string_view name) {
+constexpr minor_stage_t get_minor_stage(const string_view &name) {
     const uint64_t hash{ hash_string(name) };
 
     switch (hash) {
@@ -386,7 +386,7 @@ constexpr inline string_view const ARTIFACT_STAR_STR[NUM_ARTIFACT_STARS]{
     "0_star", "1_star", "2_star", "3_star", "4_star", "5_star"
 };
 
-constexpr artifact_star_t get_artifact_star(string_view name) {
+constexpr artifact_star_t get_artifact_star(const string_view &name) {
     const uint64_t hash{ hash_string(name) };
 
     switch (hash) {

@@ -7,6 +7,7 @@
 
 #include "calculator_interactions.hpp"
 #include "calculator_types.hpp"
+#include "../global.hpp"
 
 using namespace dpp;
 
@@ -39,7 +40,42 @@ task<void> calculator_select_click_handler(const select_click_t &event);
  * returns nullopt
  */
 template <derived_from<interaction_create_t> T>
-task<optional<pair<message, calculator_client_t> *>> verify_user(const T &event);
+task<optional<pair<message, calculator_client_t> *>> verify_user(const T &event) {
+    snowflake user_id{event.command.usr.id};
+
+    if (DEBUG) cerr << "Verifying user: " << user_id << endl;
+
+    auto it{calc_sessions.find(user_id)};
+    if (it == calc_sessions.end()) {
+        if (DEBUG) cerr << "this user is not the owner of this session." << endl;
+        co_return nullopt;
+    }
+
+    if (DEBUG) cerr << "querying message and channel ID..." << endl;
+
+    confirmation_callback_t callback{co_await event.co_get_original_response()};
+    if (callback.is_error()) {
+        cerr << "Error: " << callback.get_error().message << endl;
+        co_return nullopt;
+    }
+    message msg{callback.get<message>()};
+
+    if (DEBUG) {
+        cerr << "Message ID: " << msg.id << endl;
+        cerr << "Channel ID: " << msg.channel_id << endl;
+    }
+
+    if (it->second.first.id != msg.id) {
+        if (DEBUG)
+            cerr << "Message ID: " << msg.id
+                 << " does not match the cached message ID: " << it->second.first.id << endl;
+        co_return nullopt;
+    }
+
+    if (DEBUG) cerr << "User ID: " << user_id << " is the owner of this session." << endl;
+    co_return &it->second;
+}
+
 task<optional<pair<message, calculator_client_t> *>> verify_user(const slashcommand_t &event);
 string print_client_info(const calculator_client_t &client);
 

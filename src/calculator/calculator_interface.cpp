@@ -64,43 +64,6 @@ task<void> start_interactive_calculator(const slashcommand_t &event) {
     co_return;
 }
 
-template <derived_from<interaction_create_t> T>
-task<optional<pair<message, calculator_client_t> *>> verify_user(const T &event) {
-    snowflake user_id{event.command.usr.id};
-
-    if (DEBUG) cerr << "Verifying user: " << user_id << endl;
-
-    auto it{calc_sessions.find(user_id)};
-    if (it == calc_sessions.end()) {
-        if (DEBUG) cerr << "this user is not the owner of this session." << endl;
-        co_return nullopt;
-    }
-
-    if (DEBUG) cerr << "querying message and channel ID..." << endl;
-
-    confirmation_callback_t callback{co_await event.co_get_original_response()};
-    if (callback.is_error()) {
-        cerr << "Error: " << callback.get_error().message << endl;
-        co_return nullopt;
-    }
-    message msg{callback.get<message>()};
-
-    if (DEBUG) {
-        cerr << "Message ID: " << msg.id << endl;
-        cerr << "Channel ID: " << msg.channel_id << endl;
-    }
-
-    if (it->second.first.id != msg.id) {
-        if (DEBUG)
-            cerr << "Message ID: " << msg.id
-                 << " does not match the cached message ID: " << it->second.first.id << endl;
-        co_return nullopt;
-    }
-
-    if (DEBUG) cerr << "User ID: " << user_id << " is the owner of this session." << endl;
-    co_return &it->second;
-}
-
 task<void> calc_cancel(const button_click_t &event) {
     if (DEBUG) cerr << "Canceling calculator session..." << endl;
 

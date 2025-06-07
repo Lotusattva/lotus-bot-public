@@ -1,6 +1,5 @@
-#include "calculator_interface.hpp"
-
 #include "../global.hpp"
+#include "calculator_interface.hpp"
 
 command_option calculator_commands() {
     return command_option{co_sub_command_group, string{CALC_MAIN_COMMAND[0]},
