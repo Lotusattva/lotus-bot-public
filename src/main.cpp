@@ -1,7 +1,7 @@
 #include <dpp/dpp.h>
 #include <dpp/message.h>
 
-#include "calculator.hpp"
+#include "calculator/calculator_interface.hpp"
 #include "feet.hpp"
 #include "global.hpp"
 #include "poll.hpp"
