@@ -15,7 +15,7 @@ add_executable(${PROJECT_NAME}
     src/poll.cpp
     src/feet.cpp
     src/scheduler.cpp 
-    src/calculator.cpp
+    src/calculator_interface.cpp
 )
 
 find_package(DPP REQUIRED)

@@ -1,13 +1,8 @@
-#include "calculator.hpp"
-
-#include <dpp/appcommand.h>
-#include <dpp/message.h>
-#include <dpp/restresults.h>
+#include "calculator_interface.hpp"
 
 #include <string>
 
-#include "calculator_constants.hpp"
-#include "global.hpp"
+#include "../global.hpp"
 
 command_option calculator_commands() {
     return command_option{co_sub_command_group, string{CALC_MAIN_COMMAND[0]},
