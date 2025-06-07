@@ -4,7 +4,6 @@
 #include <cassert>
 #include <numeric>
 #include <cstdint>
-#include <string>
 #include <string_view>
 
 using namespace std;
@@ -386,6 +385,20 @@ enum artifact_star_t {
 constexpr inline string_view const ARTIFACT_STAR_STR[NUM_ARTIFACT_STARS]{
     "0_star", "1_star", "2_star", "3_star", "4_star", "5_star"
 };
+
+constexpr artifact_star_t get_artifact_star(string_view name) {
+    const uint64_t hash{ hash_string(name) };
+
+    switch (hash) {
+        case hash_string(ARTIFACT_STAR_STR[STAR_0]): return STAR_0;
+        case hash_string(ARTIFACT_STAR_STR[STAR_1]): return STAR_1;
+        case hash_string(ARTIFACT_STAR_STR[STAR_2]): return STAR_2;
+        case hash_string(ARTIFACT_STAR_STR[STAR_3]): return STAR_3;
+        case hash_string(ARTIFACT_STAR_STR[STAR_4]): return STAR_4;
+        case hash_string(ARTIFACT_STAR_STR[STAR_5]): return STAR_5;
+        default: return NUM_ARTIFACT_STARS; // An invalid star, indicates an error
+    }
+}
 
 /**
  * Artifact energy recovery rate per star

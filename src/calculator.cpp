@@ -1,6 +1,7 @@
 #include "calculator.hpp"
 
 #include <dpp/appcommand.h>
+#include <dpp/message.h>
 #include <dpp/restresults.h>
 
 #include <string>
@@ -105,10 +106,20 @@ command_option calculator_commands() {
                             co_integer, string{CALC_SUBCMD_PARAM[CALC_SUBCMD_EXTRACTOR][2][0]},
                             string{CALC_SUBCMD_PARAM[CALC_SUBCMD_EXTRACTOR][2][1]}, true}
                                         .set_min_value(0)
-                                        .set_max_value(30))
+                                        .set_max_value(30)))
 
-                    /////// end of subcommands
-        );
+        // subcommand for reporting number of myrimon fruit
+        .add_option(command_option{co_sub_command, string{CALC_SUBCMDS[CALC_SUBCMD_MYRIMON][0]},
+                                   string{CALC_SUBCMDS[CALC_SUBCMD_MYRIMON][1]}}
+                        // Parameters
+                        // 1. number of myrimon fruit
+                        .add_option(command_option{
+                            co_integer, string{CALC_SUBCMD_PARAM[CALC_SUBCMD_MYRIMON][0][0]},
+                            string{CALC_SUBCMD_PARAM[CALC_SUBCMD_MYRIMON][0][1]}, true}
+                                        .set_min_value(0)))
+
+        /////// end of subcommands
+        ;
 }
 
 task<void> start_interactive_calculator(const slashcommand_t &event) {
@@ -190,6 +201,10 @@ task<void> calculator_subcommand_handler(const slashcommand_t &event,
         co_await process_respira(event);
     else if (subcommand.name == CALC_SUBCMDS[CALC_SUBCMD_PILL][0])
         co_await process_pill(event);
+    else if (subcommand.name == CALC_SUBCMDS[CALC_SUBCMD_EXTRACTOR][0])
+        co_await process_extractor_node(event);
+    else if (subcommand.name == CALC_SUBCMDS[CALC_SUBCMD_MYRIMON][0])
+        co_await process_myrimon(event);
     else {
         if (DEBUG) cerr << "Unhandled calculator subcommand: " << subcommand.name << endl;
 
@@ -280,21 +295,21 @@ task<void> calculator_button_click_handler(const button_click_t &event) {
                  client.node_levels[1] == INVALID_EXTRACTOR_NODE_LVL ||
                  client.node_levels[2] == INVALID_EXTRACTOR_NODE_LVL)
             // ask for extractor node levels if not set
-            co_await calc_ask_extractor_node_lvl(event);
+            co_await calc_ask_extractor_node(event);
         else if (client.fruit_quantity == INVALID_UNSIGNED_VAL)
             // ask for myrimon fruit quantity if not set
-            co_await calc_ask_myrimon_fruit(event);
+            co_await calc_ask_myrimon(event);
         else
             // ask for vase ownership if all previous data are set
             co_await calc_ask_vase_own(event);
     } else if (id == CALC_BUTTON_IDS[CALC_BUTTON_EXTRACTOR_NODE]) {
         if (client.fruit_quantity == INVALID_UNSIGNED_VAL)
             // ask for myrimon fruit quantity if not set
-            co_await calc_ask_myrimon_fruit(event);
+            co_await calc_ask_myrimon(event);
         else
             // ask for vase ownership if all previous data are set
             co_await calc_ask_vase_own(event);
-    } else if (id == CALC_BUTTON_IDS[CALC_BUTTON_FRUIT])
+    } else if (id == CALC_BUTTON_IDS[CALC_BUTTON_MYRIMON])
         co_await calc_ask_vase_own(event);
     else if (id == CALC_BUTTON_IDS[CALC_BUTTON_VASE_YES])
         // ask about vase details if user owns a vase
@@ -304,7 +319,7 @@ task<void> calculator_button_click_handler(const button_click_t &event) {
         co_await calc_under_construction(event);  // TODO: replace with calc_result
     else if (id == CALC_BUTTON_IDS[CALC_BUTTON_VASE_DETAIL]) {
         if (client.vase.has_value() && client.vase->star != INVALID_STAR &&
-            client.vase->daily_recharge != INVALID_UNSIGNED_VAL)
+            client.vase->daily_recharge != INVALID_BINARY_VAL)
             // ask about mirror ownership if vase details are set
             co_await calc_ask_mirror_own(event);
         else
@@ -317,7 +332,7 @@ task<void> calculator_button_click_handler(const button_click_t &event) {
         co_await calc_under_construction(event);  // TODO: replace with calc_result
     else if (id == CALC_BUTTON_IDS[CALC_BUTTON_MIRROR_DETAIL]) {
         if (client.mirror.has_value() && client.mirror->star != INVALID_STAR &&
-            client.mirror->daily_recharge != INVALID_UNSIGNED_VAL)
+            client.mirror->daily_recharge != INVALID_BINARY_VAL)
             // all data are set, then calculate result
             co_await calc_under_construction(event);  // TODO: replace with calc_result
     } else {
@@ -350,6 +365,30 @@ task<void> calculator_select_click_handler(const select_click_t &event) {
         if (DEBUG) cerr << "Extractor quality selected: " << event.values[0] << endl;
 
         client.extractor_quality = get_quality(event.values[0]);
+    } else if (event.custom_id == CALC_SELECT_IDS[CALC_SELECT_VASE_STAR]) {
+        if (DEBUG) cerr << "Vase star selected: " << event.values[0] << endl;
+
+        if (!client.vase) client.vase.emplace();
+        client.vase->star = get_artifact_star(event.values[0]);
+    } else if (event.custom_id == CALC_SELECT_IDS[CALC_SELECT_VASE_DAILY_RECHARGE]) {
+        if (DEBUG) cerr << "Vase daily recharge selected: " << event.values[0] << endl;
+
+        if (!client.vase) client.vase.emplace();
+        client.vase->daily_recharge = get_binary_val(event.values[0]);
+    } else if (event.custom_id == CALC_SELECT_IDS[CALC_SELECT_VASE_TRANSMOG]) {
+        if (DEBUG) cerr << "Vase transmog selected: " << event.values[0] << endl;
+
+        client.vase_transmog = get_binary_val(event.values[0]);
+    } else if (event.custom_id == CALC_SELECT_IDS[CALC_SELECT_MIRROR_STAR]) {
+        if (DEBUG) cerr << "Mirror star selected: " << event.values[0] << endl;
+
+        if (!client.mirror) client.mirror.emplace();
+        client.mirror->star = get_artifact_star(event.values[0]);
+    } else if (event.custom_id == CALC_SELECT_IDS[CALC_SELECT_MIRROR_DAILY_RECHARGE]) {
+        if (DEBUG) cerr << "Mirror daily recharge selected: " << event.values[0] << endl;
+
+        if (!client.mirror) client.mirror.emplace();
+        client.mirror->daily_recharge = get_binary_val(event.values[0]);
     } else
         cerr << "Unhandled select event: " << event.custom_id << endl;
 
@@ -414,32 +453,18 @@ task<void> calc_cancel(const button_click_t &event) {
     co_return;
 }
 
-component major_stage_selectmenu_factory() {
-    component major_stage_selectmenu{component()
-                                         .set_type(cot_selectmenu)
-                                         .set_id(CALC_SELECT_IDS[CALC_SELECT_MAJOR_STAGE])
-                                         .set_placeholder("Select your major stage")
-                                         .set_required(true)};
+component selectmenu_factory(const string_view &id, const string_view &placeholder,
+                             const string_view options[], size_t num_options) {
+    component select_menu{component()
+                              .set_type(cot_selectmenu)
+                              .set_id(id)
+                              .set_placeholder(placeholder)
+                              .set_required(true)};
 
-    for (size_t i{0}; i < NUM_MAJOR_STAGES; ++i)
-        major_stage_selectmenu.add_select_option(
-            select_option(MAJOR_STAGE_STR[i], MAJOR_STAGE_STR[i], ""));
+    for (size_t i{0}; i < num_options; ++i)
+        select_menu.add_select_option(select_option(options[i], options[i], ""));
 
-    return major_stage_selectmenu;
-}
-
-component minor_stage_selectmenu_factory() {
-    component minor_stage_selectmenu{component()
-                                         .set_type(cot_selectmenu)
-                                         .set_id(CALC_SELECT_IDS[CALC_SELECT_MINOR_STAGE])
-                                         .set_placeholder("Select your minor stage")
-                                         .set_required(true)};
-
-    for (size_t i{0}; i < NUM_MINOR_STAGES; ++i)
-        minor_stage_selectmenu.add_select_option(
-            select_option(MINOR_STAGE_STR[i], MINOR_STAGE_STR[i], ""));
-
-    return minor_stage_selectmenu;
+    return select_menu;
 }
 
 task<void> calc_ask_stage(const button_click_t &event) {
@@ -452,10 +477,18 @@ task<void> calc_ask_stage(const button_click_t &event) {
                                       .set_content("Please select your major and minor stage")};
 
     static component major_stage_selectmenu{
-        component().set_type(cot_action_row).add_component_v2(major_stage_selectmenu_factory())};
+        component()
+            .set_type(cot_action_row)
+            .add_component_v2(selectmenu_factory(CALC_SELECT_IDS[CALC_SELECT_MAJOR_STAGE],
+                                                 "Select your major stage", MAJOR_STAGE_STR,
+                                                 NUM_MAJOR_STAGES))};
 
     static component minor_stage_selectmenu{
-        component().set_type(cot_action_row).add_component_v2(minor_stage_selectmenu_factory())};
+        component()
+            .set_type(cot_action_row)
+            .add_component_v2(selectmenu_factory(CALC_SELECT_IDS[CALC_SELECT_MINOR_STAGE],
+                                                 "Select your minor stage", MINOR_STAGE_STR,
+                                                 NUM_MINOR_STAGES))};
 
     static component next_button{component()
                                      .set_type(cot_button)
@@ -541,7 +574,19 @@ string print_client_info(const calculator_client_t &client) {
     if (client.fruit_quantity != INVALID_UNSIGNED_VAL)
         info += "- Myrimon Fruit Quantity: " + to_string(client.fruit_quantity) + "\n";
 
-    // TODO: handle artifacts
+    if (client.vase.has_value()) {
+        info += "- Vase:\n";
+        info += "  - Star: " + string{ARTIFACT_STAR_STR[client.vase->star]} + "\n";
+        info += "  - Daily Recharge: " + string{BINARY_VAL_STR[client.vase->daily_recharge]} + "\n";
+        info += "  - Transmog: " + string{BINARY_VAL_STR[client.vase_transmog]} + "\n";
+    }
+
+    if (client.mirror.has_value()) {
+        info += "- Mirror:\n";
+        info += "  - Star: " + string{ARTIFACT_STAR_STR[client.mirror->star]} + "\n";
+        info +=
+            "  - Daily Recharge: " + string{BINARY_VAL_STR[client.mirror->daily_recharge]} + "\n";
+    }
 
     return info + "\n\n";
 }
@@ -733,18 +778,6 @@ task<void> process_cosmosapsis(const slashcommand_t &event) {
     co_return;
 }
 
-component quality_selectmenu_factory(const string_view &id, const string_view &placeholder) {
-    component quality_selectmenu{component()
-                                     .set_type(cot_selectmenu)
-                                     .set_id(id)
-                                     .set_placeholder(placeholder)
-                                     .set_required(true)};
-    for (size_t i{0}; i < NUM_QUALITIES; ++i)
-        quality_selectmenu.add_select_option(select_option{QUALITY_STR[i], QUALITY_STR[i], ""});
-
-    return quality_selectmenu;
-}
-
 task<void> calc_ask_aura_gem(const button_click_t &event) {
     calc_sessions[event.command.usr.id].second.calc_state = CALC_ASK_AURA_GEM;
 
@@ -755,8 +788,9 @@ task<void> calc_ask_aura_gem(const button_click_t &event) {
     static component aura_gem_quality_selectmenu{
         component()
             .set_type(cot_action_row)
-            .add_component_v2(quality_selectmenu_factory(
-                CALC_SELECT_IDS[CALC_SELECT_AURA_GEM_QUALITY], "Select quality of your aura gem"))};
+            .add_component_v2(selectmenu_factory(CALC_SELECT_IDS[CALC_SELECT_AURA_GEM_QUALITY],
+                                                 "Select quality of your aura gem", QUALITY_STR,
+                                                 NUM_QUALITIES))};
 
     static component next_button{component()
                                      .set_type(cot_button)
@@ -1004,9 +1038,9 @@ task<void> calc_ask_extractor_quality(const button_click_t &event) {
     static component extractor_quality_selectmenu{
         component()
             .set_type(cot_action_row)
-            .add_component_v2(
-                quality_selectmenu_factory(CALC_SELECT_IDS[CALC_SELECT_EXTRACTOR_QUALITY],
-                                           "Select quality of your extractor"))};
+            .add_component_v2(selectmenu_factory(CALC_SELECT_IDS[CALC_SELECT_EXTRACTOR_QUALITY],
+                                                 "Select quality of your extractor", QUALITY_STR,
+                                                 NUM_QUALITIES))};
 
     static component next_button{component()
                                      .set_type(cot_button)
@@ -1017,7 +1051,10 @@ task<void> calc_ask_extractor_quality(const button_click_t &event) {
     component text_display{
         component()
             .set_type(cot_text_display)
-            .set_content(client_info + "Please select the quality of your extractor. ")};
+            .set_content(client_info +
+                         "Please select the quality of your extractor **WHEN YOU "
+                         "INTEND TO EAT YOUR MYRIMON FRUITS** (your current extractor quality "
+                         "might be lower than the one you select): ")};
 
     if (DEBUG) cerr << "Sending extractor quality selection message..." << endl;
 
@@ -1040,7 +1077,7 @@ task<void> calc_ask_extractor_quality(const button_click_t &event) {
     co_return;
 }
 
-task<void> calc_ask_extractor_node_lvl(const button_click_t &event) {
+task<void> calc_ask_extractor_node(const button_click_t &event) {
     calc_sessions[event.command.usr.id].second.calc_state = CALC_ASK_EXTRACTOR_NODE_LVL;
 
     if (DEBUG) cerr << "Asking for extractor node levels..." << endl;
@@ -1052,16 +1089,16 @@ task<void> calc_ask_extractor_node_lvl(const button_click_t &event) {
             .set_type(cot_text_display)
             .set_content(
                 client_info +
-                "Please indicate the levels of the following extractor nodes"
-                "**WHEN YOU INTEND TO EAT YOUR MYRIMON FRUITS**"
-                " (your extractor node levels might be lower than the numbers you enter):\n"
+                "Please indicate the levels of the following extractor nodes "
+                "**WHEN YOU INTEND TO EAT YOUR MYRIMON FRUITS** "
+                "(your current extractor node levels might be lower than the numbers you enter):\n"
                 "- Cultivation XP \n"
                 "- Quality \n"
                 "- Gush \n"
                 "via `/calc extractor` command.\n\n"
                 "Note that the levels must be between 0 and 30.\n\n"
                 "For example, if you intend to eat your myrimon fruits when all extractor nodes "
-                "are at leve 25, you should enter `25 25 25`.\n\n"
+                "are at level 25, you should enter `25 25 25`.\n\n"
                 "We will continue once your input is received.")};
 
     co_await event.co_edit_response(
@@ -1080,7 +1117,7 @@ task<void> calc_ask_extractor_node_lvl(const button_click_t &event) {
     co_return;
 }
 
-task<void> process_extractor_node_lvl(const slashcommand_t &event) {
+task<void> process_extractor_node(const slashcommand_t &event) {
     optional<pair<message, calculator_client_t> *> user{co_await verify_user(event)};
 
     if (!user) co_return;
@@ -1137,33 +1174,310 @@ task<void> process_extractor_node_lvl(const slashcommand_t &event) {
     co_return;
 }
 
-task<void> calc_ask_myrimon_fruit(const button_click_t &event) {
-    co_await calc_under_construction(event);
+task<void> calc_ask_myrimon(const button_click_t &event) {
+    calc_sessions[event.command.usr.id].second.calc_state = CALC_ASK_MYRIMON;
+
+    if (DEBUG) cerr << "Asking for myrimon fruit quantity..." << endl;
+
+    string client_info{print_client_info(calc_sessions[event.command.usr.id].second)};
+
+    component text_display{
+        component()
+            .set_type(cot_text_display)
+            .set_content(client_info + "Please input the number of myrimon fruits you plan to eat "
+                                       "via `/calc myrimon` command.\n\n"
+                                       "We will continue once your input is received.")};
+
+    co_await event.co_edit_response(
+        message()
+            .set_flags(m_using_components_v2)
+            .add_component_v2(
+                component()
+                    // a container
+                    .set_type(cot_container)
+                    // ...with a text display
+                    .add_component_v2(text_display)
+                    // ...and a button
+                    .add_component_v2(
+                        component().set_type(cot_action_row).add_component_v2(cancel_button))));
+
     co_return;
 }
 
-task<void> process_myrimon_fruit(const slashcommand_t &event) {
-    co_await event.co_reply(message("This command is not implemented yet.").set_flags(m_ephemeral));
+task<void> process_myrimon(const slashcommand_t &event) {
+    optional<pair<message, calculator_client_t> *> user{co_await verify_user(event)};
+
+    if (!user) co_return;
+
+    // acknowledge the slash command
+    co_await event.co_reply("input received, processing...");
+
+    calculator_client_t &client{user.value()->second};
+    client.fruit_quantity = static_cast<unsigned short>(
+        get<int64_t>(event.get_parameter(string{CALC_SUBCMD_PARAM[CALC_SUBCMD_MYRIMON][0][0]})));
+
+    if (client.calc_state == CALC_ASK_MYRIMON) {
+        // if the user is in the myrimon fruit state, then we can edit the message
+        string client_info{print_client_info(calc_sessions[event.command.usr.id].second)};
+
+        component text_display{component()
+                                   .set_type(cot_text_display)
+                                   .set_content(client_info +
+                                                "Please click **NEXT** to continue, or use `/calc "
+                                                "myrimon` to update your progress.\n\n")};
+
+        static component next_button{component()
+                                         .set_type(cot_button)
+                                         .set_style(cos_primary)
+                                         .set_label("NEXT")
+                                         .set_id(CALC_BUTTON_IDS[CALC_BUTTON_MYRIMON])};
+
+        message msg{user.value()->first};
+
+        // edit the message
+        msg.components.clear();
+        msg.add_component_v2(component()
+                                 // a container
+                                 .set_type(cot_container)
+                                 // ...with a text display
+                                 .add_component_v2(text_display)
+                                 // ...and two buttons
+                                 .add_component_v2(component()
+                                                       .set_type(cot_action_row)
+                                                       .add_component_v2(next_button)
+                                                       .add_component_v2(cancel_button)));
+
+        co_await bot.co_message_edit(msg);
+    }
+
+    // otherwise proceed silently
+    event.co_delete_original_response();
+
     co_return;
 }
 
 task<void> calc_ask_vase_own(const button_click_t &event) {
-    co_await calc_under_construction(event);
+    calc_sessions[event.command.usr.id].second.calc_state = CALC_ASK_VASE_OWN;
+
+    if (DEBUG) cerr << "Asking for vase ownership..." << endl;
+
+    string client_info{print_client_info(calc_sessions[event.command.usr.id].second)};
+
+    component text_display{
+        component()
+            .set_type(cot_text_display)
+            .set_content(client_info + "Do you own a vase? Please click **YES** or **NO** below.")};
+
+    static component yes_button{component()
+                                    .set_type(cot_button)
+                                    .set_style(dpp::cos_success)
+                                    .set_label("YES")
+                                    .set_id(CALC_BUTTON_IDS[CALC_BUTTON_VASE_YES])};
+
+    static component no_button{component()
+                                   .set_type(cot_button)
+                                   .set_style(dpp::cos_secondary)
+                                   .set_label("NO")
+                                   .set_id(CALC_BUTTON_IDS[CALC_BUTTON_VASE_NO])};
+
+    co_await event.co_edit_response(
+        message()
+            .set_flags(m_using_components_v2)
+            .add_component_v2(component()
+                                  // a container
+                                  .set_type(cot_container)
+                                  // ...with a text display
+                                  .add_component_v2(text_display)
+                                  // ...and three buttons
+                                  .add_component_v2(component()
+                                                        .set_type(cot_action_row)
+                                                        .add_component_v2(yes_button)
+                                                        .add_component_v2(no_button)
+                                                        .add_component_v2(cancel_button))));
+
     co_return;
 }
 
 task<void> calc_ask_vase_detail(const button_click_t &event) {
-    co_await calc_under_construction(event);
+    calc_sessions[event.command.usr.id].second.calc_state = CALC_ASK_VASE_DETAIL;
+
+    if (DEBUG) cerr << "Asking for vase detail..." << endl;
+
+    string client_info{print_client_info(calc_sessions[event.command.usr.id].second)};
+
+    static component vase_star_selectmenu{
+        component()
+            .set_type(cot_action_row)
+            .add_component_v2(selectmenu_factory(CALC_SELECT_IDS[CALC_SELECT_VASE_STAR],
+                                                 "Select star of your vase", ARTIFACT_STAR_STR,
+                                                 NUM_ARTIFACT_STARS))};
+
+    static component vase_daily_recharge_selectmenu{
+        component()
+            .set_type(cot_action_row)
+            .add_component_v2(selectmenu_factory(CALC_SELECT_IDS[CALC_SELECT_VASE_DAILY_RECHARGE],
+                                                 "Do you use fateum to recharge your vase daily?",
+                                                 BINARY_VAL_STR, NUM_YES_NO))};
+
+    static component vase_transmog_selectmenu{
+        component()
+            .set_type(cot_action_row)
+            .add_component_v2(selectmenu_factory(CALC_SELECT_IDS[CALC_SELECT_VASE_TRANSMOG],
+                                                 "Do you have the transmog for your vase?",
+                                                 BINARY_VAL_STR, NUM_YES_NO))};
+
+    static component next_button{component()
+                                     .set_type(cot_button)
+                                     .set_style(dpp::cos_primary)
+                                     .set_label("NEXT")
+                                     .set_id(CALC_BUTTON_IDS[CALC_BUTTON_VASE_DETAIL])};
+
+    component client_info_and_select_star_text_display{
+        component()
+            .set_type(cot_text_display)
+            .set_content(client_info + "Select the star of your vase:")};
+
+    static component select_daily_recharge_text_display{
+        component()
+            .set_type(cot_text_display)
+            .set_content("Do you use fateum to recharge your vase daily?")};
+
+    static component select_transmog_text_display{
+        component()
+            .set_type(cot_text_display)
+            .set_content("Do you have the transmog for your vase?")};
+
+    if (DEBUG) cerr << "Sending vase detail selection message..." << endl;
+
+    co_await event.co_edit_response(
+        message()
+            .set_flags(m_using_components_v2)
+            // a container
+            .add_component_v2(component()
+                                  .set_type(cot_container)
+                                  // ...with a text display
+                                  .add_component_v2(client_info_and_select_star_text_display)
+                                  // ...and a select menu for vase star
+                                  .add_component_v2(vase_star_selectmenu)
+                                  // ...and a text display for daily recharge
+                                  .add_component_v2(select_daily_recharge_text_display)
+                                  // ...and a select menu for daily recharge
+                                  .add_component_v2(vase_daily_recharge_selectmenu)
+                                  // ...and a text display for transmog
+                                  .add_component_v2(select_transmog_text_display)
+                                  // ...and a select menu for transmog
+                                  .add_component_v2(vase_transmog_selectmenu)
+                                  // ...and an action row with two buttons
+                                  .add_component_v2(component()
+                                                        .set_type(cot_action_row)
+                                                        .add_component_v2(next_button)
+                                                        .add_component_v2(cancel_button))));
+
     co_return;
 }
 
 task<void> calc_ask_mirror_own(const button_click_t &event) {
-    co_await calc_under_construction(event);
+    calc_sessions[event.command.usr.id].second.calc_state = CALC_ASK_MIRROR_OWN;
+
+    if (DEBUG) cerr << "Asking for mirror ownership..." << endl;
+
+    string client_info{print_client_info(calc_sessions[event.command.usr.id].second)};
+
+    component text_display{
+        component()
+            .set_type(cot_text_display)
+            .set_content(client_info +
+                         "Do you own a mirror? Please click **YES** or **NO** below.")};
+
+    static component yes_button{component()
+                                    .set_type(cot_button)
+                                    .set_style(dpp::cos_success)
+                                    .set_label("YES")
+                                    .set_id(CALC_BUTTON_IDS[CALC_BUTTON_MIRROR_YES])};
+
+    static component no_button{component()
+                                   .set_type(cot_button)
+                                   .set_style(dpp::cos_secondary)
+                                   .set_label("NO")
+                                   .set_id(CALC_BUTTON_IDS[CALC_BUTTON_MIRROR_NO])};
+
+    co_await event.co_edit_response(
+        message()
+            .set_flags(m_using_components_v2)
+            .add_component_v2(component()
+                                  // a container
+                                  .set_type(cot_container)
+                                  // ...with a text display
+                                  .add_component_v2(text_display)
+                                  // ...and three buttons
+                                  .add_component_v2(component()
+                                                        .set_type(cot_action_row)
+                                                        .add_component_v2(yes_button)
+                                                        .add_component_v2(no_button)
+                                                        .add_component_v2(cancel_button))));
+
     co_return;
 }
 
 task<void> calc_ask_mirror_detail(const button_click_t &event) {
-    co_await calc_under_construction(event);
+    calc_sessions[event.command.usr.id].second.calc_state = CALC_ASK_MIRROR_DETAIL;
+
+    if (DEBUG) cerr << "Asking for mirror detail..." << endl;
+
+    string client_info{print_client_info(calc_sessions[event.command.usr.id].second)};
+
+    static component mirror_star_selectmenu{
+        component()
+            .set_type(cot_action_row)
+            .add_component_v2(selectmenu_factory(CALC_SELECT_IDS[CALC_SELECT_MIRROR_STAR],
+                                                 "Select star of your mirror", ARTIFACT_STAR_STR,
+                                                 NUM_ARTIFACT_STARS))};
+
+    static component mirror_daily_recharge_selectmenu{
+        component()
+            .set_type(cot_action_row)
+            .add_component_v2(selectmenu_factory(CALC_SELECT_IDS[CALC_SELECT_MIRROR_DAILY_RECHARGE],
+                                                 "Do you use fateum to recharge your mirror daily?",
+                                                 BINARY_VAL_STR, NUM_YES_NO))};
+
+    static component next_button{component()
+                                     .set_type(cot_button)
+                                     .set_style(dpp::cos_primary)
+                                     .set_label("NEXT")
+                                     .set_id(CALC_BUTTON_IDS[CALC_BUTTON_MIRROR_DETAIL])};
+
+    component client_info_and_select_star_text_display{
+        component()
+            .set_type(cot_text_display)
+            .set_content(client_info + "Select the star of your mirror:")};
+
+    static component select_daily_recharge_text_display{
+        component()
+            .set_type(cot_text_display)
+            .set_content("Do you use fateum to recharge your mirror daily?")};
+
+    if (DEBUG) cerr << "Sending mirror detail selection message..." << endl;
+
+    co_await event.co_edit_response(
+        message()
+            .set_flags(m_using_components_v2)
+            // a container
+            .add_component_v2(component()
+                                  .set_type(cot_container)
+                                  // ...with a text display
+                                  .add_component_v2(client_info_and_select_star_text_display)
+                                  // ...and a select menu for mirror star
+                                  .add_component_v2(mirror_star_selectmenu)
+                                  // ...and a text display for daily recharge
+                                  .add_component_v2(select_daily_recharge_text_display)
+                                  // ...and a select menu for daily recharge
+                                  .add_component_v2(mirror_daily_recharge_selectmenu)
+                                  // ...and an action row with two buttons
+                                  .add_component_v2(component()
+                                                        .set_type(cot_action_row)
+                                                        .add_component_v2(next_button)
+                                                        .add_component_v2(cancel_button))));
+
     co_return;
 }
 

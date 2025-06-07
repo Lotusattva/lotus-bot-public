@@ -18,7 +18,7 @@ enum calc_state_t {
     CALC_ASK_PILL,     // attempt, how many of each quality, bonus
     CALC_ASK_EXTRACTOR_QUALITY,
     CALC_ASK_EXTRACTOR_NODE_LVL,
-    CALC_ASK_MYRIMON_FRUIT,
+    CALC_ASK_MYRIMON,
     CALC_ASK_VASE_OWN,  // whether the user owns a vase
     CALC_ASK_VASE_DETAIL,
     CALC_ASK_MIRROR_OWN,  // whether the user owns a mirror
@@ -53,6 +53,25 @@ constexpr inline string_view const CALC_STATE_IDS[NUM_CALC_STATES]{
 #define INVALID_EXTRACTOR_NODE_LVL 31
 #define INVALID_STAR NUM_ARTIFACT_STARS  // default to invalid, should be in the range [0, 5]
 
+enum binary_t {
+    NO,
+    YES,
+    NUM_YES_NO  // used for invalid yes/no
+};
+
+#define INVALID_BINARY_VAL NUM_YES_NO
+
+inline constexpr string_view BINARY_VAL_STR[NUM_YES_NO]{"no", "yes"};
+
+constexpr binary_t get_binary_val(const string_view &id) {
+    if (id == BINARY_VAL_STR[NO])
+        return NO;
+    else if (id == BINARY_VAL_STR[YES])
+        return YES;
+    else
+        return NUM_YES_NO;  // invalid yes/no
+}
+
 /**
  * A struct that stores the necessary information for an artifact.
  *
@@ -62,8 +81,8 @@ constexpr inline string_view const CALC_STATE_IDS[NUM_CALC_STATES]{
 struct artifact_t {
     unsigned short star{INVALID_STAR};  // default to invalid, should be in the range [0, 5]
 
-    // invalid(0): has not been set, 1: no daily recharge, 2: daily recharge
-    unsigned short daily_recharge{INVALID_UNSIGNED_VAL};
+    // 0: no daily recharge, 1: daily recharge, 2 (invalid binary value): not set
+    binary_t daily_recharge{INVALID_BINARY_VAL};
 };
 
 /**
@@ -123,8 +142,8 @@ struct calculator_client_t {
 
     // artifacts
     optional<artifact_t> vase{nullopt};
-    // invalid(0): has not been set, 1: no transmog, 2: has vase transmog
-    unsigned short vase_transmog{INVALID_UNSIGNED_VAL};
+    // 0: no transmog, 1: has vase transmog, 2 (invalid binary value): not set
+    binary_t vase_transmog{INVALID_BINARY_VAL};
     optional<artifact_t> mirror{nullopt};
 };
 
@@ -176,7 +195,7 @@ enum calc_button_t {
     CALC_BUTTON_PILL,
     CALC_BUTTON_EXTRACTOR_QUALITY,
     CALC_BUTTON_EXTRACTOR_NODE,
-    CALC_BUTTON_FRUIT,
+    CALC_BUTTON_MYRIMON,
     CALC_BUTTON_VASE_YES,
     CALC_BUTTON_VASE_NO,
     CALC_BUTTON_VASE_DETAIL,
@@ -191,7 +210,7 @@ constexpr inline string_view const CALC_BUTTON_IDS[NUM_CALC_BUTTONS]{
     "calc_start",          "calc_cancel",        "calc_stage",
     "calc_percent",        "calc_cosmosapsis",   "calc_aura_gem",
     "calc_respira",        "calc_pill",          "calc_extractor_quality",
-    "calc_extractor_node", "calc_fruit",         "calc_vase_yes",
+    "calc_extractor_node", "calc_myrimon",       "calc_vase_yes",
     "calc_vase_no",        "calc_vase_detail",   "calc_mirror_yes",
     "calc_mirror_no",      "calc_mirror_detail",
 };
@@ -208,6 +227,7 @@ enum CALC_SUBCMD_t {
     CALC_SUBCMD_RESPIRA,
     CALC_SUBCMD_PILL,
     CALC_SUBCMD_EXTRACTOR,
+    CALC_SUBCMD_MYRIMON,
 
     NUM_CALC_SUBCMDS
 };
@@ -218,7 +238,8 @@ constexpr inline string_view CALC_SUBCMDS[NUM_CALC_SUBCMDS][SUBCOMMAND_AND_DESCR
     {"cosmosapsis", "report cosmosapsis during an interactive calc session"},
     {"respira", "report respira during an interactive calc session"},
     {"pill", "report pill data during an interactive calc session"},
-    {"extractor", "report extractor node levels during an interactive calc session"}};
+    {"extractor", "report extractor node levels during an interactive calc session"},
+    {"myrimon", "report myrimon fruit data during an interactive calc session"}};
 
 constexpr inline unsigned short CALC_SUBCMD_NUM_PARAM[NUM_CALC_SUBCMDS]{
     0,  // start
@@ -227,6 +248,7 @@ constexpr inline unsigned short CALC_SUBCMD_NUM_PARAM[NUM_CALC_SUBCMDS]{
     2,  // respira
     5,  // pill
     3,  // extractor
+    1,  // myrimon
 };
 
 constexpr inline string_view **CALC_SUBCMD_PARAM[NUM_CALC_SUBCMDS]{
@@ -257,7 +279,8 @@ constexpr inline string_view **CALC_SUBCMD_PARAM[NUM_CALC_SUBCMDS]{
         (string_view[SUBCOMMAND_AND_DESCRIPTION]){"culti_xp", "level of the cultivation xp node"},
         (string_view[SUBCOMMAND_AND_DESCRIPTION]){"quality", "level of the extractor quality node"},
         (string_view[SUBCOMMAND_AND_DESCRIPTION]){"gush", "level of the extractor gush node"}},
-};
+    (string_view * [CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_MYRIMON]]){
+        (string_view[SUBCOMMAND_AND_DESCRIPTION]){"num_myrimon", "number of myrimon fruits"}}};
 
 // Register slashcommands for the calculator
 command_option calculator_commands();
@@ -294,9 +317,9 @@ inline const component cancel_button{component()
                                          .set_style(cos_danger)
                                          .set_label("CANCEL")
                                          .set_id(CALC_BUTTON_IDS[CALC_BUTTON_CANCEL])};
-component major_stage_selectmenu_factory();
-component minor_stage_selectmenu_factory();
-component quality_selectmenu_factory(const string_view &id, const string_view &placeholder);
+
+component selectmenu_factory(const string_view &id, const string_view &placeholder,
+                             const string_view options[], size_t num_options);
 
 ///////// Below are calculator events/states
 
@@ -322,11 +345,11 @@ task<void> process_pill(const slashcommand_t &event);
 
 task<void> calc_ask_extractor_quality(const button_click_t &event);
 
-task<void> calc_ask_extractor_node_lvl(const button_click_t &event);
-task<void> process_extractor_node_lvl(const slashcommand_t &event);
+task<void> calc_ask_extractor_node(const button_click_t &event);
+task<void> process_extractor_node(const slashcommand_t &event);
 
-task<void> calc_ask_myrimon_fruit(const button_click_t &event);
-task<void> process_myrimon_fruit(const slashcommand_t &event);
+task<void> calc_ask_myrimon(const button_click_t &event);
+task<void> process_myrimon(const slashcommand_t &event);
 
 task<void> calc_ask_vase_own(const button_click_t &event);
 task<void> calc_ask_vase_detail(const button_click_t &event);
