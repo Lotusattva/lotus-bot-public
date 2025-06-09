@@ -81,7 +81,7 @@ struct calculator_client_t {
     quality_t aura_gem_quality{INVALID_QUALITY};  // default to invalid
 
     // respira
-    exp_t respira_exp{INVALID_UNSIGNED_VAL};  // default to 0, should be a positive number
+    double respira_bonus{INVALID_DOUBLE_VAL};  // default to invalid, should be a non-negative number
     unsigned short daily_respira_attempts{
         INVALID_UNSIGNED_VAL};  // default to 0, should be a positive number
 

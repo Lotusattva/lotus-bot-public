@@ -174,8 +174,8 @@ string print_client_info(const calculator_client_t &client) {
     if (client.aura_gem_quality != INVALID_QUALITY)
         info += "- Aura Gem Quality: " + string{QUALITY_STR[client.aura_gem_quality]} + "\n";
 
-    if (client.respira_exp != INVALID_UNSIGNED_VAL)
-        info += "- Respira Exp: " + to_string(client.respira_exp) + "\n";
+    if (client.respira_bonus != INVALID_DOUBLE_VAL)
+        info += "- Respira Bonus: " + to_string(client.respira_bonus) + "%\n";
 
     if (client.daily_respira_attempts != INVALID_UNSIGNED_VAL)
         info += "- Daily Respira Attempts: " + to_string(client.daily_respira_attempts) + "\n";
@@ -466,9 +466,13 @@ task<void> calc_ask_respira(const button_click_t &event) {
     component text_display{
         component()
             .set_type(cot_text_display)
-            .set_content(client_info + "Please input the amount of exp per respira attempt and "
+            .set_content(client_info + "Please input your **TOTAL** respira bonus in percent and "
                                        "the number of daily respira attempts via `/calc respira` "
                                        "command.\n\n"
+                                       "To check your respira bonuses, click on \"Compare BR\" button on another player's profile, then \n"
+                                       "Click on \"Details\" button on the \"Technique\" section, and click on \"Details\" button that appears on top right of the panel. Scroll down and record the percentage of your \"Respira Effect\"\n"
+                                       "Repeat this process for \"Curio Collection\" and \"Immortal Bonus\" sections. Then, report the *sum* of these percentages via the command.\n"
+                                       "If the total respira bonus is 233% percent, enter 233. \n\n"
                                        "We will continue once your input is received.")};
 
     co_await event.co_edit_response(
@@ -496,8 +500,8 @@ task<void> process_respira(const slashcommand_t &event) {
     auto reply{event.co_reply("input received, processing...")};
 
     calculator_client_t &client{user.value()->second};
-    client.respira_exp = static_cast<exp_t>(
-        get<int64_t>(event.get_parameter(string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][0][0]})));
+    client.respira_bonus = 
+        get<double>(event.get_parameter(string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][0][0]}));
     client.daily_respira_attempts = static_cast<unsigned>(
         get<int64_t>(event.get_parameter(string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][1][0]})));
 

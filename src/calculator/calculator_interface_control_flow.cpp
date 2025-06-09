@@ -1,5 +1,6 @@
 #include "../global.hpp"
 #include "calculator_interface.hpp"
+#include "calculator_types.hpp"
 
 command_option calculator_commands() {
     return command_option{co_sub_command_group, string{CALC_MAIN_COMMAND[0]},
@@ -33,7 +34,7 @@ command_option calculator_commands() {
                         // Parameters
                         // 1. respira exp per attempt
                         .add_option(command_option{
-                            co_integer, string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][0][0]},
+                            co_number, string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][0][0]},
                             string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][0][1]}, true}
                                         .set_min_value(1))
                         // 2. number of daily respira attempts
@@ -193,7 +194,7 @@ task<void> calculator_button_click_handler(const button_click_t &event) {
     else if (id == CALC_BUTTON_IDS[CALC_BUTTON_AURA_GEM]) {
         if (client.aura_gem_quality == INVALID_QUALITY)
             co_return;  // do nothing since user has not selected aura gem quality
-        else if (client.respira_exp == INVALID_UNSIGNED_VAL ||
+        else if (client.respira_bonus == INVALID_DOUBLE_VAL ||
                  client.daily_respira_attempts == INVALID_UNSIGNED_VAL)
             // ask for respira if not set
             co_await calc_ask_respira(event);

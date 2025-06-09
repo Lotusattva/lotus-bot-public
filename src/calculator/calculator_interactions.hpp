@@ -110,8 +110,8 @@ constexpr inline string_view **CALC_SUBCMD_PARAM[NUM_CALC_SUBCMDS]{
      [CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_COSMOSAPSIS]]){(string_view[SUBCOMMAND_AND_DESCRIPTION]){
         "cosmosapsis_val", "cosmosapsis displayed in your abode"}},
     (string_view * [CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_RESPIRA]]){
-        (string_view[SUBCOMMAND_AND_DESCRIPTION]){"respira_exp_per_attempt",
-                                                  "respira exp per attempt"},
+        (string_view[SUBCOMMAND_AND_DESCRIPTION]){"total_respira_bonus",
+                                                  "total respira bonus in percent"},
         (string_view[SUBCOMMAND_AND_DESCRIPTION]){"num_daily_respira_attempts",
                                                   "number of daily respira attempts"}},
     (string_view * [CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_PILL]]){
