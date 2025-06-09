@@ -7,7 +7,7 @@
 An interactive calculator that produces an estimate of how much longer it takes to breakthrough to the next major cultivation stage.
 
 ## Documentation
-- [ ] Add section about respira
+- [x] Add section about respira
 - [ ] Refine
 
 ## Frontend
@@ -26,7 +26,7 @@ An interactive calculator that produces an estimate of how much longer it takes 
 - [x] Message ownership (for preventing other users from tempering with inputs of the command-initiating user)
 - [x] Prevent a user from starting multiple calculator sessions
 - [x] Placeholder functions
-- [ ] Handle asynchronous calling of slashcommands during a session
+- [x] Handle asynchronous calling of slashcommands during a session
 - [ ] Auto clean up stale calculator sessions
 - [x] Define calculator constants
 - [ ] Implement calculator logic
@@ -43,5 +43,5 @@ An interactive calculator that produces an estimate of how much longer it takes 
 - [ ] Custom server role which allows users to opt-in for notifications
 
 ## Backend
-- [ ] Refactor project structure for better organization
+- [x] Refactor project structure for better organization
 - [ ] Take advantage of caching to speed up the processes
