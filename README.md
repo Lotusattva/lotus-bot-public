@@ -17,7 +17,5 @@ An interactive calculator that produces an estimate of how much longer it takes 
 
 
 
-## Funny emoji shenanigans (under construction)
+## Funny emoji shenanigans
 Some servers have a running joke about feet fetish, thus some members have requested a function to let the bot spits out feet emojis based on commands
-
-***Not yet implemented!!!*** I will start working on this after construction is done.
