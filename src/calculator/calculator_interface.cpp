@@ -86,15 +86,15 @@ task<void> calc_cancel(const button_click_t &event) {
 }
 
 component selectmenu_factory(const string_view &id, const string_view &placeholder,
-                             const string_view options[], size_t num_options) {
+                             const span<const string_view> &options) {
     component select_menu{component()
                               .set_type(cot_selectmenu)
                               .set_id(id)
                               .set_placeholder(placeholder)
                               .set_required(true)};
 
-    for (size_t i{0}; i < num_options; ++i)
-        select_menu.add_select_option(select_option(options[i], options[i], ""));
+    for (const string_view &option : options)
+        select_menu.add_select_option(select_option(option, option, ""));
 
     return select_menu;
 }
@@ -112,15 +112,13 @@ task<void> calc_ask_stage(const button_click_t &event) {
         component()
             .set_type(cot_action_row)
             .add_component_v2(selectmenu_factory(CALC_SELECT_IDS[CALC_SELECT_MAJOR_STAGE],
-                                                 "Select your major stage", MAJOR_STAGE_STR,
-                                                 NUM_MAJOR_STAGES))};
+                                                 "Select your major stage", MAJOR_STAGE_STR))};
 
     static component minor_stage_selectmenu{
         component()
             .set_type(cot_action_row)
             .add_component_v2(selectmenu_factory(CALC_SELECT_IDS[CALC_SELECT_MINOR_STAGE],
-                                                 "Select your minor stage", MINOR_STAGE_STR,
-                                                 NUM_MINOR_STAGES))};
+                                                 "Select your minor stage", MINOR_STAGE_STR))};
 
     static component next_button{component()
                                      .set_type(cot_button)
@@ -421,8 +419,7 @@ task<void> calc_ask_aura_gem(const button_click_t &event) {
         component()
             .set_type(cot_action_row)
             .add_component_v2(selectmenu_factory(CALC_SELECT_IDS[CALC_SELECT_AURA_GEM_QUALITY],
-                                                 "Select quality of your aura gem", QUALITY_STR,
-                                                 NUM_QUALITIES))};
+                                                 "Select quality of your aura gem", QUALITY_STR))};
 
     static component next_button{component()
                                      .set_type(cot_button)
@@ -466,14 +463,19 @@ task<void> calc_ask_respira(const button_click_t &event) {
     component text_display{
         component()
             .set_type(cot_text_display)
-            .set_content(client_info + "Please input your **TOTAL** respira bonus in percent and "
-                                       "the number of daily respira attempts via `/calc respira` "
-                                       "command.\n\n"
-                                       "To check your respira bonuses, click on \"Compare BR\" button on another player's profile, then \n"
-                                       "Click on \"Details\" button on the \"Technique\" section, and click on \"Details\" button that appears on top right of the panel. Scroll down and record the percentage of your \"Respira Effect\"\n"
-                                       "Repeat this process for \"Curio Collection\" and \"Immortal Bonus\" sections. Then, report the *sum* of these percentages via the command.\n"
-                                       "If the total respira bonus is 233% percent, enter 233. \n\n"
-                                       "We will continue once your input is received.")};
+            .set_content(client_info +
+                         "Please input your **TOTAL** respira bonus in percent and "
+                         "the number of daily respira attempts via `/calc respira` "
+                         "command.\n\n"
+                         "To check your respira bonuses, click on \"Compare BR\" button on another "
+                         "player's profile, then \n"
+                         "Click on \"Details\" button on the \"Technique\" section, and click on "
+                         "\"Details\" button that appears on top right of the panel. Scroll down "
+                         "and record the percentage of your \"Respira Effect\"\n"
+                         "Repeat this process for \"Curio Collection\" and \"Immortal Bonus\" "
+                         "sections. Then, report the *sum* of these percentages via the command.\n"
+                         "If the total respira bonus is 233% percent, enter 233. \n\n"
+                         "We will continue once your input is received.")};
 
     co_await event.co_edit_response(
         message()
@@ -500,7 +502,7 @@ task<void> process_respira(const slashcommand_t &event) {
     auto reply{event.co_reply("input received, processing...")};
 
     calculator_client_t &client{user.value()->second};
-    client.respira_bonus = 
+    client.respira_bonus =
         get<double>(event.get_parameter(string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][0][0]}));
     client.daily_respira_attempts = static_cast<unsigned>(
         get<int64_t>(event.get_parameter(string{CALC_SUBCMD_PARAM[CALC_SUBCMD_RESPIRA][1][0]})));
@@ -675,8 +677,7 @@ task<void> calc_ask_extractor_quality(const button_click_t &event) {
         component()
             .set_type(cot_action_row)
             .add_component_v2(selectmenu_factory(CALC_SELECT_IDS[CALC_SELECT_EXTRACTOR_QUALITY],
-                                                 "Select quality of your extractor", QUALITY_STR,
-                                                 NUM_QUALITIES))};
+                                                 "Select quality of your extractor", QUALITY_STR))};
 
     static component next_button{component()
                                      .set_type(cot_button)
@@ -945,22 +946,21 @@ task<void> calc_ask_vase_detail(const button_click_t &event) {
         component()
             .set_type(cot_action_row)
             .add_component_v2(selectmenu_factory(CALC_SELECT_IDS[CALC_SELECT_VASE_STAR],
-                                                 "Select star of your vase", ARTIFACT_STAR_STR,
-                                                 NUM_ARTIFACT_STARS))};
+                                                 "Select star of your vase", ARTIFACT_STAR_STR))};
 
     static component vase_daily_recharge_selectmenu{
         component()
             .set_type(cot_action_row)
             .add_component_v2(selectmenu_factory(CALC_SELECT_IDS[CALC_SELECT_VASE_DAILY_RECHARGE],
                                                  "Do you use fateum to recharge your vase daily?",
-                                                 BINARY_VAL_STR, NUM_YES_NO))};
+                                                 BINARY_VAL_STR))};
 
     static component vase_transmog_selectmenu{
         component()
             .set_type(cot_action_row)
             .add_component_v2(selectmenu_factory(CALC_SELECT_IDS[CALC_SELECT_VASE_TRANSMOG],
                                                  "Do you have the transmog for your vase?",
-                                                 BINARY_VAL_STR, NUM_YES_NO))};
+                                                 BINARY_VAL_STR))};
 
     static component next_button{component()
                                      .set_type(cot_button)
@@ -1066,15 +1066,14 @@ task<void> calc_ask_mirror_detail(const button_click_t &event) {
         component()
             .set_type(cot_action_row)
             .add_component_v2(selectmenu_factory(CALC_SELECT_IDS[CALC_SELECT_MIRROR_STAR],
-                                                 "Select star of your mirror", ARTIFACT_STAR_STR,
-                                                 NUM_ARTIFACT_STARS))};
+                                                 "Select star of your mirror", ARTIFACT_STAR_STR))};
 
     static component mirror_daily_recharge_selectmenu{
         component()
             .set_type(cot_action_row)
             .add_component_v2(selectmenu_factory(CALC_SELECT_IDS[CALC_SELECT_MIRROR_DAILY_RECHARGE],
                                                  "Do you use fateum to recharge your mirror daily?",
-                                                 BINARY_VAL_STR, NUM_YES_NO))};
+                                                 BINARY_VAL_STR))};
 
     static component next_button{component()
                                      .set_type(cot_button)

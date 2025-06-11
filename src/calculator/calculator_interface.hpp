@@ -90,8 +90,9 @@ inline const component cancel_button{component()
                                          .set_label("CANCEL")
                                          .set_id(CALC_BUTTON_IDS[CALC_BUTTON_CANCEL])};
 
+
 component selectmenu_factory(const string_view &id, const string_view &placeholder,
-                             const string_view options[], size_t num_options);
+                             const span<const string_view> &options);
 
 ///////// Below are calculator events/states
 

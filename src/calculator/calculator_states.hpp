@@ -2,6 +2,7 @@
 #define CALCULATOR_STATES_HPP
 
 #include <string_view>
+#include <array>
 
 using namespace std;
 
@@ -24,7 +25,7 @@ enum calc_state_t {
     NUM_CALC_STATES
 };
 
-constexpr inline string_view const CALC_STATE_IDS[NUM_CALC_STATES]{
+constexpr inline array<string_view, NUM_CALC_STATES> CALC_STATE_IDS{
     "calc_cancel",
     "calc_ask_stage",
     "calc_ask_percent_progress",
