@@ -132,7 +132,7 @@ The "CultiXP" node introduces a multiplicative bonus with two additive component
 
 1. The first component is calculated based on the level of the "CultiXP" node as follows:
 
-    $$ CultiXPLevelMult = CultiXPNodeLevel \times CultiXPPerLevelMult $$
+    $$CultiXPLevelMult = CultiXPNodeLevel \times CultiXPPerLevelMult$$
     
     Where:
     - $CultiXPLevelMult$ is the multiplicative bonus applied to the exp of the resulting orb based on the level of the "CultiXP" node
