@@ -63,6 +63,7 @@ constexpr quality_t get_quality(const string_view &name) {
 
 // one cosmosapsis is 8 seconds
 constexpr inline chrono::seconds COSMOSAPSIS{8};
+constexpr inline int NUM_COSMOSAPSIS_PER_HOUR{3600 / COSMOSAPSIS.count()};
 
 ///////////////// Cultivation stages and exp requirements /////////////////
 

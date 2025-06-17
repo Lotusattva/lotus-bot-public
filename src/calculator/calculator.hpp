@@ -33,4 +33,6 @@ expected<chrono::hours, calculator_error_t> get_estimated_time_to_breakthrough(c
 
 bool is_valid_client(const calculator_client_t &client);
 
+double consolidated_gush_chance(double gush_chance);
+
 #endif  // CALCULATOR_HPP
