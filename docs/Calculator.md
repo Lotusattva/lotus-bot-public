@@ -88,8 +88,11 @@ Where:
 
 A player has a limited number of cultivation pill attempts per day. Each pill offers an amount of exp depending on its rank and quality and the player's cultivation pill bonuses. The calculation is as follows:
 - For common to legendary pills:
+
     $$Exp = PillBaseExp \times (1 + PlayerPillBonus)$$
+
 - For mythic pills:
+
     $$Exp = PillBaseExp \times (1 + PlayerPillBonus + VaseBonus)$$
 
 Where:
@@ -128,7 +131,9 @@ This section outlines how cultivation exp from consuming myrimom fruits is effec
 The "CultiXP" node introduces a multiplicative bonus with two additive components: one that depends on the node's level, and one that depends on the node's quality.
 
 1. The first component is calculated based on the level of the "CultiXP" node as follows:
+
     $$ CultiXPLevelMult = CultiXPNodeLevel \times CultiXPPerLevelMult $$
+    
     Where:
     - $CultiXPLevelMult$ is the multiplicative bonus applied to the exp of the resulting orb based on the level of the "CultiXP" node
     - $CultiXPNodeLevel$ is the level of the "CultiXP" node
@@ -140,8 +145,11 @@ The "CultiXP" node introduces a multiplicative bonus with two additive component
         | Immortal | *Currently no data*   |
 
 2. The second component is a 20% bonus conditional whether the quality of the "CultiXP" node is at or above the quality of the exp orb produced by the aura extractor upon consuming a myrimon fruit (e.g. if the orb is RARE, and the "CultiXP" extractor node is at RARE or higher, then the 20% bonus applies). 
-    The expectancy of this bonus is calculated as follows:\
+
+    The expectancy of this bonus is calculated as follows:
+
     $$ CultiXPQualityMult = 0.2 \cdot \Pr(\text{CultiXP quality >= orb quality}) $$
+    
     The probability distribution of the orb quality is explored in the next section.
 
 Taken together, the expected multiplicative bonus applied to the exp of the resulting orb based on the "CultiXP" node is calculated as follows:
