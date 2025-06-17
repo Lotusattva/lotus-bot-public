@@ -1,5 +1,6 @@
 #include "calculator.hpp"
 
+#include "../global.hpp"
 #include "calculator_constants.hpp"
 #include "calculator_types.hpp"
 
@@ -73,4 +74,18 @@ bool is_valid_client(const calculator_client_t &client) {
 double consolidated_gush_chance(double gush_chance) {
     return 1. / ((2. - gush_chance) * (3. + (gush_chance - 3.) * gush_chance) *
                  (1. + (gush_chance - 1.) * gush_chance));
+}
+
+double calculate_myrimon_fruit_exp(const calculator_client_t &client) {
+    // get probability distribution of quality
+    array<double, NUM_QUALITIES> quality_probabilities{
+        NODE_QUALITY_CHANCE[client.node_levels[QUALITY_NODE]]};
+    // The aura extractor adds a 30% chance to produce an orb of the same quality as itself
+    quality_probabilities[client.extractor_quality] += 0.3;
+    
+    if (DEBUG)
+        assert(abs(accumulate(quality_probabilities.begin(), quality_probabilities.end(), 0.0) -
+                   1.0) < 1e-10);
+
+
 }

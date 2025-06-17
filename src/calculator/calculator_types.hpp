@@ -49,6 +49,21 @@ struct artifact_t {
     binary_t daily_recharge{INVALID_BINARY_VAL};
 };
 
+enum extractor_node_t {
+    CULTI_XP_NODE,
+    QUALITY_NODE,
+    GUSH_NODE,
+
+    NUM_EXTRACTOR_NODES
+};
+
+enum pill_quantity_index_t {
+    RARE_IDX,
+    EPIC_IDX,
+    LEGENDARY_IDX,
+
+    NUM_PILL_QUANTITIES_INDICES
+};
 
 /**
  * A struct that stores the necessary information for a calculator client.
@@ -81,7 +96,8 @@ struct calculator_client_t {
     quality_t aura_gem_quality{INVALID_QUALITY};  // default to invalid
 
     // respira
-    double respira_bonus{INVALID_DOUBLE_VAL};  // default to invalid, should be a non-negative number
+    double respira_bonus{
+        INVALID_DOUBLE_VAL};  // default to invalid, should be a non-negative number
     unsigned short daily_respira_attempts{
         INVALID_UNSIGNED_VAL};  // default to 0, should be a positive number
 
@@ -90,16 +106,16 @@ struct calculator_client_t {
         INVALID_UNSIGNED_VAL};  // default to 0, should be a positive number
 
     // 0: rare, 1: epic, 2: legendary
-    unsigned short pill_quantity[3]{INVALID_UNSIGNED_VAL, INVALID_UNSIGNED_VAL,
-                                    INVALID_UNSIGNED_VAL};
+    unsigned short pill_quantity[NUM_PILL_QUANTITIES_INDICES]{
+        INVALID_UNSIGNED_VAL, INVALID_UNSIGNED_VAL, INVALID_UNSIGNED_VAL};
     double pill_bonus{INVALID_DOUBLE_VAL};  // needs to be calculated because game does not show it
 
     // extractor
     quality_t extractor_quality{INVALID_QUALITY};  // default to invalid
 
     // 0: cultiXP, 1: quality, 2: gush; default to 31, should be in the range [0, 30]
-    unsigned short node_levels[3]{INVALID_EXTRACTOR_NODE_LVL, INVALID_EXTRACTOR_NODE_LVL,
-                                  INVALID_EXTRACTOR_NODE_LVL};
+    unsigned short node_levels[NUM_EXTRACTOR_NODES]{
+        INVALID_EXTRACTOR_NODE_LVL, INVALID_EXTRACTOR_NODE_LVL, INVALID_EXTRACTOR_NODE_LVL};
 
     // myrimon fruit
     unsigned short fruit_quantity{

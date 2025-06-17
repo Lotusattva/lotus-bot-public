@@ -35,4 +35,6 @@ bool is_valid_client(const calculator_client_t &client);
 
 double consolidated_gush_chance(double gush_chance);
 
+double calculate_myrimon_fruit_exp(const calculator_client_t &client);
+
 #endif  // CALCULATOR_HPP
