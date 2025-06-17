@@ -132,30 +132,30 @@ The "CultiXP" node introduces a multiplicative bonus with two additive component
 
 1. The first component is calculated based on the level of the "CultiXP" node as follows:
 
-    $$CultiXPLevelMult = CultiXPNodeLevel \times CultiXPPerLevelMult$$
+    $$CultiXPLevelMult = CultiXPNodeLevel \times CultiXPMultPerNodeLevel$$
     
     Where:
     - $CultiXPLevelMult$ is the multiplicative bonus applied to the exp of the resulting orb based on the level of the "CultiXP" node
     - $CultiXPNodeLevel$ is the level of the "CultiXP" node
-    - $CultiXPPerLevelMult$ is the multiplier per node level depending on the "world" level corresponding to the player's major stage, as defined in the following table:
-        | World    | $CultiXPPerLevelMult$ |
-        |----------|-----------------------|
-        | Mortal   | 0.02                  |
-        | Spirit   | 0.04                  |
-        | Immortal | *Currently no data*   |
+    - $CultiXPMultPerNodeLevel$ is the multiplier per node level depending on the "world" level corresponding to the player's major stage, as defined in the following table:
+        | World    | $CultiXPMultPerNodeLevel$ |
+        |----------|---------------------------|
+        | Mortal   | 0.02                      |
+        | Spirit   | 0.04                      |
+        | Immortal | *Currently no data*       |
 
 2. The second component is a 20% bonus conditional whether the quality of the "CultiXP" node is at or above the quality of the exp orb produced by the aura extractor upon consuming a myrimon fruit (e.g. if the orb is RARE, and the "CultiXP" extractor node is at RARE or higher, then the 20% bonus applies). 
 
     The expectancy of this bonus is calculated as follows:
 
-    $$CultiXPQualityMult = 0.2 \cdot \Pr(\text{CultiXP quality >= orb quality})$$
+    $$E[\text{conditional quality multiplier}] = 0.2 \cdot \Pr(\text{CultiXP quality >= orb quality})$$
 
     The probability distribution of the orb quality is explored in the next section.
 
 Taken together, the expected multiplicative bonus applied to the exp of the resulting orb based on the "CultiXP" node is calculated as follows:
 
 $$
-CultiXPMult = 1 + CultiXPLevelMult + CulitiXPQualityMult
+CultiXPMult = 1 + CultiXPLevelMult + E[\text{conditional quality multiplier}]
 $$
 
 ### Quality
@@ -297,8 +297,17 @@ E[\text{gush multiplier}] = GushMult \times P_{\text{consolidated}}
 $$
 
 ### Conclusion
-Taken together, the expected exp the player gets from consuming a myrimom fruit is calculated as follows:
+Taken together, the total expected multiplier is calculated as follows:
 
+$$
+TotalMult =  (1 + CultiXPLevelMult + E[\text{conditional quality multiplier}]) \times E[\text{quality multiplier}] \times E[\text{gush multiplier}]
+$$
+
+And the expected amount of cultivation exp gained from consuming a myrimon fruit is calculated as follows:
+
+$$
+ExpectedExp = MyrimonBaseExp \times TotalMult
+$$
 
 ## Creation Artifacts: the Vase and the Mirror
 
