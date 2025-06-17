@@ -148,8 +148,8 @@ The "CultiXP" node introduces a multiplicative bonus with two additive component
 
     The expectancy of this bonus is calculated as follows:
 
-    $$ CultiXPQualityMult = 0.2 \cdot \Pr(\text{CultiXP quality >= orb quality}) $$
-    
+    $$CultiXPQualityMult = 0.2 \cdot \Pr(\text{CultiXP quality >= orb quality})$$
+
     The probability distribution of the orb quality is explored in the next section.
 
 Taken together, the expected multiplicative bonus applied to the exp of the resulting orb based on the "CultiXP" node is calculated as follows:
