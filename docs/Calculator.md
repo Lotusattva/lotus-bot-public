@@ -87,10 +87,10 @@ Where:
 ## Cultivation Pills
 
 A player has a limited number of cultivation pill attempts per day. Each pill offers an amount of exp depending on its rank and quality and the player's cultivation pill bonuses. The calculation is as follows:
-- For common to legendary pills:\
-$$Exp = PillBaseExp \times (1 + PlayerPillBonus)$$
-- For mythic pills:\
-$$Exp = PillBaseExp \times (1 + PlayerPillBonus + VaseBonus)$$
+- For common to legendary pills:
+    $$Exp = PillBaseExp \times (1 + PlayerPillBonus)$$
+- For mythic pills:
+    $$Exp = PillBaseExp \times (1 + PlayerPillBonus + VaseBonus)$$
 
 Where:
 - $Exp$ is the cultivation exp gained from consuming the pill
@@ -121,8 +121,105 @@ Where:
 
 ## Myrimon Fruits and the Aura Extractor
 
-### Gush
+This section outlines how cultivation exp from consuming myrimom fruits is effected by 3 nodes of the aura extractor: CultiXP, Quality, and Gush. Each of these nodes introduces multiplicative bonuses that are applied to the base exp of a myrimon fruit with different conditions.
 
+### CultiXP
+
+The "CultiXP" node introduces a multiplicative bonus with two additive components: one that depends on the node's level, and one that depends on the node's quality.
+
+1. The first component is calculated based on the level of the "CultiXP" node as follows:
+    $$ CultiXPLevelMult = CultiXPNodeLevel \times CultiXPPerLevelMult $$
+    Where:
+    - $CultiXPLevelMult$ is the multiplicative bonus applied to the exp of the resulting orb based on the level of the "CultiXP" node
+    - $CultiXPNodeLevel$ is the level of the "CultiXP" node
+    - $CultiXPPerLevelMult$ is the multiplier per node level depending on the "world" level corresponding to the player's major stage, as defined in the following table:
+        | World    | $CultiXPPerLevelMult$ |
+        |----------|-----------------------|
+        | Mortal   | 0.02                  |
+        | Spirit   | 0.04                  |
+        | Immortal | *Currently no data*   |
+
+2. The second component is a 20% bonus conditional whether the quality of the "CultiXP" node is at or above the quality of the exp orb produced by the aura extractor upon consuming a myrimon fruit (e.g. if the orb is RARE, and the "CultiXP" extractor node is at RARE or higher, then the 20% bonus applies). 
+    The expectancy of this bonus is calculated as follows:\
+    $$ CultiXPQualityMult = 0.2 \cdot \Pr(\text{CultiXP quality >= orb quality}) $$
+    The probability distribution of the orb quality is explored in the next section.
+
+Taken together, the expected multiplicative bonus applied to the exp of the resulting orb based on the "CultiXP" node is calculated as follows:
+
+$$
+CultiXPMult = 1 + CultiXPLevelMult + CulitiXPQualityMult
+$$
+
+### Quality
+Another multiplicative bonus is applied to the exp of the resulting orb based on the quality of that orb, as defined in the following table:
+| Orb Quality | Multiplier |
+|-------------|------------|
+| Common      | 1.0        |
+| Uncommon    | 1.3        |
+| Rare        | 1.6        |
+| Epic        | 2.0        |
+| Legendary   | 2.4        |
+| Mythic      | 3.0        |
+
+The quality of the exp orb produced by the aura extractor upon consuming a myrimon fruit is dependent on 1) the quality of the aura extractor itself, and 2) the level of the "Quality" node:
+    
+1. The aura extractor adds a 30% chance to produce an orb of the same quality as itself, e.g., if the extractor is of *Epic* quality, then an orb of *Epic* quality would have a 30% higher chance to be produced.
+
+2. The level of the "Quality" node distributes the remaining 70% chance among qualities as defined in the following table:
+    
+    <details><summary><ins>Click to show table</ins></summary>
+
+    | Node Level | Common | Uncommon | Rare  | Epic  | Legendary | Mythic |
+    |------------|--------|----------|-------|-------|-----------|--------|
+    | 0          | 70%    | 0%       | 0%    | 0%    | 0%        | 0%     |
+    | 1          | 65%    | 5%       | 0%    | 0%    | 0%        | 0%     |
+    | 2          | 60%    | 10%      | 0%    | 0%    | 0%        | 0%     |
+    | 3          | 55%    | 15%      | 0%    | 0%    | 0%        | 0%     |
+    | 4          | 50%    | 25%      | 0%    | 0%    | 0%        | 0%     |
+    | 5          | 45%    | 25%      | 0%    | 0%    | 0%        | 0%     |
+    | 6          | 20%    | 50%      | 0%    | 0%    | 0%        | 0%     |
+    | 7          | 15%    | 55%      | 0%    | 0%    | 0%        | 0%     |
+    | 8          | 10%    | 60%      | 0%    | 0%    | 0%        | 0%     |
+    | 9          | 5%     | 65%      | 0%    | 0%    | 0%        | 0%     |
+    | 10         | 0%     | 70%      | 0%    | 0%    | 0%        | 0%     |
+    | 11         | 0%     | 40%      | 30%   | 0%    | 0%        | 0%     |
+    | 12         | 0%     | 30%      | 40%   | 0%    | 0%        | 0%     |
+    | 13         | 0%     | 20%      | 50%   | 0%    | 0%        | 0%     |
+    | 14         | 0%     | 10%      | 60%   | 0%    | 0%        | 0%     |
+    | 15         | 0%     | 0%       | 70%   | 0%    | 0%        | 0%     |
+    | 16         | 0%     | 0%       | 40%   | 30%   | 0%        | 0%     |
+    | 17         | 0%     | 0%       | 30%   | 40%   | 0%        | 0%     |
+    | 18         | 0%     | 0%       | 20%   | 50%   | 0%        | 0%     |
+    | 19         | 0%     | 0%       | 10%   | 60%   | 0%        | 0%     |
+    | 20         | 0%     | 0%       | 0%    | 70%   | 0%        | 0%     |
+    | 21         | 0%     | 0%       | 0%    | 40%   | 30%       | 0%     |
+    | 22         | 0%     | 0%       | 0%    | 30%   | 40%       | 0%     |
+    | 23         | 0%     | 0%       | 0%    | 20%   | 50%       | 0%     |
+    | 24         | 0%     | 0%       | 0%    | 10%   | 60%       | 0%     |
+    | 25         | 0%     | 0%       | 0%    | 0%    | 70%       | 0%     |
+    | 26         | 0%     | 0%       | 0%    | 0%    | 40%       | 30%    |
+    | 27         | 0%     | 0%       | 0%    | 0%    | 30%       | 40%    |
+    | 28         | 0%     | 0%       | 0%    | 0%    | 20%       | 50%    |
+    | 29         | 0%     | 0%       | 0%    | 0%    | 10%       | 60%    |
+    | 30         | 0%     | 0%       | 0%    | 0%    | 0%        | 70%    |
+
+    </details>
+
+> For example, if the aura extractor is of *Epic* quality and the "Quality" node is at level 16, then the player has a 40% chance of getting a *Rare* orb and a 60% chance of getting an *Epic* orb. 
+> - 40% chance of getting a *Rare* orb comes from "Quality" node at level 16
+> - 60% chance of getting an *Epic* orb comes from two sources:
+>   - 30% chance of getting an *Epic* orb from the aura extractor itself being of *Epic* quality
+>   - 30% chance of getting an *Epic* orb from the "Quality" node at level 16
+
+Then, the expected quality multiplier can be calculated as follows:
+
+$$
+E[\text{quality multiplier}] = \sum^{i}[QualityChance_i \times QualityMult_i]
+$$
+
+Where $i$ is quality from common to mythic.
+
+### Gush
 Consuming a myrimon fruit has a chance to gush. When a gush occurs, a multiplicative bonus based on the level of the "Gush" extractor node is applied to the exp of the resulting orb. This bonus is dependent on the level of the "Gush" node, which is calculated as follows:
 
 $$ GushMult = BaseGushMult + GushNodeLevel \cdot GushMultPerNodeLevel $$
@@ -185,66 +282,15 @@ The chance to gush $P$ is dependent on the quality of the "Quality" aura extract
 | Legendary    | 0.3  |
 | Mythic       | 0.35 |
 
-### Exp orb quality
-Another multiplicative bonus is applied to the exp of the resulting orb based on the quality of that orb, as defined in the following table:
-| Orb Quality | Multiplier |
-|-------------|------------|
-| Common      | 1.0        |
-| Uncommon    | 1.3        |
-| Rare        | 1.6        |
-| Epic        | 2.0        |
-| Legendary   | 2.4        |
-| Mythic      | 3.0        |
+Then, we can calculate the expected gush multiplier from the consolidated chance:
 
-The quality of the exp orb produced by the aura extractor upon consuming a myrimon fruit is dependent on 1) the quality of the aura extractor itself, and 2) the level of the "Quality" node:
-    
-1. The aura extractor adds a 30% chance to produce an orb of the same quality as itself, e.g., if the extractor is of *Epic* quality, then an orb of *Epic* quality would have a 30% higher chance to be produced.
+$$
+E[\text{gush multiplier}] = GushMult \times P_{\text{consolidated}}
+$$
 
-2. The level of the "Quality" node distributes the remaining 70% chance among qualities as defined in the following table:
-    
-    <details><summary><ins>Click to show table</ins></summary>
+### Conclusion
+Taken together, the expected exp the player gets from consuming a myrimom fruit is calculated as follows:
 
-    | Node Level | Common | Uncommon | Rare  | Epic  | Legendary | Mythic |
-    |------------|--------|----------|-------|-------|-----------|--------|
-    | 0          | 70%    | 0%       | 0%    | 0%    | 0%        | 0%     |
-    | 1          | 65%    | 5%       | 0%    | 0%    | 0%        | 0%     |
-    | 2          | 60%    | 10%      | 0%    | 0%    | 0%        | 0%     |
-    | 3          | 55%    | 15%      | 0%    | 0%    | 0%        | 0%     |
-    | 4          | 50%    | 25%      | 0%    | 0%    | 0%        | 0%     |
-    | 5          | 45%    | 25%      | 0%    | 0%    | 0%        | 0%     |
-    | 6          | 20%    | 50%      | 0%    | 0%    | 0%        | 0%     |
-    | 7          | 15%    | 55%      | 0%    | 0%    | 0%        | 0%     |
-    | 8          | 10%    | 60%      | 0%    | 0%    | 0%        | 0%     |
-    | 9          | 5%     | 65%      | 0%    | 0%    | 0%        | 0%     |
-    | 10         | 0%     | 70%      | 0%    | 0%    | 0%        | 0%     |
-    | 11         | 0%     | 40%      | 30%   | 0%    | 0%        | 0%     |
-    | 12         | 0%     | 30%      | 40%   | 0%    | 0%        | 0%     |
-    | 13         | 0%     | 20%      | 50%   | 0%    | 0%        | 0%     |
-    | 14         | 0%     | 10%      | 60%   | 0%    | 0%        | 0%     |
-    | 15         | 0%     | 0%       | 70%   | 0%    | 0%        | 0%     |
-    | 16         | 0%     | 0%       | 40%   | 30%   | 0%        | 0%     |
-    | 17         | 0%     | 0%       | 30%   | 40%   | 0%        | 0%     |
-    | 18         | 0%     | 0%       | 20%   | 50%   | 0%        | 0%     |
-    | 19         | 0%     | 0%       | 10%   | 60%   | 0%        | 0%     |
-    | 20         | 0%     | 0%       | 0%    | 70%   | 0%        | 0%     |
-    | 21         | 0%     | 0%       | 0%    | 40%   | 30%       | 0%     |
-    | 22         | 0%     | 0%       | 0%    | 30%   | 40%       | 0%     |
-    | 23         | 0%     | 0%       | 0%    | 20%   | 50%       | 0%     |
-    | 24         | 0%     | 0%       | 0%    | 10%   | 60%       | 0%     |
-    | 25         | 0%     | 0%       | 0%    | 0%    | 70%       | 0%     |
-    | 26         | 0%     | 0%       | 0%    | 0%    | 40%       | 30%    |
-    | 27         | 0%     | 0%       | 0%    | 0%    | 30%       | 40%    |
-    | 28         | 0%     | 0%       | 0%    | 0%    | 20%       | 50%    |
-    | 29         | 0%     | 0%       | 0%    | 0%    | 10%       | 60%    |
-    | 30         | 0%     | 0%       | 0%    | 0%    | 0%        | 70%    |
-
-    </details>
-
-> For example, if the aura extractor is of *Epic* quality and the "Quality" node is at level 16, then the player has a 40% chance of getting a *Rare* orb and a 60% chance of getting an *Epic* orb. 
-> - 40% chance of getting a *Rare* orb comes from "Quality" node at level 16
-> - 60% chance of getting an *Epic* orb comes from two sources:
->   - 30% chance of getting an *Epic* orb from the aura extractor itself being of *Epic* quality
->   - 30% chance of getting an *Epic* orb from the "Quality" node at level 16
 
 ## Creation Artifacts: the Vase and the Mirror
 
