@@ -78,14 +78,31 @@ double consolidated_gush_chance(double gush_chance) {
 
 double calculate_myrimon_fruit_exp(const calculator_client_t &client) {
     // get probability distribution of quality
-    array<double, NUM_QUALITIES> quality_probabilities{
+    array<double, NUM_QUALITIES> orb_quality_probabilities{
         NODE_QUALITY_CHANCE[client.node_levels[QUALITY_NODE]]};
     // The aura extractor adds a 30% chance to produce an orb of the same quality as itself
-    quality_probabilities[client.extractor_quality] += 0.3;
-    
+    orb_quality_probabilities[client.extractor_quality] += 0.3;
+
     if (DEBUG)
-        assert(abs(accumulate(quality_probabilities.begin(), quality_probabilities.end(), 0.0) -
+        assert(abs(accumulate(orb_quality_probabilities.begin(), orb_quality_probabilities.end(),
+                              0.0) -
                    1.0) < 1e-10);
+
+    // calculate multiplier from CultiXP
+    const double cultixp_level_mult{
+        client.node_levels[CULTIXP_NODE] *
+        MULT_PER_CULTIXP_NODE_LEVEL[get_world_level(client.major_stage)]};
+    // A conditional 20% exp bonus is applied to exp orb of a certain quality if the "CultiXP"
+    // extractor node is at or above this quality
+    const quality_t cultixp_node_quality{
+        get_extractor_node_quality(client.node_levels[CULTIXP_NODE])};
+    double prob_cultixp_node_quality_higher_or_equal_to_orb{0.0};
+    for (const auto &[quality, prob] : orb_quality_probabilities | views::enumerate)
+        if (cultixp_node_quality >= quality)
+            prob_cultixp_node_quality_higher_or_equal_to_orb += prob;
+    const double expected_conditional_20_percent_exp_bonus{
+        prob_cultixp_node_quality_higher_or_equal_to_orb * 0.2};
+    const double cultixp_mult{1.0 + cultixp_level_mult + expected_conditional_20_percent_exp_bonus};
 
 
 }

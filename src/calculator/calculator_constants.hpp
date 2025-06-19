@@ -616,132 +616,63 @@ constexpr inline array<double, NUM_QUALITIES> QUALITY_MULT{
 };
 
 #define MAX_EXTRACTOR_NODE_LVL 30
-#define EXP_BONUS_PER_NODE_LVL 0.02
+
+constexpr quality_t get_extractor_node_quality(unsigned short node_level) {
+    if (node_level < 0 || node_level > MAX_EXTRACTOR_NODE_LVL)
+        return NUM_QUALITIES;  // An invalid quality, indicates an error
+
+    if (node_level < 6)
+        return COMMON;
+    else if (node_level < 11)
+        return UNCOMMON;
+    else if (node_level < 16)
+        return RARE;
+    else if (node_level < 21)
+        return EPIC;
+    else if (node_level < 26)
+        return LEGENDARY;
+    else
+        return MYTHIC;
+}
+
 #define EXP_GUSH_BASE_MULT 1.5
 #define EXP_GUSH_MULT_PER_NODE_LVL 0.04
 #define GUSH_BASE_CHANCE 0.1
 #define GUSH_CHANCE_PER_QUALITY 0.05
 
-// /**
-//  * Chance of generating an orb of a certain quality based on the extractor "Quality" node level
-//  *
-//  * ex. get chance of getting a EPIC orb if "Quality" node is at level 10:
-//  * NODE_QUALITY_CHANCE[EPIC][10]
-//  */
-// // constexpr inline const double NODE_QUALITY_CHANCE[NUM_QUALITIES][MAX_EXTRACTOR_NODE_LVL + 1]
-// constexpr inline array<array<double, MAX_EXTRACTOR_NODE_LVL + 1>, NUM_QUALITIES>
-//     NODE_QUALITY_CHANCE{
-//         // COMMON
-//         0.7,   // lvl 0
-//         0.65,  // lvl 1
-//         0.6,   // lvl 2
-//         0.55,  // lvl 3
-//         0.5,   // lvl 4
-//         0.45,  // lvl 5
-//         0.2,   // lvl 6
-//         0.15,  // lvl 7
-//         0.1,   // lvl 8
-//         0.05,  // lvl 9
+enum world_level_t {
+    MORTAL,    // Mortal world
+    SPIRIT,    // Spirit world
+    IMMORTAL,  // Immortal world
 
-//         // for lvl 10 and above, the chance is 0.0
-//         0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  // lvl 10-15
-//         0.0, 0.0, 0.0, 0.0, 0.0,       // lvl 16-20
-//         0.0, 0.0, 0.0, 0.0, 0.0,       // lvl 21-25
-//         0.0, 0.0, 0.0, 0.0, 0.0,       // lvl 26-30
+    NUM_WORLDS
+};
 
-//         // UNCOMMON
-//         0.0,   // lvl 0
-//         0.05,  // lvl 1
-//         0.1,   // lvl 2
-//         0.15,  // lvl 3
-//         0.2,   // lvl 4
-//         0.25,  // lvl 5
-//         0.5,   // lvl 6
-//         0.55,  // lvl 7
-//         0.6,   // lvl 8
-//         0.65,  // lvl 9
-//         0.7,   // lvl 10
-//         0.4,   // lvl 11
-//         0.3,   // lvl 12
-//         0.2,   // lvl 13
-//         0.1,   // lvl 14
+constexpr world_level_t get_world_level(major_stage_t major_stage) {
+    switch (major_stage) {
+        case FOUNDATION:
+        case VIRTUOSO:
+        case NASCENT:
+        case INCARNATION:
+        case VOIDBREAK:
+            return MORTAL;
+        case WHOLENESS:
+        case PERFECTION:
+        case NIRVANA:
+            return SPIRIT;
+        case CELESTIAL:
+        case ETERNAL:
+            return IMMORTAL;
+        default:
+            return NUM_WORLDS;  // An invalid world, indicates an error
+    }
+}
 
-//         // for lvl 15 and above, the chance is 0.0
-//         0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  // lvl 15-20
-//         0.0, 0.0, 0.0, 0.0, 0.0,       // lvl 21-25
-//         0.0, 0.0, 0.0, 0.0, 0.0,       // lvl 26-30
-
-//         // RARE
-//         // for lvl 0-10, the chance is 0.0
-//         0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  // lvl 0-5
-//         0.0, 0.0, 0.0, 0.0, 0.0,       // lvl 6-10
-
-//         0.3,  // lvl 11
-//         0.4,  // lvl 12
-//         0.5,  // lvl 13
-//         0.6,  // lvl 14
-//         0.7,  // lvl 15
-//         0.4,  // lvl 16
-//         0.3,  // lvl 17
-//         0.2,  // lvl 18
-//         0.1,  // lvl 19
-
-//         // for lvl 20 and above, the chance is 0.0
-//         0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  // lvl 20-25
-//         0.0, 0.0, 0.0, 0.0, 0.0,       // lvl 26-30
-
-//         // EPIC
-//         // for lvl 0-15, the chance is 0.0
-//         0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  // lvl 0-5
-//         0.0, 0.0, 0.0, 0.0, 0.0,       // lvl 6-10
-//         0.0, 0.0, 0.0, 0.0, 0.0,       // lvl 11-15
-
-//         0.3,  // lvl 16
-//         0.4,  // lvl 17
-//         0.5,  // lvl 18
-//         0.6,  // lvl 19
-//         0.7,  // lvl 20
-//         0.4,  // lvl 21
-//         0.3,  // lvl 22
-//         0.2,  // lvl 23
-//         0.1,  // lvl 24
-
-//         // for lvl 25 and above, the chance is 0.0
-//         0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  // lvl 25-30
-
-//         // LEGENDARY
-//         // for lvl 0-20, the chance is 0.0
-//         0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  // lvl 0-5
-//         0.0, 0.0, 0.0, 0.0, 0.0,       // lvl 6-10
-//         0.0, 0.0, 0.0, 0.0, 0.0,       // lvl 11-15
-//         0.0, 0.0, 0.0, 0.0, 0.0,       // lvl 16-20
-
-//         0.3,  // lvl 21
-//         0.4,  // lvl 22
-//         0.5,  // lvl 23
-//         0.6,  // lvl 24
-//         0.7,  // lvl 25
-//         0.4,  // lvl 26
-//         0.3,  // lvl 27
-//         0.2,  // lvl 28
-//         0.1,  // lvl 29
-//         0.0,  // lvl 30
-
-//         // MYTHIC
-//         // for lvl 0-25, the chance is 0.0
-//         0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  // lvl 0-5
-//         0.0, 0.0, 0.0, 0.0, 0.0,       // lvl 6-10
-//         0.0, 0.0, 0.0, 0.0, 0.0,       // lvl 11-15
-//         0.0, 0.0, 0.0, 0.0, 0.0,       // lvl 16-20
-//         0.0, 0.0, 0.0, 0.0, 0.0,       // lvl 21-25
-
-//         0.3,  // lvl 26
-//         0.4,  // lvl 27
-//         0.5,  // lvl 28
-//         0.6,  // lvl 29
-//         0.7,  // lvl 30
-
-//     };
+constexpr inline array<double, NUM_WORLDS> MULT_PER_CULTIXP_NODE_LEVEL{
+    0.02,  // mortal world
+    0.04,  // spirit world
+    -1.0,  // immortal world (CURRENTLY NO DATA)
+};
 
 /**
  * Chance of generating an orb of a certain quality based on the extractor "Quality" node level

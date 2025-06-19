@@ -50,7 +50,7 @@ struct artifact_t {
 };
 
 enum extractor_node_t {
-    CULTI_XP_NODE,
+    CULTIXP_NODE,
     QUALITY_NODE,
     GUSH_NODE,
 
