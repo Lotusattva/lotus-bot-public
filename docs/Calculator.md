@@ -311,40 +311,43 @@ $$
 
 ## Creation Artifacts: the Vase and the Mirror
 
-## Vase
-| Vase Rank | Gain/Taoist year| Cap | Energy per Pill, Epic, Legendary | Pills a day / Pills a day with Epic, Legendary/ Pills a day with charge/ Pills a day with charge, Epic, Legendary |
-|-----------|-----------------|-----|----------------------------------|-------------------------------------------------------------------------------------------------------------------|
-| 1         | +1              | 300 | 100 / 90                         | 0.96 / 1.06 / 1.96 / 2.06                                                                                         |
-| 2         | +1.5            | 400 | 100 / 90                         | 1.44 / 1.56 / 2.44 / 2.56                                                                                         |
-| 3         | +2              | 500 | 100 / 90                         | 1.92 / 2.02 / 2.92 / 3.02                                                                                         |
-| 4         | +2.5            | 600 | 100 / 90                         | 2.40 / 2.50 / 3.40 / 3.50                                                                                         |
-| 5         | +3              | 700 | 100 / 90                         | 2.88 / 2.98 / 3.88 / 3.98                                                                                         |
+Energy of the vase and the mirror recover at different rates depending on their star level, as defined in the following table:
 
-Get 100 Energy a day with charge
-  
-- Rank 1 10% increase to exp for crafted pills
-- Rank 3 exp for crafted pills increased to 20% instead of 10%
-- Rank 5 15% chance to double craft
-- Jade Purity Vase Transmog +8% increased exp for crafted pills
+| Star Level | Energy Recovery Rate (point of energy per 15 minutes) |
+|------------|-------------------------------------------------------|
+| 0          | 1.0                                                   |
+| 1          | 1.3                                                   |
+| 2          | 1.6                                                   |
+| 3          | 2.0                                                   |
+| 4          | 2.4                                                   |
+| 5          | 3.0                                                   |
 
+### Vase
 
-## Mirror
-*Based on ingame data will update tomorrow to real figures*
-| Mirror Rank | Gain/Taoist year| Cap | Mythic duplication Gain a day, Gain with charge |
-|-------------|-----------------|-----|-------------------------------------------------|
-| 1           | +1              | 300 | 0.48  / 0.98                                    |
-| 2           | +1.6            | 400 | 0.768 / 1.268                                   |
-| 3           | +2              | 500 | 0.96  / 1.46                                    |
-| 4           | +2.5            | 600 | 1.20  / 1.70                                    |
-| 5           | +3              | 700 | 1.44  / 1.94                                    |
+If a player owns a vase, they can use it to create a number of mythic pills everyday. This calculator will assume that the player only uses pills of rarities below epic to create mythic pills (using 100 points of energy).
 
+Mythic pills created by the vase have exp bonus in addition to the player's pill bonus. The bonus is calculated as follows:
 
-Get 100 Energy a day with charge
-Mythic Duplication Cost 190 for R7
+$$
+MythicPillExp = MythicPillBaseExp \times (1 + PlayerPillBonus + VaseStarBonus + VaseTransmogBonus)
+$$
 
-- Rank 1 -5% Energy cost for Duplication
-- Rank 3 Energy Reduction cost increased to 10%
-- Rank 5 15% chance to obtain a Duplicate
+***TODO: Check this formula***
 
+Where:
+- $MythicPillBaseExp$ is the base cultivation exp of a mythic pill, dependent on the rank of the pill
+- $PlayerPillBonus$ is the player's sum of all cultivation pill bonuses they gain from various sources such as techniques, curios, and immortal friends
+- $VaseStarBonus$ is the bonus from the creation artifact vase, and it's only applied to mythic pills. This bonus is 10% if the vase is 1-2 stars, 20% if it is 3 stars and above.
+- $VaseTransmogBonus$ is a 8% bonus applied if the player has the vase's transmog
 
-Todo!
+Additionally, if the vase is 5 stars, creating a mythic pill has a 15% chance of not consuming energy.
+
+### Mirror
+
+***TODO: gather data about energy cost of mirror***
+
+This calculator assumes that the player uses the mirror to duplicate mythic pills only.
+
+There is a 5% energy cost reduction if the mirror is 1-2 stars, and a 10% energy cost reduction if it is 3 stars and above.
+
+Additionally, if the mirror is 5 stars, duplicating a mythic pill has a 15% chance of generating an extra copy.
