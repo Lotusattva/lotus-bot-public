@@ -76,7 +76,13 @@ double consolidated_gush_chance(double gush_chance) {
                  (1. + (gush_chance - 1.) * gush_chance));
 }
 
-double calculate_myrimon_fruit_exp(const calculator_client_t &client) {
+expected<double, calculator_error_t> calculate_myrimon_fruit_exp(const calculator_client_t &client) {
+    // get base exp of the fruit based on its rank
+    const fruit_rank_t fruit_rank {get_fruit_rank(client.major_stage)};
+    if (fruit_rank == NUM_FRUIT_RANKS)
+        return unexpected(calculator_error_t::MYRIMOM_CALCULATION_ERROR);
+    const exp_t base_exp{FRUIT_BASE_EXP[fruit_rank]};
+
     // get probability distribution of quality
     array<double, NUM_QUALITIES> orb_quality_probabilities{
         NODE_QUALITY_CHANCE[client.node_levels[QUALITY_NODE]]};
@@ -88,7 +94,7 @@ double calculate_myrimon_fruit_exp(const calculator_client_t &client) {
                               0.0) -
                    1.0) < 1e-10);
 
-    // calculate multiplier from CultiXP
+    // calculate multiplier from CultiXP node
     const double cultixp_level_mult{
         client.node_levels[CULTIXP_NODE] *
         MULT_PER_CULTIXP_NODE_LEVEL[get_world_level(client.major_stage)]};
@@ -102,7 +108,19 @@ double calculate_myrimon_fruit_exp(const calculator_client_t &client) {
             prob_cultixp_node_quality_higher_or_equal_to_orb += prob;
     const double expected_conditional_20_percent_exp_bonus{
         prob_cultixp_node_quality_higher_or_equal_to_orb * 0.2};
-    const double cultixp_mult{1.0 + cultixp_level_mult + expected_conditional_20_percent_exp_bonus};
+    const double expected_cultixp_mult{1.0 + cultixp_level_mult +
+                                       expected_conditional_20_percent_exp_bonus};
 
+    // calculate multiplier from Quality node
+    const double expected_quality_mult{inner_product(orb_quality_probabilities.begin(),
+                                                    orb_quality_probabilities.end(),
+                                                    QUALITY_MULT.begin(), 0.0)};
 
+    // calculate multiplier from
+    const double gush_chance{0.1 + static_cast<double>(client.extractor_quality) *
+                                       GUSH_CHANCE_PER_QUALITY};
+    const double gush_mult{1.5 + EXP_GUSH_MULT_PER_NODE_LVL * client.node_levels[GUSH_NODE]};
+    const double expected_gush_mult{consolidated_gush_chance(gush_chance) * gush_mult};
+
+    return static_cast<double>(base_exp) * expected_cultixp_mult * expected_quality_mult * expected_gush_mult;
 }

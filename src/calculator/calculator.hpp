@@ -13,6 +13,7 @@ enum class calculator_error_t {
     INVALID_CLIENT,  // The calculator client is not fully initialized or has invalid data.
     OVERFLOW_EXP, // The player already has enough exp to breakthrough to the next major stage.
     MYRIMON_NOW, // The player can breakthrough to the next major stage now if they consume the amount of myrimon fruits they have set in the calculator client.
+    MYRIMOM_CALCULATION_ERROR, // An error occurred while calculating the myrimon fruit exp.
 };
 
 /**
@@ -35,6 +36,6 @@ bool is_valid_client(const calculator_client_t &client);
 
 double consolidated_gush_chance(double gush_chance);
 
-double calculate_myrimon_fruit_exp(const calculator_client_t &client);
+expected<double, calculator_error_t> calculate_myrimon_fruit_exp(const calculator_client_t &client);
 
 #endif  // CALCULATOR_HPP

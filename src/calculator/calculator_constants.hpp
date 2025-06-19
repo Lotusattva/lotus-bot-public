@@ -594,6 +594,27 @@ enum fruit_rank_t {
     NUM_FRUIT_RANKS
 };
 
+constexpr fruit_rank_t get_fruit_rank(major_stage_t major_stage) {
+    switch (major_stage) {
+        case INCARNATION:
+            return R3;  // R3 fruit rank
+        case VOIDBREAK:
+            return R6;  // R6 fruit rank
+        case WHOLENESS:
+            return R7;  // R7 fruit rank
+        case PERFECTION:
+            return R8;  // R8 fruit rank
+        case NIRVANA:
+            return R9;  // R9 fruit rank
+        case CELESTIAL:
+            return R10;  // R10 fruit rank
+        case ETERNAL:
+            return R11;  // R11 fruit rank
+        default:
+            return NUM_FRUIT_RANKS;  // An invalid rank, indicates an error
+    }
+}
+
 // constexpr inline const exp_t FRUIT_BASE_EXP[NUM_FRUIT_RANKS]
 constexpr inline array<exp_t, NUM_FRUIT_RANKS> FRUIT_BASE_EXP{
     65000,   // R3
