@@ -103,37 +103,6 @@ constexpr inline unsigned short CALC_SUBCMD_NUM_PARAM[NUM_CALC_SUBCMDS]{
     1,  // myrimon
 };
 
-// constexpr inline string_view **CALC_SUBCMD_PARAM[NUM_CALC_SUBCMDS]{
-//     (string_view * [CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_START]]){},
-//     (string_view *
-//      [CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_PERCENT]]){(string_view[SUBCOMMAND_AND_DESCRIPTION]){
-//         "percentage_val", "percentage displayed on top left corner of the screen"}},
-//     (string_view *
-//      [CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_COSMOSAPSIS]]){(string_view[SUBCOMMAND_AND_DESCRIPTION]){
-//         "cosmosapsis_val", "cosmosapsis displayed in your abode"}},
-//     (string_view * [CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_RESPIRA]]){
-//         (string_view[SUBCOMMAND_AND_DESCRIPTION]){"total_respira_bonus",
-//                                                   "total respira bonus in percent"},
-//         (string_view[SUBCOMMAND_AND_DESCRIPTION]){"num_daily_respira_attempts",
-//                                                   "number of daily respira attempts"}},
-//     (string_view * [CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_PILL]]){
-//         (string_view[SUBCOMMAND_AND_DESCRIPTION]){"num_daily_pill_attempts",
-//                                                   "number of daily pill attempts"},
-//         (string_view[SUBCOMMAND_AND_DESCRIPTION]){"num_rare_pills",
-//                                                   "number of rare pills consumed"},
-//         (string_view[SUBCOMMAND_AND_DESCRIPTION]){"num_epic_pills",
-//                                                   "number of epic pills consumed"},
-//         (string_view[SUBCOMMAND_AND_DESCRIPTION]){"num_legendary_pills",
-//                                                   "number of legendary pills consumed"},
-//         (string_view[SUBCOMMAND_AND_DESCRIPTION]){"pill_exp_bonus",
-//                                                   "pill experience bonus in percent"}},
-//     (string_view * [CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_EXTRACTOR]]){
-//         (string_view[SUBCOMMAND_AND_DESCRIPTION]){"culti_xp", "level of the cultivation xp node"},
-//         (string_view[SUBCOMMAND_AND_DESCRIPTION]){"quality", "level of the extractor quality node"},
-//         (string_view[SUBCOMMAND_AND_DESCRIPTION]){"gush", "level of the extractor gush node"}},
-//     (string_view * [CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_MYRIMON]]){
-//         (string_view[SUBCOMMAND_AND_DESCRIPTION]){"num_myrimon", "number of myrimon fruits"}}};
-
 using subcmd_and_desc = array<string_view, SUBCOMMAND_AND_DESCRIPTION>;
 
 constexpr array<subcmd_and_desc, CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_START]> CALC_SUBCMD_START_PARAM{};
