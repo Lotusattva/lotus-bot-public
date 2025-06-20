@@ -412,11 +412,15 @@ constexpr inline array<double, NUM_ARTIFACT_STARS> ARTIFACT_ENERGY_RECOVERY_RATE
 #define VASE_1_STAR_PILL_BONUS 0.1
 #define VASE_3_STAR_PILL_BONUS 0.2        // not additive! overrides VASE_1_STAR_PILL_BONUS
 #define VASE_5_STAR_COSTLESS_CHANCE 0.15  // chance to not cost energy when purifying a pill
+#define VASE_MYTHIC_PILL_COST 100.0       // cost to purify a mythic pill
 
 #define MIRROR_1_STAR_COST_DEDUCTION 0.05
 #define MIRROR_3_STAR_COST_DEDUCTION 0.1  // not additive! overrides MIRROR_1_STAR_COST_DEDUCTION
 #define MIRROR_5_STAR_CHANCE_EXTRA_DUPLICATE \
     0.15  // chance to make an extra copy when duplicating an item
+#define MIRROR_DUPLICATE_MYTHIC_PILL_COST 200.0 
+
+#define ARTIFACT_DAILY_ENERGY_RECHARGE 100.0  // paid daily energy recharge for artifacts
 
 ///////////////////// Respira ///////////////////////
 
@@ -433,7 +437,7 @@ static_assert(abs(accumulate(RESPIRA_MULT_CHANCE.begin(), RESPIRA_MULT_CHANCE.en
                   1e-10,
               "RESPIRA_MULT_CHANCE must sum to 1.0");
 
-constexpr inline const double RESPIRA_MULT_EXPECTANCY{
+constexpr inline const double EXPECTED_RESPIRA_MULT{
     inner_product(RESPIRA_MULT.begin(), RESPIRA_MULT.end(), RESPIRA_MULT_CHANCE.begin(), 0.0)};
 
 /**
