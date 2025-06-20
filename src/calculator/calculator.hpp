@@ -38,4 +38,6 @@ double consolidated_gush_chance(double gush_chance);
 
 expected<double, calculator_error_t> calculate_myrimon_fruit_exp(const calculator_client_t &client);
 
+double calculate_artifact_exp(const calculator_client_t &client);
+
 #endif  // CALCULATOR_HPP
