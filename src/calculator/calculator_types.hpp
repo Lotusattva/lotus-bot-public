@@ -86,7 +86,6 @@ struct calculator_client_t {
     // cultivation progress
     major_stage_t major_stage{INVALID_MAJOR_STAGE};  // default to invalid
     minor_stage_t minor_stage{INVALID_MINOR_STAGE};  // default to invalid
-    optional<unsigned short> gate;
 
     // default to invalid, should be a non-negative number
     double percent_progress{INVALID_DOUBLE_VAL};
@@ -112,6 +111,7 @@ struct calculator_client_t {
 
     // extractor
     quality_t extractor_quality{INVALID_QUALITY};  // default to invalid
+    binary_t extractor_major_stage_bonus{INVALID_BINARY_VAL}; // 0: no bonus, 1: has bonus, 2 (invalid binary value): not set
 
     // 0: cultiXP, 1: quality, 2: gush; default to 31, should be in the range [0, 30]
     unsigned short node_levels[NUM_EXTRACTOR_NODES]{
