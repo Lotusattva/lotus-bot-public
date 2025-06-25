@@ -116,7 +116,7 @@ task<void> process_respira(const slashcommand_t &event);
 task<void> calc_ask_pill(const button_click_t &event);
 task<void> process_pill(const slashcommand_t &event);
 
-task<void> calc_ask_extractor_quality(const button_click_t &event);
+task<void> calc_ask_extractor(const button_click_t &event);
 
 task<void> calc_ask_extractor_node(const button_click_t &event);
 task<void> process_extractor_node(const slashcommand_t &event);

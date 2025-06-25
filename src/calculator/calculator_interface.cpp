@@ -3,6 +3,7 @@
 #include <string>
 
 #include "../global.hpp"
+#include "calculator_types.hpp"
 
 task<void> start_interactive_calculator(const slashcommand_t &event) {
     static component calc_overview_text{
@@ -563,10 +564,20 @@ task<void> calc_ask_pill(const button_click_t &event) {
                                        "- Average number of rare pills consumed everyday \n"
                                        "- Average number of epic pills consumed everyday \n"
                                        "- Average number of legendary pills consumed everyday \n"
-                                       "- Pill exp bonus in percent \n"
+                                       "- Your **TOTAL** Pill exp bonus in percent \n"
                                        "via `/calc pill` command.\n\n"
                                        "Note that the number of rare, epic and legendary pills "
                                        "must add up to the number of daily pill attempts.\n\n"
+                                       "To check your pill bonuses, click on \"Compare BR\" "
+                                       "button on another player's profile, then \n"
+                                        "Click on \"Details\" button on the \"Technique\" section, "
+                                        "and click on \"Details\" button that appears on top right "
+                                        "of the panel. Scroll down and record the percentage of "
+                                        "your \"Cultivation Pill Effect\"\n"
+                                        "Repeat this process for \"Curio Collection\" and "
+                                        "\"Immortal Bonus\" sections. Then, report the *sum* of "
+                                        "these percentages.\n"
+                                        "If the total pill bonus is 233% percent, enter 233. \n\n"
                                        "We will continue once your input is received.")};
 
     co_await event.co_edit_response(
@@ -666,7 +677,7 @@ task<void> process_pill(const slashcommand_t &event) {
     co_return;
 }
 
-task<void> calc_ask_extractor_quality(const button_click_t &event) {
+task<void> calc_ask_extractor(const button_click_t &event) {
     calc_sessions[event.command.usr.id].second.calc_state = CALC_ASK_EXTRACTOR_QUALITY;
 
     if (DEBUG) cerr << "Asking for extractor quality..." << endl;
@@ -679,6 +690,14 @@ task<void> calc_ask_extractor_quality(const button_click_t &event) {
             .add_component_v2(selectmenu_factory(CALC_SELECT_IDS[CALC_SELECT_EXTRACTOR_QUALITY],
                                                  "Select quality of your extractor", QUALITY_STR))};
 
+    static component extractor_major_stage_bonus_selectmenu{
+        component()
+            .set_type(cot_action_row)
+            .add_component_v2(selectmenu_factory(
+                CALC_SELECT_IDS[CALC_SELECT_EXTRACTOR_MAJOR_STAGE_BONUS],
+                "Select whether your extractor matches the highest major stage in your cluster",
+                BINARY_VAL_STR))};
+
     static component next_button{component()
                                      .set_type(cot_button)
                                      .set_style(cos_primary)
@@ -688,10 +707,12 @@ task<void> calc_ask_extractor_quality(const button_click_t &event) {
     component text_display{
         component()
             .set_type(cot_text_display)
-            .set_content(client_info +
-                         "Please select the quality of your extractor **WHEN YOU "
-                         "INTEND TO EAT YOUR MYRIMON FRUITS** (your current extractor quality "
-                         "might be lower than the one you select): ")};
+            .set_content(
+                client_info +
+                "Please select the quality of your extractor and whether your extractor is at the "
+                "highest major stage in your cluster (before timegate) **WHEN YOU "
+                "INTEND TO EAT YOUR MYRIMON FRUITS** (your current extractor quality "
+                "might be lower than the one you select): ")};
 
     if (DEBUG) cerr << "Sending extractor quality selection message..." << endl;
 

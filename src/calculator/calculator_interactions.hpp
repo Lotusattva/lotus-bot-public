@@ -1,9 +1,9 @@
 #ifndef CALCULATOR_INTERACTIONS_HPP
 #define CALCULATOR_INTERACTIONS_HPP
 
-#include <string_view>
 #include <array>
 #include <span>
+#include <string_view>
 
 using namespace std;
 
@@ -17,6 +17,7 @@ enum calc_select_t {
 
     // extractor
     CALC_SELECT_EXTRACTOR_QUALITY,
+    CALC_SELECT_EXTRACTOR_MAJOR_STAGE_BONUS,
 
     // vase detail
     CALC_SELECT_VASE_STAR,
@@ -31,9 +32,16 @@ enum calc_select_t {
 };
 
 constexpr inline array<string_view, NUM_CALC_SELECTS> CALC_SELECT_IDS{
-    "calc_select_major_stage",       "calc_select_minor_stage", "calc_select_aura_gem_quality",
-    "calc_select_extractor_quality", "calc_select_vase_star",   "calc_select_vase_daily_recharge",
-    "calc_select_vase_transmog",     "calc_select_mirror_star", "calc_select_mirror_daily_recharge",
+    "calc_select_major_stage",
+    "calc_select_minor_stage",
+    "calc_select_aura_gem_quality",
+    "calc_select_extractor_quality",
+    "calc_select_extractor_major_stage_bonus",
+    "calc_select_vase_star",
+    "calc_select_vase_daily_recharge",
+    "calc_select_vase_transmog",
+    "calc_select_mirror_star",
+    "calc_select_mirror_daily_recharge",
 };
 
 enum calc_button_t {
@@ -84,14 +92,14 @@ enum calc_subcmd_t {
     NUM_CALC_SUBCMDS
 };
 
-constexpr inline array<array<string_view, SUBCOMMAND_AND_DESCRIPTION>, NUM_CALC_SUBCMDS> CALC_SUBCMDS{
-    "start", "start an interactive cultivation calculator session",
-    "percent", "report percent progress during an interactive calc session",
-    "cosmosapsis", "report cosmosapsis during an interactive calc session",
-    "respira", "report respira during an interactive calc session",
-    "pill", "report pill data during an interactive calc session",
-    "extractor", "report extractor node levels during an interactive calc session",
-    "myrimon", "report myrimon fruit data during an interactive calc session"};
+constexpr inline array<array<string_view, SUBCOMMAND_AND_DESCRIPTION>, NUM_CALC_SUBCMDS>
+    CALC_SUBCMDS{"start",       "start an interactive cultivation calculator session",
+                 "percent",     "report percent progress during an interactive calc session",
+                 "cosmosapsis", "report cosmosapsis during an interactive calc session",
+                 "respira",     "report respira during an interactive calc session",
+                 "pill",        "report pill data during an interactive calc session",
+                 "extractor",   "report extractor node levels during an interactive calc session",
+                 "myrimon",     "report myrimon fruit data during an interactive calc session"};
 
 constexpr inline unsigned short CALC_SUBCMD_NUM_PARAM[NUM_CALC_SUBCMDS]{
     0,  // start
@@ -105,34 +113,32 @@ constexpr inline unsigned short CALC_SUBCMD_NUM_PARAM[NUM_CALC_SUBCMDS]{
 
 using subcmd_and_desc = array<string_view, SUBCOMMAND_AND_DESCRIPTION>;
 
-constexpr array<subcmd_and_desc, CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_START]> CALC_SUBCMD_START_PARAM{};
-constexpr array<subcmd_and_desc, CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_PERCENT]> CALC_SUBCMD_PERCENT_PARAM{
-    "percentage_val", "percentage displayed on top left corner of the screen"};
-constexpr array<subcmd_and_desc, CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_COSMOSAPSIS]> CALC_SUBCMD_COSMOSAPSIS_PARAM{
-    "cosmosapsis_val", "cosmosapsis displayed in your abode"};
-constexpr array<subcmd_and_desc, CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_RESPIRA]> CALC_SUBCMD_RESPIRA_PARAM{
-    "total_respira_bonus", "total respira bonus in percent",
-    "num_daily_respira_attempts", "number of daily respira attempts"};
+constexpr array<subcmd_and_desc, CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_START]>
+    CALC_SUBCMD_START_PARAM{};
+constexpr array<subcmd_and_desc, CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_PERCENT]>
+    CALC_SUBCMD_PERCENT_PARAM{"percentage_val",
+                              "percentage displayed on top left corner of the screen"};
+constexpr array<subcmd_and_desc, CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_COSMOSAPSIS]>
+    CALC_SUBCMD_COSMOSAPSIS_PARAM{"cosmosapsis_val", "cosmosapsis displayed in your abode"};
+constexpr array<subcmd_and_desc, CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_RESPIRA]>
+    CALC_SUBCMD_RESPIRA_PARAM{"total_respira_bonus", "total respira bonus in percent",
+                              "num_daily_respira_attempts", "number of daily respira attempts"};
 constexpr array<subcmd_and_desc, CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_PILL]> CALC_SUBCMD_PILL_PARAM{
     "num_daily_pill_attempts", "number of daily pill attempts",
-    "num_rare_pills", "number of rare pills consumed",
-    "num_epic_pills", "number of epic pills consumed",
-    "num_legendary_pills", "number of legendary pills consumed",
-    "pill_exp_bonus", "pill experience bonus in percent"};
-constexpr array<subcmd_and_desc, CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_EXTRACTOR]> CALC_SUBCMD_EXTRACTOR_PARAM{
-    "culti_xp", "level of the cultivation xp node",
-    "quality", "level of the extractor quality node",
-    "gush", "level of the extractor gush node"};
-constexpr array<subcmd_and_desc, CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_MYRIMON]> CALC_SUBCMD_MYRIMON_PARAM{
-    "num_myrimon", "number of myrimon fruits"};
+    "num_rare_pills",          "number of rare pills consumed",
+    "num_epic_pills",          "number of epic pills consumed",
+    "num_legendary_pills",     "number of legendary pills consumed",
+    "pill_exp_bonus",          "pill experience bonus in percent"};
+constexpr array<subcmd_and_desc, CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_EXTRACTOR]>
+    CALC_SUBCMD_EXTRACTOR_PARAM{"culti_xp", "level of the cultivation xp node",
+                                "quality",  "level of the extractor quality node",
+                                "gush",     "level of the extractor gush node"};
+constexpr array<subcmd_and_desc, CALC_SUBCMD_NUM_PARAM[CALC_SUBCMD_MYRIMON]>
+    CALC_SUBCMD_MYRIMON_PARAM{"num_myrimon", "number of myrimon fruits"};
 
 constexpr inline array<span<const subcmd_and_desc>, NUM_CALC_SUBCMDS> CALC_SUBCMD_PARAM{
-    CALC_SUBCMD_START_PARAM,
-    CALC_SUBCMD_PERCENT_PARAM,
-    CALC_SUBCMD_COSMOSAPSIS_PARAM,
-    CALC_SUBCMD_RESPIRA_PARAM,
-    CALC_SUBCMD_PILL_PARAM,
-    CALC_SUBCMD_EXTRACTOR_PARAM,
+    CALC_SUBCMD_START_PARAM,   CALC_SUBCMD_PERCENT_PARAM, CALC_SUBCMD_COSMOSAPSIS_PARAM,
+    CALC_SUBCMD_RESPIRA_PARAM, CALC_SUBCMD_PILL_PARAM,    CALC_SUBCMD_EXTRACTOR_PARAM,
     CALC_SUBCMD_MYRIMON_PARAM};
 
 #endif  // CALCULATOR_INTERACTIONS_HPP

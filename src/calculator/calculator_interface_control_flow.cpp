@@ -1,4 +1,5 @@
 #include "../global.hpp"
+#include "calculator_interactions.hpp"
 #include "calculator_interface.hpp"
 #include "calculator_types.hpp"
 
@@ -207,7 +208,7 @@ task<void> calculator_button_click_handler(const button_click_t &event) {
             co_await calc_ask_pill(event);
         else
             // ask for extractor quality if all previous data are set
-            co_await calc_ask_extractor_quality(event);
+            co_await calc_ask_extractor(event);
     } else if (id == CALC_BUTTON_IDS[CALC_BUTTON_RESPIRA]) {
         if (client.daily_pill_attempts == INVALID_UNSIGNED_VAL ||
             (client.pill_quantity[0] == INVALID_UNSIGNED_VAL &&
@@ -218,9 +219,9 @@ task<void> calculator_button_click_handler(const button_click_t &event) {
             co_await calc_ask_pill(event);
         else
             // ask for extractor quality if all previous data are set
-            co_await calc_ask_extractor_quality(event);
+            co_await calc_ask_extractor(event);
     } else if (id == CALC_BUTTON_IDS[CALC_BUTTON_PILL])
-        co_await calc_ask_extractor_quality(event);
+        co_await calc_ask_extractor(event);
     else if (id == CALC_BUTTON_IDS[CALC_BUTTON_EXTRACTOR_QUALITY]) {
         if (client.extractor_quality == INVALID_QUALITY)
             co_return;  // do nothing since user has not selected extractor quality
@@ -298,6 +299,10 @@ task<void> calculator_select_click_handler(const select_click_t &event) {
         if (DEBUG) cerr << "Extractor quality selected: " << event.values[0] << endl;
 
         client.extractor_quality = get_quality(event.values[0]);
+    } else if (event.custom_id == CALC_SELECT_IDS[CALC_SELECT_EXTRACTOR_MAJOR_STAGE_BONUS]) {
+        if (DEBUG) cerr << "Extractor major stage bonus selected: " << event.values[0] << endl;
+
+        client.extractor_major_stage_bonus = get_binary_val(event.values[0]);
     } else if (event.custom_id == CALC_SELECT_IDS[CALC_SELECT_VASE_STAR]) {
         if (DEBUG) cerr << "Vase star selected: " << event.values[0] << endl;
 
