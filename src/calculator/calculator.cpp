@@ -69,6 +69,7 @@ bool is_valid_client(const calculator_client_t &client) {
         (client.pill_quantity[0] + client.pill_quantity[1] + client.pill_quantity[2]) !=
             client.daily_pill_attempts ||
         client.pill_bonus == INVALID_DOUBLE_VAL || client.extractor_quality == INVALID_QUALITY ||
+        client.extractor_major_stage_bonus == INVALID_BINARY_VAL ||
         client.node_levels[0] == INVALID_EXTRACTOR_NODE_LVL ||
         client.node_levels[1] == INVALID_EXTRACTOR_NODE_LVL ||
         client.node_levels[2] == INVALID_EXTRACTOR_NODE_LVL ||
@@ -142,8 +143,11 @@ expected<double, calculator_error_t> calculate_myrimon_fruit_exp(
     const double gush_mult{1.5 + EXP_GUSH_MULT_PER_NODE_LVL * client.node_levels[GUSH_NODE]};
     const double expected_gush_mult{consolidated_gush_chance(gush_chance) * gush_mult};
 
+    const double major_stage_bonus{
+        client.extractor_major_stage_bonus == YES ? 1.0 + MAJOR_STAGE_BONUS : 1.0};
+
     return static_cast<double>(base_exp) * expected_cultixp_mult * expected_quality_mult *
-           expected_gush_mult;
+           expected_gush_mult * major_stage_bonus;
 }
 
 double calculate_artifact_exp(const calculator_client_t &client) {

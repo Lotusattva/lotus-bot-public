@@ -7,7 +7,7 @@
 #include "calculator_types.hpp"
 
 // game's daily reset happens at 8:00 am UTC-5
-constexpr inline chrono::utc_time DAILY_RESET_TIME{chrono::hours{8 + 5}}; // 8 am + 5 hours offset
+// constexpr inline chrono::utc_time DAILY_RESET_TIME{chrono::hours{8 + 5}}; // 8 am + 5 hours offset
 
 enum class calculator_error_t {
     INVALID_CLIENT,  // The calculator client is not fully initialized or has invalid data.
