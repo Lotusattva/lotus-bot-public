@@ -664,6 +664,7 @@ constexpr quality_t get_extractor_node_quality(unsigned short node_level) {
 #define EXP_GUSH_MULT_PER_NODE_LVL 0.04
 #define GUSH_BASE_CHANCE 0.1
 #define GUSH_CHANCE_PER_QUALITY 0.05
+#define MAJOR_STAGE_BONUS 0.5
 
 enum world_level_t {
     MORTAL,    // Mortal world
