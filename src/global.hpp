@@ -8,9 +8,9 @@
 using namespace std;
 using namespace dpp;
 
-inline string BOT_TOKEN{getenv("BOT_TOKEN")};
+// inline string BOT_TOKEN{getenv("BOT_TOKEN")};
 
-inline cluster bot(BOT_TOKEN, intents::i_all_intents); // global bot instance
+// inline cluster bot(BOT_TOKEN, intents::i_all_intents); // global bot instance
 
 inline message_map polls;       // global poll message storage
 inline message_map debug_polls; // global debug poll message storage

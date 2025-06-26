@@ -2,6 +2,7 @@
 #include <dpp/message.h>
 
 #include "calculator/calculator.hpp"
+#include "calculator/calculator_constants.hpp"
 #include "feet.hpp"
 #include "global.hpp"
 #include "poll.hpp"
@@ -96,25 +97,18 @@ void sigint_handler(int _) {
 
 
 int main() {
-    calculator_client_t client{
-        .major_stage = WHOLENESS,
-        .minor_stage = LATE,
-        .percent_progress = 250.0,
-        .cosmosapsis = 560.0,
-        .aura_gem_quality = MYTHIC,
-        .respira_bonus = 500.0,
-        .daily_respira_attempts = 30,
-        .daily_pill_attempts = 30,
-        .pill_quantity = {10, 10, 10},
-        .pill_bonus = 300.0,
-        .extractor_quality = MYTHIC,
-        .extractor_major_stage_bonus = YES,
-        .node_levels = {30, 30, 30},
-        .fruit_quantity = 100,
-    };
+    calculator_client_t client;
+    client.major_stage = WHOLENESS;
+    client.minor_stage = LATE;
+    client.extractor_quality = MYTHIC;
+    client.extractor_major_stage_bonus = YES;
+    client.node_levels[CULTIXP_NODE] = 30;
+    client.node_levels[QUALITY_NODE] = 30;
+    client.node_levels[GUSH_NODE] = 30;
 
-    auto fruit_result {calculate_myrimon_fruit_exp(client)};
+    cout << "Start calculation" << endl;
+    double fruit_result {calculate_myrimon_fruit_exp(client)};
     if (fruit_result) {
-        cout << "Myrimon fruit exp: " << fruit_result.value() << endl;
+        cout << "Myrimon fruit exp (no gush): " << fruit_result << endl;
     }
 }

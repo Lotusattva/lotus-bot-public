@@ -30,13 +30,13 @@ enum class calculator_error_t {
  * @param client The calculator client.
  * @return An expected value containing the estimated time to breakthrough in hours, or an error if the calculation fails.
  */
-expected<chrono::hours, calculator_error_t> get_estimated_time_to_breakthrough(const calculator_client_t &client);
+// expected<chrono::hours, calculator_error_t> get_estimated_time_to_breakthrough(const calculator_client_t &client);
 
 bool is_valid_client(const calculator_client_t &client);
 
 double consolidated_gush_chance(double gush_chance);
 
-expected<double, calculator_error_t> calculate_myrimon_fruit_exp(const calculator_client_t &client);
+double calculate_myrimon_fruit_exp(const calculator_client_t &client);
 
 double calculate_artifact_exp(const calculator_client_t &client);
 

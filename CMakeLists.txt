@@ -12,11 +12,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable(${PROJECT_NAME} 
     src/main.cpp
-    src/poll.cpp
-    src/feet.cpp
-    src/scheduler.cpp 
-    src/calculator/calculator_interface.cpp
-    src/calculator/calculator_interface_control_flow.cpp
+    src/calculator/calculator.cpp
 )
 
 find_package(DPP REQUIRED)

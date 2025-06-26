@@ -665,40 +665,8 @@ constexpr quality_t get_extractor_node_quality(unsigned short node_level) {
 #define GUSH_BASE_CHANCE 0.1
 #define GUSH_CHANCE_PER_QUALITY 0.05
 #define MAJOR_STAGE_BONUS 0.5
+#define MULT_PER_CULTIXP_NODE_LEVEL 0.02
 
-enum world_level_t {
-    MORTAL,    // Mortal world
-    SPIRIT,    // Spirit world
-    IMMORTAL,  // Immortal world
-
-    NUM_WORLDS
-};
-
-constexpr world_level_t get_world_level(major_stage_t major_stage) {
-    switch (major_stage) {
-        case FOUNDATION:
-        case VIRTUOSO:
-        case NASCENT:
-        case INCARNATION:
-        case VOIDBREAK:
-            return MORTAL;
-        case WHOLENESS:
-        case PERFECTION:
-        case NIRVANA:
-            return SPIRIT;
-        case CELESTIAL:
-        case ETERNAL:
-            return IMMORTAL;
-        default:
-            return NUM_WORLDS;  // An invalid world, indicates an error
-    }
-}
-
-constexpr inline array<double, NUM_WORLDS> MULT_PER_CULTIXP_NODE_LEVEL{
-    0.02,  // mortal world
-    0.04,  // spirit world
-    -1.0,  // immortal world (CURRENTLY NO DATA)
-};
 
 /**
  * Chance of generating an orb of a certain quality based on the extractor "Quality" node level
