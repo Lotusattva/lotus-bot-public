@@ -40,4 +40,6 @@ double calculate_myrimon_fruit_exp(const calculator_client_t &client);
 
 double calculate_artifact_exp(const calculator_client_t &client);
 
+double calculate_mythic_pill_exp(const calculator_client_t &client);
+
 #endif  // CALCULATOR_HPP

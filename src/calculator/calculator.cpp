@@ -181,8 +181,14 @@ double calculate_artifact_exp(const calculator_client_t &client) {
     if (client.vase_transmog == YES)
         mythic_bonus += VASE_TRANSMOG_PILL_BONUS;  // transmog adds a flat bonus
 
+    if (DEBUG)
+        cout << "Vase mythic bonus: " << mythic_bonus << endl;
+
     const double mythic_pill_exp{PILL_BASE_EXP[client.major_stage][MYTHIC] *
                                  (1.0 + mythic_bonus + client.pill_bonus / 100.0)};
+
+    if (DEBUG)
+        cout << "Mythic pill exp: " << mythic_pill_exp << endl;
 
     // calculate expected exp from mythic pills per day
     const double expected_vase_mythic_pill_exp_per_day{
