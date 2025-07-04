@@ -137,12 +137,7 @@ The "CultiXP" node introduces a multiplicative bonus with two additive component
     Where:
     - $CultiXPLevelMult$ is the multiplicative bonus applied to the exp of the resulting orb based on the level of the "CultiXP" node
     - $CultiXPNodeLevel$ is the level of the "CultiXP" node
-    - $CultiXPMultPerNodeLevel$ is the multiplier per node level depending on the "world" level corresponding to the player's major stage, as defined in the following table:
-        | World    | $CultiXPMultPerNodeLevel$ |
-        |----------|---------------------------|
-        | Mortal   | 0.02                      |
-        | Spirit   | 0.04                      |
-        | Immortal | *Currently no data*       |
+    - $CultiXPMultPerNodeLevel$ is the multiplier per node level. Its value is 0.02.
 
 2. The second component is a 20% bonus conditional whether the quality of the "CultiXP" node is at or above the quality of the exp orb produced by the aura extractor upon consuming a myrimon fruit (e.g. if the orb is RARE, and the "CultiXP" extractor node is at RARE or higher, then the 20% bonus applies). 
 
