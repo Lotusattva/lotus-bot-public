@@ -8,6 +8,8 @@ expected<chrono::hours, calculator_error_t> get_estimated_time_to_breakthrough(
     const calculator_client_t &client) {
     if (!is_valid_client(client)) return unexpected(calculator_error_t::INVALID_CLIENT);
 
+    chrono::hours hours_to_breakthrough{0};
+
     // determine the amount of exp needed to reach the next major stage
     double exp_needed{0.0};
     for (size_t i{LATE}; i >= client.minor_stage; --i)
@@ -25,12 +27,18 @@ expected<chrono::hours, calculator_error_t> get_estimated_time_to_breakthrough(
     // calculate exp generate per hour by cultivation and aura gem
     const double cosmosapsis_and_aura_gem{client.cosmosapsis *
                                           (1 + AURA_GEM_MULT[client.aura_gem_quality])};
-    const double exp_per_hour{cosmosapsis_and_aura_gem / NUM_COSMOSAPSIS_PER_HOUR};
-    if (const double initial_day_passive_exp{exp_per_hour * hours_to_next_reset.count()};
+    const double cultivation_exp_per_hour{cosmosapsis_and_aura_gem / NUM_COSMOSAPSIS_PER_HOUR};
+    if (const double initial_day_passive_exp{cultivation_exp_per_hour *
+                                             hours_to_next_reset.count()};
         initial_day_passive_exp > exp_needed)
-        return chrono::hours{static_cast<int>(exp_needed / exp_per_hour)};
-    else
+        return chrono::hours{static_cast<int>(exp_needed / cultivation_exp_per_hour)};
+    else {
         exp_needed -= initial_day_passive_exp;
+        hours_to_breakthrough += hours_to_next_reset;
+    }
+
+    // calculate exp generate per day by cultivation and aura gem
+    const double cultivation_exp_per_day{cultivation_exp_per_hour * 24.0};
 
     // calculate myrimom fruit exp
     const expected<double, calculator_error_t> calculate_fruit_exp_result{
@@ -53,11 +61,23 @@ expected<chrono::hours, calculator_error_t> get_estimated_time_to_breakthrough(
         expected_pill_exp_per_day += PILL_BASE_EXP[client.major_stage][idx + 2] * quantity *
                                      (1.0 + client.pill_bonus / 100.0);
 
-    // TODO: calculate artifact
-    // TODO: calculate time
+    // calculate artifact exp per day
+    const double expected_artifact_exp_per_day{calculate_artifact_exp(client)};
 
-    // placeholder return value
-    return chrono::hours{0};
+    const double total_exp_per_day{cultivation_exp_per_day + expected_respira_exp_per_day +
+                                   expected_pill_exp_per_day + expected_artifact_exp_per_day};
+    chrono::days days_to_breakthrough{static_cast<int>(exp_needed / total_exp_per_day)};
+    exp_needed -= days_to_breakthrough.count() * total_exp_per_day;
+    if (exp_needed <= 0.0) return hours_to_breakthrough + days_to_breakthrough;
+
+    exp_needed -=
+        expected_respira_exp_per_day + expected_pill_exp_per_day + expected_artifact_exp_per_day;
+
+    if (exp_needed <= 0.0)
+        return hours_to_breakthrough + days_to_breakthrough;
+    else
+        return hours_to_breakthrough + days_to_breakthrough +
+               chrono::hours{static_cast<int>(exp_needed / cultivation_exp_per_hour)};
 }
 
 bool is_valid_client(const calculator_client_t &client) {
@@ -99,8 +119,7 @@ double consolidated_gush_chance(double gush_chance) {
                  (1. + (gush_chance - 1.) * gush_chance));
 }
 
-double calculate_myrimon_fruit_exp(
-    const calculator_client_t &client) {
+double calculate_myrimon_fruit_exp(const calculator_client_t &client) {
     // get base exp of the fruit based on its rank
     const fruit_rank_t fruit_rank{get_fruit_rank(client.major_stage)};
 
@@ -143,13 +162,13 @@ double calculate_myrimon_fruit_exp(
                                        GUSH_CHANCE_PER_QUALITY};
     const double gush_mult{1.5 + EXP_GUSH_MULT_PER_NODE_LVL * client.node_levels[GUSH_NODE]};
 
-
     const double expected_gush_mult{consolidated_gush_chance(gush_chance) * gush_mult};
 
     const double major_stage_bonus{
         client.extractor_major_stage_bonus == YES ? 1.0 + MAJOR_STAGE_BONUS : 1.0};
 
-    return static_cast<double>(base_exp) * expected_cultixp_mult * major_stage_bonus * expected_quality_mult * expected_gush_mult;
+    return static_cast<double>(base_exp) * expected_cultixp_mult * major_stage_bonus *
+           expected_quality_mult * expected_gush_mult;
 }
 
 double calculate_artifact_exp(const calculator_client_t &client) {
@@ -183,14 +202,12 @@ double calculate_artifact_exp(const calculator_client_t &client) {
     if (client.vase_transmog == YES)
         mythic_bonus += VASE_TRANSMOG_PILL_BONUS;  // transmog adds a flat bonus
 
-    if (DEBUG)
-        cout << "Vase mythic bonus: " << mythic_bonus << endl;
+    if (DEBUG) cout << "Vase mythic bonus: " << mythic_bonus << endl;
 
     const double mythic_pill_exp{PILL_BASE_EXP[client.major_stage][MYTHIC] *
                                  (1.0 + mythic_bonus + client.pill_bonus / 100.0)};
 
-    if (DEBUG)
-        cout << "Mythic pill exp: " << mythic_pill_exp << endl;
+    if (DEBUG) cout << "Mythic pill exp: " << mythic_pill_exp << endl;
 
     // calculate expected exp from mythic pills per day
     const double expected_vase_mythic_pill_exp_per_day{
