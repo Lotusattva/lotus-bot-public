@@ -7,13 +7,13 @@
 #include "calculator_types.hpp"
 
 // game's daily reset happens at 8:00 am UTC-5
-// constexpr inline chrono::utc_time DAILY_RESET_TIME{chrono::hours{8 + 5}}; // 8 am + 5 hours offset
+constexpr inline chrono::utc_time DAILY_RESET_TIME{chrono::hours{8 + 5}}; // 8 am + 5 hours offset
 
 enum class calculator_error_t {
     INVALID_CLIENT,  // The calculator client is not fully initialized or has invalid data.
     OVERFLOW_EXP, // The player already has enough exp to breakthrough to the next major stage.
     MYRIMON_NOW, // The player can breakthrough to the next major stage now if they consume the amount of myrimon fruits they have set in the calculator client.
-    MYRIMOM_CALCULATION_ERROR, // An error occurred while calculating the myrimon fruit exp.
+    MYRIMON_CALCULATION_ERROR, // An error occurred while calculating the myrimon fruit exp.
 };
 
 /**
@@ -30,7 +30,7 @@ enum class calculator_error_t {
  * @param client The calculator client.
  * @return An expected value containing the estimated time to breakthrough in hours, or an error if the calculation fails.
  */
-// expected<chrono::hours, calculator_error_t> get_estimated_time_to_breakthrough(const calculator_client_t &client);
+expected<chrono::hours, calculator_error_t> get_estimated_time_to_breakthrough(const calculator_client_t &client);
 
 bool is_valid_client(const calculator_client_t &client);
 

@@ -4,58 +4,61 @@
 #include "calculator_constants.hpp"
 #include "calculator_types.hpp"
 
-// expected<chrono::hours, calculator_error_t> get_estimated_time_to_breakthrough(
-//     const calculator_client_t &client) {
-//     if (!is_valid_client(client)) return unexpected(calculator_error_t::INVALID_CLIENT);
+expected<chrono::hours, calculator_error_t> get_estimated_time_to_breakthrough(
+    const calculator_client_t &client) {
+    if (!is_valid_client(client)) return unexpected(calculator_error_t::INVALID_CLIENT);
 
-//     // determine the amount of exp needed to reach the next major stage
-//     double exp_needed{0.0};
-//     for (size_t i{LATE}; i >= client.minor_stage; --i)
-//         exp_needed += STAGE_EXP_REQ[client.major_stage][i];
-//     exp_needed -=
-//         client.percent_progress / 100 * STAGE_EXP_REQ[client.major_stage][client.minor_stage];
-//     if (exp_needed <= 0.0) return unexpected(calculator_error_t::OVERFLOW_EXP);
+    // determine the amount of exp needed to reach the next major stage
+    double exp_needed{0.0};
+    for (size_t i{LATE}; i >= client.minor_stage; --i)
+        exp_needed += STAGE_EXP_REQ[client.major_stage][i];
+    exp_needed -=
+        client.percent_progress / 100 * STAGE_EXP_REQ[client.major_stage][client.minor_stage];
+    if (exp_needed <= 0.0) return unexpected(calculator_error_t::OVERFLOW_EXP);
 
-//     // calculate time to next daily reset rounded to nearest hour
-//     const auto now{chrono::utc_clock::now()};
-//     const auto next_reset{DAILY_RESET_TIME +
-//                           chrono::days{(now.time_since_epoch().count() / 86400) + 1}};
-//     const auto hours_to_next_reset{chrono::duration_cast<chrono::hours>(next_reset - now)};
+    // calculate time to next daily reset rounded to nearest hour
+    const auto now{chrono::utc_clock::now()};
+    const auto next_reset{DAILY_RESET_TIME +
+                          chrono::days{(now.time_since_epoch().count() / 86400) + 1}};
+    const auto hours_to_next_reset{chrono::duration_cast<chrono::hours>(next_reset - now)};
 
-//     // calculate exp generate per hour by cultivation and aura gem
-//     const double cosmosapsis_and_aura_gem{client.cosmosapsis *
-//                                           (1 + AURA_GEM_MULT[client.aura_gem_quality])};
-//     const double exp_per_hour{cosmosapsis_and_aura_gem / NUM_COSMOSAPSIS_PER_HOUR};
-//     if (const double initial_day_passive_exp{exp_per_hour * hours_to_next_reset.count()};
-//         initial_day_passive_exp > exp_needed)
-//         return chrono::hours{static_cast<int>(exp_needed / exp_per_hour)};
-//     else
-//         exp_needed -= initial_day_passive_exp;
+    // calculate exp generate per hour by cultivation and aura gem
+    const double cosmosapsis_and_aura_gem{client.cosmosapsis *
+                                          (1 + AURA_GEM_MULT[client.aura_gem_quality])};
+    const double exp_per_hour{cosmosapsis_and_aura_gem / NUM_COSMOSAPSIS_PER_HOUR};
+    if (const double initial_day_passive_exp{exp_per_hour * hours_to_next_reset.count()};
+        initial_day_passive_exp > exp_needed)
+        return chrono::hours{static_cast<int>(exp_needed / exp_per_hour)};
+    else
+        exp_needed -= initial_day_passive_exp;
 
-//     // calculate myrimom fruit exp
-//     const expected<double, calculator_error_t> calculate_fruit_exp_result{
-//         calculate_myrimon_fruit_exp(client)};
-//     if (!calculate_fruit_exp_result) return unexpected(calculate_fruit_exp_result.error());
-//     const double myrimon_fruit_exp{calculate_fruit_exp_result.value()};
+    // calculate myrimom fruit exp
+    const expected<double, calculator_error_t> calculate_fruit_exp_result{
+        calculate_myrimon_fruit_exp(client)};
+    if (!calculate_fruit_exp_result) return unexpected(calculate_fruit_exp_result.error());
+    const double myrimon_fruit_exp{calculate_fruit_exp_result.value()};
 
-//     exp_needed -= client.fruit_quantity * myrimon_fruit_exp;
-//     if (exp_needed <= 0.0) return unexpected(calculator_error_t::MYRIMON_NOW);
+    exp_needed -= client.fruit_quantity * myrimon_fruit_exp;
+    if (exp_needed <= 0.0) return unexpected(calculator_error_t::MYRIMON_NOW);
 
-//     // calculate respira exp per day
-//     const double expected_respira_exp_per_day{
-//         RESPIRA_BASE_EXP[client.major_stage] * (client.respira_bonus / 100.0) *
-//         EXPECTED_RESPIRA_MULT * client.daily_respira_attempts};
+    // calculate respira exp per day
+    const double expected_respira_exp_per_day{
+        RESPIRA_BASE_EXP[client.major_stage] * (client.respira_bonus / 100.0) *
+        EXPECTED_RESPIRA_MULT * client.daily_respira_attempts};
 
-//     // calculate pill exp per day
-//     double expected_pill_exp_per_day{0.0};
-//     for (const auto &[idx, quantity] : client.pill_quantity | views::enumerate)
-//         // offset index by 2 because we do not count common and uncommon pills (start at rare)
-//         expected_pill_exp_per_day += PILL_BASE_EXP[client.major_stage][idx + 2] * quantity *
-//                                      (1.0 + client.pill_bonus / 100.0);
+    // calculate pill exp per day
+    double expected_pill_exp_per_day{0.0};
+    for (const auto &[idx, quantity] : client.pill_quantity | views::enumerate)
+        // offset index by 2 because we do not count common and uncommon pills (start at rare)
+        expected_pill_exp_per_day += PILL_BASE_EXP[client.major_stage][idx + 2] * quantity *
+                                     (1.0 + client.pill_bonus / 100.0);
 
-//     // placeholder return value
-//     return chrono::hours{0};
-// }
+    // TODO: calculate artifact
+    // TODO: calculate time
+
+    // placeholder return value
+    return chrono::hours{0};
+}
 
 bool is_valid_client(const calculator_client_t &client) {
     if (client.major_stage == INVALID_MAJOR_STAGE || client.minor_stage == INVALID_MINOR_STAGE ||
@@ -100,8 +103,7 @@ double calculate_myrimon_fruit_exp(
     const calculator_client_t &client) {
     // get base exp of the fruit based on its rank
     const fruit_rank_t fruit_rank{get_fruit_rank(client.major_stage)};
-    // if (fruit_rank == NUM_FRUIT_RANKS)
-    //     return unexpected(calculator_error_t::MYRIMOM_CALCULATION_ERROR);
+
     const exp_t base_exp{FRUIT_BASE_EXP[fruit_rank]};
 
     // get probability distribution of quality
