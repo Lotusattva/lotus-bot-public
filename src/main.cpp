@@ -1,8 +1,9 @@
 #include <dpp/dpp.h>
 #include <dpp/message.h>
 
+#include "calculator/calculator.hpp"
 #include "calculator/calculator_interface.hpp"
-#include "calculator/calculator_constants.hpp"
+#include "calculator/calculator_types.hpp"
 #include "feet.hpp"
 #include "global.hpp"
 #include "poll.hpp"
@@ -65,7 +66,40 @@ int main() {
     bot.on_message_create(&feet);
 
     if (DEBUG) {
-        // nothing for now
+        calculator_client_t client;
+        client.major_stage = PERFECTION;
+        client.minor_stage = MIDDLE;
+        client.percent_progress = 75.2;
+        client.cosmosapsis = 870.87;
+        client.aura_gem_quality = MYTHIC;
+        client.respira_bonus = 187.0 + 10.0 + 2.0 + 23.0;
+        client.daily_respira_attempts = 9 + 1 + 2 + 4;
+        client.daily_pill_attempts = 27;
+        client.pill_quantity[RARE_IDX] = 15;
+        client.pill_quantity[EPIC_IDX] = 10;
+        client.pill_quantity[LEGENDARY_IDX] = 2;
+        client.pill_bonus = 47.8;
+        client.extractor_quality = MYTHIC;
+        client.extractor_major_stage_bonus = YES;
+        client.node_levels[CULTIXP_NODE] = 30;
+        client.node_levels[QUALITY_NODE] = 30;
+        client.node_levels[GUSH_NODE] = 30;
+        client.fruit_quantity = 100;
+        client.vase.emplace();
+        client.vase->star = 3;
+        client.vase->daily_recharge = YES;
+        client.vase_transmog = YES;
+        client.mirror.emplace();
+        client.mirror->star = 3;
+        client.mirror->daily_recharge = YES;
+
+        auto result{get_estimated_time_to_breakthrough(client)};
+        if (result)
+            cout << "Estimated time to breakthrough: " << result.value().count() / 24
+                 << " days and " << result.value().count() % 24 << " hours." << endl;
+        else
+            cerr << "Error calculating estimated time to breakthrough: "
+                 << static_cast<int>(result.error()) << endl;
     } else {
         auto now{chrono::system_clock::now()};
         auto now_time_t{chrono::system_clock::to_time_t(now)};
