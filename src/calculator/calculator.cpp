@@ -1,5 +1,7 @@
 #include "calculator.hpp"
 
+#include <print>
+
 #include "../global.hpp"
 #include "calculator_constants.hpp"
 #include "calculator_types.hpp"
@@ -19,15 +21,32 @@ expected<chrono::hours, calculator_error_t> get_estimated_time_to_breakthrough(
     if (exp_needed <= 0.0) return unexpected(calculator_error_t::OVERFLOW_EXP);
 
     // calculate time to next daily reset rounded to nearest hour
-    const auto now{chrono::utc_clock::now()};
-    const auto next_reset{DAILY_RESET_TIME +
-                          chrono::days{(now.time_since_epoch().count() / 86400) + 1}};
-    const auto hours_to_next_reset{chrono::duration_cast<chrono::hours>(next_reset - now)};
+    const chrono::time_point now{chrono::utc_clock::now()};
+    const chrono::hh_mm_ss time_of_day{now - chrono::floor<chrono::days>(now)};
+
+    chrono::hours hours_to_next_reset{DAILY_RESET_TIME - time_of_day.hours()};
+    if (hours_to_next_reset < chrono::hours{0}) {
+        // if the time of day is past the daily reset time, add 24 hours
+        hours_to_next_reset += chrono::hours{24};
+    }
+
+    if (DEBUG) println(cerr, "Hours to next reset: {}", hours_to_next_reset);
 
     // calculate exp generate per hour by cultivation and aura gem
     const double cosmosapsis_and_aura_gem{client.cosmosapsis *
                                           (1 + AURA_GEM_MULT[client.aura_gem_quality])};
-    const double cultivation_exp_per_hour{cosmosapsis_and_aura_gem / NUM_COSMOSAPSIS_PER_HOUR};
+
+    if (DEBUG) {
+        println(cerr, "Cosmosapsis: {}", client.cosmosapsis);
+        println(cerr, "Aura gem quality: {}", QUALITY_STR[client.aura_gem_quality]);
+        println(cerr, "Cosmosapsis and aura gem: {}", cosmosapsis_and_aura_gem);
+        println(cerr, "Number of cosmosapsis per hour: {}", NUM_COSMOSAPSIS_PER_HOUR);
+    }
+
+    const double cultivation_exp_per_hour{cosmosapsis_and_aura_gem * NUM_COSMOSAPSIS_PER_HOUR};
+
+    if (DEBUG) println(cerr, "Cultivation exp per hour: {}", cultivation_exp_per_hour);
+
     if (const double initial_day_passive_exp{cultivation_exp_per_hour *
                                              hours_to_next_reset.count()};
         initial_day_passive_exp > exp_needed)
@@ -40,11 +59,15 @@ expected<chrono::hours, calculator_error_t> get_estimated_time_to_breakthrough(
     // calculate exp generate per day by cultivation and aura gem
     const double cultivation_exp_per_day{cultivation_exp_per_hour * 24.0};
 
+    if (DEBUG) println(cerr, "Cultivation exp per day: {}", cultivation_exp_per_day);
+
     // calculate myrimom fruit exp
     const expected<double, calculator_error_t> calculate_fruit_exp_result{
         calculate_myrimon_fruit_exp(client)};
     if (!calculate_fruit_exp_result) return unexpected(calculate_fruit_exp_result.error());
     const double myrimon_fruit_exp{calculate_fruit_exp_result.value()};
+
+    if (DEBUG) println(cerr, "Myrimon fruit exp: {}", myrimon_fruit_exp);
 
     exp_needed -= client.fruit_quantity * myrimon_fruit_exp;
     if (exp_needed <= 0.0) return unexpected(calculator_error_t::MYRIMON_NOW);
@@ -54,6 +77,8 @@ expected<chrono::hours, calculator_error_t> get_estimated_time_to_breakthrough(
         RESPIRA_BASE_EXP[client.major_stage] * (client.respira_bonus / 100.0) *
         EXPECTED_RESPIRA_MULT * client.daily_respira_attempts};
 
+    if (DEBUG) println(cerr, "Expected respira exp per day: {}", expected_respira_exp_per_day);
+
     // calculate pill exp per day
     double expected_pill_exp_per_day{0.0};
     for (const auto &[idx, quantity] : client.pill_quantity | views::enumerate)
@@ -61,8 +86,12 @@ expected<chrono::hours, calculator_error_t> get_estimated_time_to_breakthrough(
         expected_pill_exp_per_day += PILL_BASE_EXP[client.major_stage][idx + 2] * quantity *
                                      (1.0 + client.pill_bonus / 100.0);
 
+    if (DEBUG) println(cerr, "Expected pill exp per day: {}", expected_pill_exp_per_day);
+
     // calculate artifact exp per day
     const double expected_artifact_exp_per_day{calculate_artifact_exp(client)};
+
+    if (DEBUG) println(cerr, "Expected artifact exp per day: {}", expected_artifact_exp_per_day);
 
     const double total_exp_per_day{cultivation_exp_per_day + expected_respira_exp_per_day +
                                    expected_pill_exp_per_day + expected_artifact_exp_per_day};
@@ -202,12 +231,8 @@ double calculate_artifact_exp(const calculator_client_t &client) {
     if (client.vase_transmog == YES)
         mythic_bonus += VASE_TRANSMOG_PILL_BONUS;  // transmog adds a flat bonus
 
-    if (DEBUG) cout << "Vase mythic bonus: " << mythic_bonus << endl;
-
     const double mythic_pill_exp{PILL_BASE_EXP[client.major_stage][MYTHIC] *
                                  (1.0 + mythic_bonus + client.pill_bonus / 100.0)};
-
-    if (DEBUG) cout << "Mythic pill exp: " << mythic_pill_exp << endl;
 
     // calculate expected exp from mythic pills per day
     const double expected_vase_mythic_pill_exp_per_day{
