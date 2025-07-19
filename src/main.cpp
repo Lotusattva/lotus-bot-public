@@ -1,6 +1,9 @@
 #include <dpp/dpp.h>
 #include <dpp/message.h>
 
+#include <iostream>
+#include <print>
+
 #include "calculator/calculator.hpp"
 #include "calculator/calculator_interface.hpp"
 #include "calculator/calculator_types.hpp"
@@ -48,7 +51,7 @@ int main() {
             co_await calculator_button_click_handler(event);
         else {
             // do nothing on client side
-            if (DEBUG) cerr << "Unhandled button click event: " << event.custom_id << endl;
+            if (DEBUG) println(cerr, "Unhandled button click event: {}", event.custom_id);
         }
     });
 
@@ -59,7 +62,7 @@ int main() {
             co_await calculator_select_click_handler(event);
         else {
             // do nothing on client side
-            if (DEBUG) cerr << "Unhandled select click event: " << event.custom_id << endl;
+            if (DEBUG) println(cerr, "Unhandled select click event: {}", event.custom_id);
         }
     });
 
@@ -95,11 +98,11 @@ int main() {
 
         auto result{get_estimated_time_to_breakthrough(client)};
         if (result)
-            cout << "Estimated time to breakthrough: " << result.value().count() / 24
-                 << " days and " << result.value().count() % 24 << " hours." << endl;
+            println(cout, "Estimated time to breakthrough: {} days and {} hours.",
+                    result.value().count() / 24, result.value().count() % 24);
         else
-            cerr << "Error calculating estimated time to breakthrough: "
-                 << static_cast<int>(result.error()) << endl;
+            println(cerr, "Error calculating estimated time to breakthrough: {}",
+                   static_cast<int>(result.error()));
     } else {
         auto now{chrono::system_clock::now()};
         auto now_time_t{chrono::system_clock::to_time_t(now)};
