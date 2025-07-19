@@ -167,10 +167,9 @@ string print_client_info(const calculator_client_t &client) {
     if (client.minor_stage != INVALID_MINOR_STAGE)
         info += "- Minor Stage: " + string{MINOR_STAGE_STR[client.minor_stage]} + "\n";
 
-    // TODO: handle gate
-
     if (client.percent_progress != INVALID_DOUBLE_VAL)
         info += "- Percent Progress: " + to_string(client.percent_progress) + "%\n";
+
     if (client.cosmosapsis != INVALID_DOUBLE_VAL)
         info += "- Cosmosapsis: " + to_string(client.cosmosapsis) + "\n";
 
@@ -730,6 +729,8 @@ task<void> calc_ask_extractor(const button_click_t &event) {
                                   .add_component_v2(text_display)
                                   // ...and a select menu for extractor quality
                                   .add_component_v2(extractor_quality_selectmenu)
+                                  // ...and a select menu for extractor major stage bonus
+                                  .add_component_v2(extractor_major_stage_bonus_selectmenu)
                                   // ...and an action row with two buttons
                                   .add_component_v2(component()
                                                         .set_type(cot_action_row)

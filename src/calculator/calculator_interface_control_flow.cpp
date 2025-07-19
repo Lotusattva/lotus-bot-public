@@ -223,7 +223,8 @@ task<void> calculator_button_click_handler(const button_click_t &event) {
     } else if (id == CALC_BUTTON_IDS[CALC_BUTTON_PILL])
         co_await calc_ask_extractor(event);
     else if (id == CALC_BUTTON_IDS[CALC_BUTTON_EXTRACTOR_QUALITY]) {
-        if (client.extractor_quality == INVALID_QUALITY)
+        if (client.extractor_quality == INVALID_QUALITY ||
+            client.extractor_major_stage_bonus == INVALID_BINARY_VAL)
             co_return;  // do nothing since user has not selected extractor quality
         else if (client.node_levels[0] == INVALID_EXTRACTOR_NODE_LVL ||
                  client.node_levels[1] == INVALID_EXTRACTOR_NODE_LVL ||
@@ -249,8 +250,9 @@ task<void> calculator_button_click_handler(const button_click_t &event) {
         // ask about vase details if user owns a vase
         co_await calc_ask_vase_detail(event);
     else if (id == CALC_BUTTON_IDS[CALC_BUTTON_VASE_NO])
+
         // skip asking mirror
-        co_await calc_under_construction(event);  // TODO: replace with calc_result
+        co_await calc_result(event);
     else if (id == CALC_BUTTON_IDS[CALC_BUTTON_VASE_DETAIL]) {
         if (client.vase.has_value() && client.vase->star != INVALID_STAR &&
             client.vase->daily_recharge != INVALID_BINARY_VAL)

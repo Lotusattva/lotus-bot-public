@@ -111,7 +111,8 @@ struct calculator_client_t {
 
     // extractor
     quality_t extractor_quality{INVALID_QUALITY};  // default to invalid
-    binary_t extractor_major_stage_bonus{INVALID_BINARY_VAL}; // 0: no bonus, 1: has bonus, 2 (invalid binary value): not set
+    binary_t extractor_major_stage_bonus{
+        INVALID_BINARY_VAL};  // 0: no bonus, 1: has bonus, 2 (invalid binary value): not set
 
     // 0: cultiXP, 1: quality, 2: gush; default to 31, should be in the range [0, 30]
     unsigned short node_levels[NUM_EXTRACTOR_NODES]{
