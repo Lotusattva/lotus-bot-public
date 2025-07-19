@@ -62,6 +62,7 @@ enum calc_button_t {
     CALC_BUTTON_MIRROR_YES,
     CALC_BUTTON_MIRROR_NO,
     CALC_BUTTON_MIRROR_DETAIL,
+    CALC_BUTTON_RESULT,
 
     NUM_CALC_BUTTONS
 };
@@ -72,7 +73,7 @@ constexpr inline array<string_view, NUM_CALC_BUTTONS> CALC_BUTTON_IDS{
     "calc_respira",        "calc_pill",          "calc_extractor_quality",
     "calc_extractor_node", "calc_myrimon",       "calc_vase_yes",
     "calc_vase_no",        "calc_vase_detail",   "calc_mirror_yes",
-    "calc_mirror_no",      "calc_mirror_detail",
+    "calc_mirror_no",      "calc_mirror_detail", "calc_result",
 };
 
 #define SUBCOMMAND_AND_DESCRIPTION 2

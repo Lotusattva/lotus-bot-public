@@ -263,12 +263,12 @@ task<void> calculator_button_click_handler(const button_click_t &event) {
         co_await calc_ask_mirror_detail(event);
     else if (id == CALC_BUTTON_IDS[CALC_BUTTON_MIRROR_NO])
         // skip asking mirror details
-        co_await calc_under_construction(event);  // TODO: replace with calc_result
+        co_await calc_result(event);
     else if (id == CALC_BUTTON_IDS[CALC_BUTTON_MIRROR_DETAIL]) {
         if (client.mirror.has_value() && client.mirror->star != INVALID_STAR &&
             client.mirror->daily_recharge != INVALID_BINARY_VAL)
             // all data are set, then calculate result
-            co_await calc_under_construction(event);  // TODO: replace with calc_result
+            co_await calc_result(event);
     } else {
         if (DEBUG) cerr << "Unhandled calculator button click event: " << id << endl;
         co_await calc_under_construction(event);

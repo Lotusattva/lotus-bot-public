@@ -5,9 +5,9 @@
 
 #include <string>
 
+#include "../global.hpp"
 #include "calculator_interactions.hpp"
 #include "calculator_types.hpp"
-#include "../global.hpp"
 
 using namespace dpp;
 
@@ -90,7 +90,6 @@ inline const component cancel_button{component()
                                          .set_label("CANCEL")
                                          .set_id(CALC_BUTTON_IDS[CALC_BUTTON_CANCEL])};
 
-
 component selectmenu_factory(const string_view &id, const string_view &placeholder,
                              const span<const string_view> &options);
 
@@ -129,6 +128,8 @@ task<void> calc_ask_vase_detail(const button_click_t &event);
 
 task<void> calc_ask_mirror_own(const button_click_t &event);
 task<void> calc_ask_mirror_detail(const button_click_t &event);
+
+task<void> calc_result(const button_click_t &event);
 
 task<void> calc_under_construction(const button_click_t &event);
 

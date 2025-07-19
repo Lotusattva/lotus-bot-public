@@ -1,8 +1,8 @@
 #ifndef CALCULATOR_STATES_HPP
 #define CALCULATOR_STATES_HPP
 
-#include <string_view>
 #include <array>
+#include <string_view>
 
 using namespace std;
 
@@ -21,6 +21,7 @@ enum calc_state_t {
     CALC_ASK_VASE_DETAIL,
     CALC_ASK_MIRROR_OWN,  // whether the user owns a mirror
     CALC_ASK_MIRROR_DETAIL,
+    CALC_RESULT,
 
     NUM_CALC_STATES
 };
@@ -40,6 +41,7 @@ constexpr inline array<string_view, NUM_CALC_STATES> CALC_STATE_IDS{
     "calc_ask_vase_detail",
     "calc_ask_mirror_own",
     "calc_ask_mirror_detail",
+    "calc_result",
 };
 
-#endif // CALCULATOR_STATES_HPP
+#endif  // CALCULATOR_STATES_HPP

@@ -1,8 +1,12 @@
 #include "calculator_interface.hpp"
 
+#include <dpp/dispatcher.h>
+#include <dpp/message.h>
+
 #include <string>
 
 #include "../global.hpp"
+#include "calculator.hpp"
 #include "calculator_types.hpp"
 
 task<void> start_interactive_calculator(const slashcommand_t &event) {
@@ -570,14 +574,14 @@ task<void> calc_ask_pill(const button_click_t &event) {
                                        "must add up to the number of daily pill attempts.\n\n"
                                        "To check your pill bonuses, click on \"Compare BR\" "
                                        "button on another player's profile, then \n"
-                                        "Click on \"Details\" button on the \"Technique\" section, "
-                                        "and click on \"Details\" button that appears on top right "
-                                        "of the panel. Scroll down and record the percentage of "
-                                        "your \"Cultivation Pill Effect\"\n"
-                                        "Repeat this process for \"Curio Collection\" and "
-                                        "\"Immortal Bonus\" sections. Then, report the *sum* of "
-                                        "these percentages.\n"
-                                        "If the total pill bonus is 233% percent, enter 233. \n\n"
+                                       "Click on \"Details\" button on the \"Technique\" section, "
+                                       "and click on \"Details\" button that appears on top right "
+                                       "of the panel. Scroll down and record the percentage of "
+                                       "your \"Cultivation Pill Effect\"\n"
+                                       "Repeat this process for \"Curio Collection\" and "
+                                       "\"Immortal Bonus\" sections. Then, report the *sum* of "
+                                       "these percentages.\n"
+                                       "If the total pill bonus is 233% percent, enter 233. \n\n"
                                        "We will continue once your input is received.")};
 
     co_await event.co_edit_response(
@@ -1156,6 +1160,51 @@ task<void> calc_under_construction(const button_click_t &event) {
 
     co_await event.co_edit_response(under_construction_message);
 
+    calc_sessions.erase(event.command.usr.id);
+
+    co_return;
+}
+
+task<void> calc_result(const button_click_t &event) {
+    calculator_client_t &client{calc_sessions[event.command.usr.id].second};
+    client.calc_state = CALC_RESULT;
+
+    auto result{get_estimated_time_to_breakthrough(client)};
+    component text_display;
+    if (result) {
+        text_display = component()
+                           .set_type(cot_text_display)
+                           .set_content("Estimated time to breakthrough: " +
+                                        to_string(result.value().count() / 24) + " days and " +
+                                        to_string(result.value().count() % 24) + " hours.");
+    } else {
+        string text{"An error occurred while calculating the estimated time to breakthrough: "};
+        using err = calculator_error_t;
+        switch (result.error()) {
+            case err::INVALID_CLIENT:
+                text += "Invalid client info.";
+                break;
+            case err::OVERFLOW_EXP:
+                text += "You already have enough exp to breakthrough to the next major stage.";
+                break;
+            case err::MYRIMON_NOW:
+                text +=
+                    "You can breakthrough to the next major stage now if you consume the "
+                    "amount of myrimon fruits you have set in the calculator client.";
+                break;
+            case err::MYRIMON_CALCULATION_ERROR:
+                text += "Unknown error..";
+                break;
+        }
+        text_display = component().set_type(cot_text_display).set_content(text);
+    }
+
+    co_await event.co_edit_response(
+        message()
+            .set_flags(m_using_components_v2)
+            .add_component_v2(component().set_type(cot_container).add_component_v2(text_display)));
+
+    // clear the session
     calc_sessions.erase(event.command.usr.id);
 
     co_return;
