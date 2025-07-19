@@ -10,10 +10,10 @@ using namespace dpp;
 
 inline string BOT_TOKEN{getenv("BOT_TOKEN")};
 
-inline cluster bot(BOT_TOKEN, intents::i_all_intents); // global bot instance
+inline cluster bot(BOT_TOKEN, intents::i_all_intents);  // global bot instance
 
-inline message_map polls;       // global poll message storage
-inline message_map debug_polls; // global debug poll message storage
+inline message_map polls;        // global poll message storage
+inline message_map debug_polls;  // global debug poll message storage
 
 enum ArrayRole {
     MAGICAL_DRIVER,
@@ -46,14 +46,14 @@ enum Guild {
 };
 
 constexpr inline const snowflake GUILD_IDS[NUM_GUILDS]{
-    1331102316018929705, // Abyss
-    1188528789928554596, // Hermitage
+    1331102316018929705,  // Abyss
+    1188528789928554596,  // Hermitage
 };
 
 // TODO: change channel IDs later
 constexpr inline const snowflake CHANNEL_IDS[NUM_GUILDS]{
-    1366138167958306816, // Abyss
-    1365845286181802034, // Hermitage
+    1366138167958306816,  // Abyss
+    1365845286181802034,  // Hermitage
 };
 
-#endif // GLOBAL_HPP
+#endif  // GLOBAL_HPP
