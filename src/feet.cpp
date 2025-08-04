@@ -1,5 +1,11 @@
 #include "feet.hpp"
 
+#include <string>
+
+#include "global.hpp"
+
+using namespace std;
+
 void feet(const message_create_t& event) {
     // do nothing if message was sent by a bot
     if (event.msg.author.is_bot()) return;
@@ -36,7 +42,8 @@ void feet(const message_create_t& event) {
         pos += 4;  // Move past the word "feet" or "foot"
 
         // check if consecutive characters are digits
-        if (!digit_found && pos < lowercase_no_space.size() && std::isdigit(lowercase_no_space[pos])) {
+        if (!digit_found && pos < lowercase_no_space.size() &&
+            std::isdigit(lowercase_no_space[pos])) {
             digit_found = true;
 
             size_t end_pos{pos};  // end position of the number
@@ -47,7 +54,7 @@ void feet(const message_create_t& event) {
             feet_count += max(std::stoi(lowercase_no_space.substr(pos, end_pos - pos)),
                               0);  // Use max() to prevent integer overflow
             pos = end_pos;         // Move past the number
-            left_bound = pos;  // Update left_bound to the end of the number
+            left_bound = pos;      // Update left_bound to the end of the number
         }
 
         if (!digit_found)

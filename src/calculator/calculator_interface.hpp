@@ -20,7 +20,7 @@ typedef unordered_map<snowflake, pair<message, calculator_client_t>> calc_sessio
 inline calc_session_map calc_sessions;
 
 // Register slashcommands for the calculator
-command_option calculator_commands();
+slashcommand calculator_commands();
 
 // Control flow for calculator subcommands
 task<void> calculator_subcommand_handler(const slashcommand_t &event,

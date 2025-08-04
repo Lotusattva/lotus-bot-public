@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_executable(${PROJECT_NAME} 
+add_executable(${PROJECT_NAME}
     src/main.cpp
     src/calculator/calculator.cpp
     src/calculator/calculator_interface.cpp
@@ -24,3 +24,5 @@ find_package(DPP REQUIRED)
 
 target_link_libraries(${PROJECT_NAME} ${DPP_LIBRARIES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${DPP_INCLUDE_DIRS})
+
+set(CMAKE_BUILD_TYPE "Release")

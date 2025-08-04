@@ -3,9 +3,8 @@
 #include "calculator_interface.hpp"
 #include "calculator_types.hpp"
 
-command_option calculator_commands() {
-    return command_option{co_sub_command_group, string{CALC_MAIN_COMMAND[0]},
-                          string{CALC_MAIN_COMMAND[1]}}
+slashcommand calculator_commands() {
+    return slashcommand{string{CALC_MAIN_COMMAND[0]}, string{CALC_MAIN_COMMAND[1]}, bot.me.id}
         // starting an interactive calculator session
         .add_option(command_option{co_sub_command, string{CALC_SUBCMDS[CALC_SUBCMD_START][0]},
                                    string{CALC_SUBCMDS[CALC_SUBCMD_START][1]}})
