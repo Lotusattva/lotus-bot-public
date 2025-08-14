@@ -18,6 +18,7 @@ add_executable(${PROJECT_NAME}
     src/feet.cpp
     src/poll.cpp
     src/scheduler.cpp
+    src/shin.cpp
 )
 
 find_package(DPP REQUIRED)
@@ -25,4 +26,4 @@ find_package(DPP REQUIRED)
 target_link_libraries(${PROJECT_NAME} ${DPP_LIBRARIES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${DPP_INCLUDE_DIRS})
 
-set(CMAKE_BUILD_TYPE "Release")
+set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type" FORCE)

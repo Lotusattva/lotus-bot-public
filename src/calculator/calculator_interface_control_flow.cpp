@@ -117,7 +117,7 @@ slashcommand calculator_commands() {
 
 task<void> calculator_subcommand_handler(const slashcommand_t &event,
                                          const command_data_option &options) {
-    const command_data_option &subcommand{options.options[0]};
+    const command_data_option &subcommand{options};
 
     if (DEBUG) cerr << "Handling calculator subcommand: " << subcommand.name << endl;
 
